@@ -1,32 +1,33 @@
 ---
 name: brief-setup
-description: Create, show or edit eis-daily-brief.json, the personal config that brief-generate reads before every run - who the user is, output language, where daily notes are written, which sources are on, priority people and channels, meeting and report folders. Use when the user says "configura o daily brief", "setup do brief", "adiciona uma pessoa prioritária", "adiciona um canal", "muda a pasta da daily", "mostra minha config do brief", "set up my daily brief", or runs /brief-setup. With no config found it creates one; with one found it edits it. "--show" prints the config path and contents. "--config PATH" names the folder or file. Interactive by nature; nothing is saved without the user's confirmation. Does not generate the daily note (use brief-generate).
+description: Create, show or edit the plugin's workspace - the .eis-daily-brief/ folder with config.json, the personal config every skill reads before each run, and the user's copy of the daily page - who the user is, output language, where daily notes are written, which sources are on, priority people and channels, meeting and report folders. Use when the user says "configura o daily brief", "setup do brief", "adiciona uma pessoa prioritária", "adiciona um canal", "muda a pasta da daily", "mostra minha config do brief", "set up my daily brief", or runs /brief-setup. With no config found it creates the workspace in a folder the user chooses; with one found it edits the config. "--show" prints the config path and contents. "--config PATH" names the folder or file. Interactive by nature; nothing is saved without the user's confirmation. Does not generate the daily note (use brief-generate).
 ---
 
 # brief-setup
 
-Fill the config the first time, then add or change things in it. The config schema and the rules for finding the file are in `../../references/config.md` (relative to this skill's folder); read it before step 2.
+Fill the config the first time, then add or change things in it. The workspace layout, the rules for finding it, the config schema and how to install the page are in `../../references/config.md` (relative to this skill's folder); read it before step 1.
 
 Write the conversation in the language the user writes in.
 
 ## What must always be true
 
-- The only file this skill writes is `eis-daily-brief.json`, in the folder the user chose. Never write to `~/.claude/`, `${CLAUDE_PLUGIN_DATA}`, the plugin's own folder or any hidden location, and never create a pointer file anywhere else.
+- This skill writes only inside `.eis-daily-brief/` in the folder the user chose: `config.json` and the page copy in `app/`. Never write to `~/.claude/`, `${CLAUDE_PLUGIN_DATA}`, the plugin's own folder or any other place, and never create a pointer file anywhere else.
 - Every question, form or folder picker is preceded by one or two sentences saying why it is asked and what will be done with the answer. In Cowork, text written between tool calls is not shown to the user, so that context goes through the user-message tool before the picker.
 - Never invent values. What can be inferred from the connected tools is proposed and confirmed, never saved silently.
 - Nothing is written before the user confirms the final summary.
 
 ## Steps
 
-### 1. Where the config lives
+### 1. Where the workspace lives
 
-Look for an existing `eis-daily-brief.json` as described in `references/config.md`.
+Look for an existing workspace as described in `references/config.md`.
 
-- **Found**: say where it is and go to step 3 (edit mode). With `--show`, print the path and the contents and stop.
+- **Found**: say where it is and go to step 3 (edit mode). With `--show`, print the path and the contents of `config.json` and stop.
+- **Found in the older layout** (`eis-daily-brief.json` straight in the folder): say so and offer to move it to `.eis-daily-brief/config.json` in the same folder. Move it only after a yes (create the folder, write the same content, then delete the old file); on a no, keep editing the old file. Either way, the page goes to `.eis-daily-brief/app/` next to it (step 4). Then go to step 3.
 - **Not found**: tell the user, before asking anything else:
-  - the settings will be saved in a file named `eis-daily-brief.json` in the folder they choose;
-  - they can edit that file by hand whenever they want;
-  - every time the brief runs, it reads that file again, so the folder must be connected (or passed with `--config`) on every run.
+  - a folder named `.eis-daily-brief` will be created inside the folder they choose (the root of their notes vault is a good place). It holds `config.json`, with all the settings, and `app/`, their copy of the daily page;
+  - they can edit `config.json` by hand whenever they want;
+  - every time the brief runs, it reads that file again, so the chosen folder must be connected (or passed with `--config`) on every run.
 
   Then ask for the folder. In Cowork use the native folder picker (request a folder connection); on other hosts, ask for the path. If a folder is already connected, offer it as the default.
 
@@ -48,6 +49,13 @@ Show a short summary of the current config (counts and key values, not the raw J
 
 ### 4. Confirm and save
 
-Show the final values in a short readable summary and the diff when editing. Save only after the user confirms. Write valid JSON with `schemaVersion: 1`, two-space indentation.
+Show the final values in a short readable summary and the diff when editing. Save only after the user confirms:
 
-Finish with: the path of the file, a one-line reminder that it can be edited by hand, and the next step (`/brief-generate`, or schedule it with the folder connected or with `--config {{path}}` in the scheduled prompt).
+1. Create `.eis-daily-brief/` in the chosen folder when it doesn't exist.
+2. Write `config.json` there: valid JSON with `schemaVersion: 1`, two-space indentation.
+3. Install or update the page copy in `.eis-daily-brief/app/`, as "The page" in `references/config.md` says.
+
+Finish with:
+- the path of `config.json` and a one-line reminder that it can be edited by hand;
+- the address of the page (`file:///…/.eis-daily-brief/app/index.html`, as the user's computer sees it). On its first opening the user picks the notes folder (`output.folder`) in **Configurações → Escolher pasta**: browsers never let a page open a folder from a path;
+- the next step: `/brief-generate`, or `/brief-view` to generate (when needed) and open the page, or a schedule with the folder connected or with `--config {{path}}` in the scheduled prompt.

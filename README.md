@@ -6,9 +6,9 @@ It works in Claude Code, Cowork and Hermes.
 
 ## Skills
 
-- `brief-setup`: creates, shows (`--show`) or edits the config file `eis-daily-brief.json`. Interactive. The first question is the folder where the file will live.
+- `brief-setup`: creates, shows (`--show`) or edits your workspace, `.eis-daily-brief/`, with the config and your copy of the daily page. Interactive. The first question is the folder where the workspace will live.
 - `brief-generate`: writes the note for the day from the config. Runs unattended, so it can be scheduled. Without a config it stops with `STATUS: BLOCKED` and says how to make the file reachable. When you run it yourself, it ends by offering to open the daily page; scheduled runs never ask. Flags: `--date YYYY-MM-DD`, `--config PATH`, `--force`, `--no-view`.
-- `brief-view`: opens the daily page (below) in the host's preview pane or in the default browser. When today's note doesn't exist yet, it runs `brief-generate` first. Flag: `--config PATH`.
+- `brief-view`: opens your copy of the daily page (below) in the host's preview pane or in the default browser, or gives you its address when the session can't open it. When today's note doesn't exist yet, it runs `brief-generate` first. Flag: `--config PATH`.
 
 ## What the note has
 
@@ -18,9 +18,10 @@ Sources, each one optional: calendar, messenger, e-mail, meeting notes, status r
 
 ## The daily page
 
-The plugin ships a local web page, `src/app/index.html`, that shows the latest daily note as a task dashboard: open tasks, new this week, due today and overdue; tasks grouped by topic, with filters and sorting. Marking a task done, adding a comment or adding a task writes to the note at once, in the brief's format, and changes made in the note show on the page in a few seconds.
+The plugin ships a local web page, `src/app/`, that shows the latest daily note as a task dashboard: open tasks, new this week, due today and overdue; tasks grouped by topic, with filters and sorting. Marking a task done, adding a comment or adding a task writes to the note at once, in the brief's format, and changes made in the note show on the page in a few seconds.
 
 - No server and no install: plain HTML, CSS and JavaScript, opened straight from disk.
+- You open your copy, `.eis-daily-brief/app/index.html` in your workspace, never the plugin's folder: the plugin folder moves on every update (in some hosts it lives in a temporary folder), and the browser keeps your choices per page address. `brief-setup` and `brief-view` keep the copy current, so its address never changes.
 - The first time, pick the folder of the daily notes in **Configurações** (the same folder as `output.folder`). Until then it shows sample data.
 - It needs a Chromium browser (Chrome, Edge, Arc, Dia, Brave) or a host preview pane that opens local files (Hermes desktop does). Safari and Firefox can't pick folders. Chat artifacts and inline widgets run sandboxed and can't reach your files.
 - Filters, sorting and the chosen folder stay in the browser. The page never writes anything but the note.
@@ -57,7 +58,15 @@ The skills show up as `eis-daily-brief:brief-setup` and `eis-daily-brief:brief-g
 
 ## Configuration
 
-Everything personal (who you are, language, notes folder, sources that are on, priority people and channels, meeting and report folders) lives in `eis-daily-brief.json`, in a folder you choose during setup. You can edit it by hand; the brief reads it again before every run. The plugin never writes to `~/.claude/`, `${CLAUDE_PLUGIN_DATA}` or its own folder. Schema in [`src/references/config.md`](src/references/config.md).
+Everything the plugin keeps for you lives in one folder, `.eis-daily-brief/`, that `brief-setup` creates inside a folder you choose (the root of your notes vault works well; Obsidian ignores dot folders):
+
+```
+<your folder>/.eis-daily-brief/
+├── config.json   who you are, language, notes folder, sources, priority people and channels, meeting and report folders
+└── app/          your copy of the daily page
+```
+
+You can edit `config.json` by hand; the skills read it again before every run. The plugin never writes to `~/.claude/`, `${CLAUDE_PLUGIN_DATA}` or its own folder. Schema in [`src/references/config.md`](src/references/config.md). A config from before v0.5.0 (`eis-daily-brief.json` straight in the folder) still works; `brief-setup` offers to move it.
 
 The skills look for the file in this order:
 
@@ -70,7 +79,7 @@ The skills look for the file in this order:
 `brief-generate` asks no questions, so it can run on a schedule. Put the config path in the scheduled prompt:
 
 - **Cowork / Claude Desktop**: a scheduled task with `/brief-generate`, with the config folder connected.
-- **Hermes**: a cron job, for example `hermes cron create "15 8 * * 1-5" "/eis-daily-brief:brief-generate --config /path/to/eis-daily-brief.json" --skill eis-daily-brief:brief-generate`.
+- **Hermes**: a cron job, for example `hermes cron create "15 8 * * 1-5" "/eis-daily-brief:brief-generate --config /path/to/.eis-daily-brief" --skill eis-daily-brief:brief-generate`.
 
 ## Closing tasks automatically
 

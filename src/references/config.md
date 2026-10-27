@@ -1,18 +1,44 @@
-# Config file - eis-daily-brief.json
+# Workspace and config - .eis-daily-brief/
 
-All personal settings of the plugin live in one JSON file named `eis-daily-brief.json`, in a folder the user chose during `brief-setup`. The user may edit it by hand at any time; `brief-generate` reads it again before every run.
+Everything the plugin keeps for a user lives in one folder, `.eis-daily-brief/`, created by `brief-setup` inside a folder the user chose (for example the root of their notes vault):
 
-Never store this file, a copy of it or a pointer to it in `~/.claude/`, `${CLAUDE_PLUGIN_DATA}`, the plugin's own folder or any other hidden location. In Cowork the plugin can only read and write inside folders connected to the session, so the file must live in a folder the user connects.
+```
+<folder the user chose>/
+└── .eis-daily-brief/          the workspace
+    ├── config.json            all personal settings (schema below)
+    └── app/                   the user's copy of the daily page (see "The page")
+        ├── index.html
+        └── VERSION            plugin version of this copy
+```
 
-## Finding the file
+The user may edit `config.json` by hand at any time; every skill reads it again before every run. The leading dot keeps the folder out of note apps (Obsidian, for example, ignores dot folders).
 
-Every skill looks for the file in this order and stops at the first hit:
+Never store the workspace, a copy of it or a pointer to it in `~/.claude/`, `${CLAUDE_PLUGIN_DATA}`, the plugin's own folder or any other place than the folder the user chose. In Cowork the plugin can only read and write inside folders connected to the session, so the user must connect the folder that holds `.eis-daily-brief/`.
 
-1. A path given in the request, as `--config {{path}}` or in prose (a folder or the file itself). This is the way for scheduled runs and agents without a connected folder.
-2. `eis-daily-brief.json` at the root of a folder connected to the session, or one level below it. On hosts without folder connection, the session's working directory counts as the connected folder.
+**Older layout.** Before v0.5.0 the config was a file named `eis-daily-brief.json` straight in the chosen folder. Skills still read it. Its workspace is the `.eis-daily-brief/` folder next to it (the page goes there). `brief-setup` offers to move the file to `.eis-daily-brief/config.json`.
+
+## Finding the workspace
+
+Every skill looks for it in this order and stops at the first hit:
+
+1. A path given in the request, as `--config {{path}}` or in prose: the chosen folder, the `.eis-daily-brief/` folder or the config file itself. This is the way for scheduled runs and agents without a connected folder.
+2. `.eis-daily-brief/config.json` (or the older `eis-daily-brief.json`) at the root of a folder connected to the session, or one level below it. On hosts without folder connection, the session's working directory counts as the connected folder.
 3. A path the host keeps for this user across sessions: an entry in the host's persistent memory, a line in the user's instructions file, or the `EIS_DAILY_BRIEF_CONFIG` environment variable when the session can read environment variables.
 
-Nothing else: no searching parent folders, home directories or hidden folders.
+Nothing else: no searching parent folders, home directories or other hidden folders.
+
+## The page
+
+The plugin ships a page, `app/` in the plugin's own folder, that shows the latest daily note and writes changes back to it. The user opens **their copy** in `.eis-daily-brief/app/`, never the plugin's: the plugin folder moves on every update (and in some hosts lives in a temporary folder), and the browser keeps the chosen notes folder per page address. A copy in the workspace keeps one address forever.
+
+**Install or update the copy** (`brief-setup` after saving, `brief-view` before opening):
+
+1. Read the plugin version from the plugin's manifest (`plugin.json` at the plugin root, two levels above a skill's folder).
+2. If `.eis-daily-brief/app/VERSION` exists and holds that version, the copy is current: do nothing.
+3. Otherwise replace `.eis-daily-brief/app/` with the plugin's `app/` folder: every file and subfolder, same names, nothing else. Use a shell copy when the session has one; else read and write each file. Then write the version in `.eis-daily-brief/app/VERSION`.
+4. The copy holds no personal data: never write config values or notes into it.
+
+**The address to give the user** is the absolute path of `.eis-daily-brief/app/index.html` **as the user's computer sees it** (`file:///…`). Hosts that run the session in an isolated environment mount the user's folders under another path: map it back to the user's path (the host shows both, or use the folder path the user gave in setup). If that is not possible, say it is `<folder you chose>/.eis-daily-brief/app/index.html`.
 
 ## Schema
 
@@ -63,7 +89,7 @@ Nothing else: no searching parent folders, home directories or hidden folders.
 - `me` identifies the user in messenger, email and calendar ("did I reply?", "am I the organizer?"). Required.
 - `language` is the language of everything written in the daily note. Section names of the template never change.
 - `windowDays` is how far back calendar, messenger and email are read. The closing check ignores it.
-- `output.folder` is required. `pattern` is relative to it; `YYYY`, `MM` and `DD` are replaced by the run date.
+- `output.folder` is required. It is also the folder the user picks in the page's settings. `pattern` is relative to it; `YYYY`, `MM` and `DD` are replaced by the run date.
 - `sources` turns each source on or off. A source that is on but has no connected tool is skipped silently. `tracker` is only used to close tasks that link to an issue (it never creates tasks); a missing `tracker` key counts as on.
 - `people` and `channels` are the priority list for the messenger; messages from anyone else that ask the user something directly still count, but these are read first.
 - `meetings.folders`, `reports.folders` and `vault.path` are optional; a missing one turns that part off.

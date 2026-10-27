@@ -38,10 +38,17 @@
 - **`brief-generate` oferece abrir a página** no fim, com uma pergunta de sim ou não. Só quando uma pessoa iniciou a execução: agendamento (tarefa agendada, cron), `--no-view` ou chamada vinda do `brief-view` pulam a oferta. A regra "roda sem perguntas" continua valendo durante a geração.
 - **Uma skill chama a outra pelo caminho do `SKILL.md`** (`../brief-view/SKILL.md`), sem nome de ferramenta de host: funciona igual no Claude e no Hermes. Cada lado sabe pular a parte que o outro já fez, para não haver laço.
 
+## 2026-10-27 — v0.5.0, workspace `.eis-daily-brief/`
+
+- **Problema**: no Claude Desktop a skill roda isolada e não abre o navegador; o plugin fica numa pasta temporária que muda a cada versão. Como o navegador guarda a pasta escolhida por endereço da página, o usuário perderia a escolha a cada atualização.
+- **Decisão**: o `brief-setup` cria `.eis-daily-brief/` na pasta que o usuário escolhe. Lá ficam `config.json` e `app/`, a cópia da página. O `brief-view` (e o setup) atualiza a cópia quando `app/VERSION` difere da versão do plugin, e abre sempre essa cópia: o endereço nunca muda. Funciona igual em qualquer host, porque a pasta escolhida é alcançável em todos (pasta conectada no Cowork, caminho no Hermes e no Claude Code).
+- **Ponto com ponto na frente**: apps de notas (Obsidian) ignoram, então a página e a config não viram notas.
+- **Compatibilidade**: `eis-daily-brief.json` solto na pasta continua sendo lido; o workspace dele é o `.eis-daily-brief/` ao lado. O setup oferece mover.
+- **Sem workspace, o `brief-view` para** e indica o `brief-setup`: não há cópia da página para abrir, e abrir a do plugin traria de volta o endereço instável.
+
 ## Pendente
 
 - Testar `brief-setup` no Cowork (seletor de pasta) e `brief-generate` agendado com `--config`.
 - Inferência de pessoas e canais pelo messenger no setup: está descrita, não testada.
 - `.gitkeep` em `src/skills/` pode ser removido.
 - Página: textos da interface em português; seguir o `language` da config.
-- Página: após atualizar o plugin a página muda de pasta e o navegador pede a pasta das dailies de novo.

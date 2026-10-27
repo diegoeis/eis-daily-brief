@@ -1,6 +1,6 @@
 ---
 name: brief-generate
-description: Generate the daily brief as a Markdown note - agenda, tasks (new and migrated from the previous daily, closed automatically when the source shows they were done), pending issues by person, important topics and concluded items - from calendar, messenger, e-mail, meeting notes, reports and the previous daily, using the people, channels and folders saved in eis-daily-brief.json. Use when the user says "gera minha daily", "roda o daily brief", "monta a nota do dia", "daily de hoje", "generate my daily brief", or runs /brief-generate, and when a scheduled task asks for the daily brief. Arguments - "--date YYYY-MM-DD" builds the note for another date (default today); "--config PATH" names the folder or file of the config; "--force" overwrites an existing note for that date. Runs unattended - no questions while building, no connector suggestions, no HTML artifacts; only at the end of a run a person started does it offer to open the daily page (brief-view), never in a scheduled run. "--no-view" skips that offer. brief-view also runs this skill when today's note is missing. Stops when the config is not found. Does not create or edit the config (use brief-setup).
+description: Generate the daily brief as a Markdown note - agenda, tasks (new and migrated from the previous daily, closed automatically when the source shows they were done), pending issues by person, important topics and concluded items - from calendar, messenger, e-mail, meeting notes, reports and the previous daily, using the people, channels and folders saved in the config (.eis-daily-brief/config.json). Use when the user says "gera minha daily", "roda o daily brief", "monta a nota do dia", "daily de hoje", "generate my daily brief", or runs /brief-generate, and when a scheduled task asks for the daily brief. Arguments - "--date YYYY-MM-DD" builds the note for another date (default today); "--config PATH" names the folder or file of the config; "--force" overwrites an existing note for that date. Runs unattended - no questions while building, no connector suggestions, no HTML artifacts; only at the end of a run a person started does it offer to open the daily page (brief-view), never in a scheduled run. "--no-view" skips that offer. brief-view also runs this skill when today's note is missing. Stops when the config is not found. Does not create or edit the config (use brief-setup).
 ---
 
 # brief-generate
@@ -11,9 +11,9 @@ Start the chat output with one line `STATUS: OK | WARN | BLOCKED`.
 
 ## 1. Load the config
 
-Find `eis-daily-brief.json` as described in `../../references/config.md` (relative to this skill's folder) and read it on every run; the user may have edited it by hand.
+Find the workspace and its config as described in `../../references/config.md` (relative to this skill's folder) and read the config on every run; the user may have edited it by hand.
 
-- **Not found**: stop with `STATUS: BLOCKED` and tell the user that `eis-daily-brief.json` was not found, that its path must be reachable as described in that reference (a connected folder, `--config`, or a path the host keeps for the user), and that `/brief-setup` creates it if it doesn't exist yet. Do nothing else.
+- **Not found**: stop with `STATUS: BLOCKED` and tell the user that the config (`.eis-daily-brief/config.json`) was not found, that its path must be reachable as described in that reference (a connected folder, `--config`, or a path the host keeps for the user), and that `/brief-setup` creates it if it doesn't exist yet. Do nothing else.
 - **Invalid JSON or missing `me` / `output.folder`**: stop with `STATUS: BLOCKED`, naming the problem.
 - A note already exists for the run date and there is no `--force`: stop with `STATUS: BLOCKED` and the path.
 
