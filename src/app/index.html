@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Daily brief</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<!-- The whole app is this one page: on file:// browsers may keep storage (the chosen folder, view prefs)
+     per page file, so separate pages would not share it. Views switch by #hash (js/app.js).
+     vendor/eis-ds.css is a trimmed copy of the eis-ds design system: built by scripts/vendor-eis-ds.py, never edited by hand. -->
+<link rel="stylesheet" href="vendor/eis-ds.css">
+<link rel="stylesheet" href="css/daily.css">
+<link rel="stylesheet" href="css/settings.css">
+</head>
+<body class="eis-app-shell">
+
+<aside class="eis-app-sidebar" aria-label="Barra lateral">
+  <p class="eis-app-brand"><a href="#daily">DAILY BRIEF</a> <span class="eis-mono">v0.3</span></p>
+  <nav class="eis-app-nav" aria-label="Principal">
+    <section class="eis-app-nav__section" aria-labelledby="nav-tasks">
+      <h2 class="eis-label" id="nav-tasks">Tarefas</h2>
+      <ul>
+        <li><a href="#daily" data-view-link="daily">Daily <span class="eis-app-nav__count" id="nav-open-count"></span></a></li>
+      </ul>
+    </section>
+    <section class="eis-app-nav__section" aria-labelledby="nav-system">
+      <h2 class="eis-label" id="nav-system">Sistema</h2>
+      <ul>
+        <li><a href="#settings" data-view-link="settings">Configurações</a></li>
+      </ul>
+    </section>
+  </nav>
+  <footer class="eis-app-sidebar__foot">
+    <dl>
+      <dt class="eis-label">Dados</dt><dd class="eis-mono" id="source-kind">mock</dd>
+    </dl>
+  </footer>
+</aside>
+
+<main class="eis-app-main" id="view-daily" data-view="daily">
+  <header class="eis-app-page-head">
+    <p class="eis-app-page-head__meta"><time class="eis-label" id="today"></time><span class="eis-mono" id="note-path"></span></p>
+    <h1>Daily</h1>
+  </header>
+
+  <p class="brief-notice eis-mono" id="notice" role="status" hidden></p>
+
+  <section class="eis-panel" id="summary" aria-label="Resumo">
+    <dl class="eis-app-metrics" id="metrics"></dl>
+  </section>
+
+  <form class="brief-toolbar" id="toolbar" action="#" aria-label="Filtros das tarefas">
+    <fieldset class="eis-tabs">
+      <legend>Status</legend>
+      <label><input type="radio" name="status" value="open"><span>Abertas</span></label>
+      <label><input type="radio" name="status" value="done"><span>Feitas</span></label>
+      <label><input type="radio" name="status" value="all"><span>Todas</span></label>
+    </fieldset>
+    <div class="brief-toolbar__fields">
+      <div class="eis-field">
+        <label for="filter-group">Grupo</label>
+        <select class="eis-select" id="filter-group" name="group"></select>
+      </div>
+      <div class="eis-field">
+        <label for="sort">Ordenar por</label>
+        <select class="eis-select" id="sort" name="sort">
+          <option value="note">Ordem da nota</option>
+          <option value="due">Prazo</option>
+          <option value="oldest">Mais antigas</option>
+          <option value="newest">Mais recentes</option>
+        </select>
+      </div>
+    </div>
+  </form>
+
+  <section class="eis-panel eis-app-tasks" id="tasks" aria-label="Tarefas por grupo" aria-live="polite"></section>
+
+  <section class="eis-panel" id="markdown-panel">
+    <details class="eis-disclosure">
+      <summary><h2 class="eis-label">Markdown da nota</h2><span class="eis-mono">o que a interface grava no arquivo</span></summary>
+      <pre class="brief-markdown" id="markdown"></pre>
+    </details>
+  </section>
+
+  <section class="eis-panel brief-setup" id="setup-panel" aria-labelledby="setup-h" hidden>
+    <h2 class="eis-label" id="setup-h"></h2>
+    <p id="setup-text"></p>
+    <a class="eis-button eis-button--black" id="setup-link" href="#settings" hidden></a>
+    <button class="eis-button eis-button--black" type="button" id="setup-allow" hidden></button>
+  </section>
+</main>
+
+<main class="eis-app-main" id="view-settings" data-view="settings" hidden>
+  <header class="eis-app-page-head">
+    <p class="eis-app-page-head__meta"><time class="eis-label" id="settings-today"></time></p>
+    <h1>Configurações</h1>
+  </header>
+
+  <section class="eis-panel brief-settings" aria-labelledby="daily-h">
+    <header class="eis-panel__head"><h2 class="eis-label" id="daily-h">Daily</h2><span class="eis-mono">eis-daily-brief</span></header>
+    <div class="brief-settings__body">
+      <div class="eis-field">
+        <label for="daily-folder">Pasta das daily notes</label>
+        <div class="brief-folder">
+          <output class="eis-input brief-folder__value" id="daily-folder" aria-describedby="daily-folder-hint"></output>
+          <button class="eis-button" type="button" id="pick-folder">Escolher pasta</button>
+        </div>
+        <p class="eis-field__hint" id="daily-folder-hint">A mesma pasta de <code>output.folder</code> no <code>eis-daily-brief.json</code>. A tela mostra a nota mais recente, achada pelo padrão de nome da skill: <code>YYYY-MM/YYYY-MM-DD.md</code>.</p>
+        <p class="eis-field__error" id="daily-folder-error" role="status"></p>
+      </div>
+    </div>
+  </section>
+</main>
+
+<script src="js/lib/daily-markdown.js"></script>
+<script src="js/lib/inline-markdown.js"></script>
+<script src="js/lib/format.js"></script>
+<script src="js/lib/view-prefs.js"></script>
+<script src="js/lib/daily-files.js"></script>
+<script src="js/lib/handle-store.js"></script>
+<script src="js/mock/daily-source.js"></script>
+<script src="js/sources/daily-folder-source.js"></script>
+<script src="js/daily.js"></script>
+<script src="js/settings.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

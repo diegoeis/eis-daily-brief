@@ -1,0 +1,54 @@
+/* app/css/daily.css
+   Layout and page-only pieces of the daily page. Tokens from eis-ds only.
+   Never restyles an eis-ds element. */
+
+/* filters: above the tasks panel, outside it. Status on the left, fields on the right */
+.brief-toolbar{display:flex;align-items:flex-end;justify-content:space-between;flex-wrap:wrap;gap:var(--space-200)}
+.brief-toolbar__fields{display:flex;flex-wrap:wrap;gap:var(--space-200)}
+.brief-toolbar .eis-field{inline-size:calc(var(--space-400) * 3)}
+
+/* DS candidate: text button, for small actions inside a row */
+.brief-text-button{border:0;background:none;padding:0;cursor:pointer;
+  font-family:var(--font-family-mono);font-size:var(--font-size-200);color:var(--ink-muted);
+  text-decoration:underline;text-decoration-color:var(--line);text-underline-offset:3px}
+.brief-text-button:hover{color:var(--ink);text-decoration-color:var(--ink)}
+
+/* DS candidate: dated notes under a task (the sub-items of the markdown) */
+.brief-notes{display:flex;flex-direction:column;gap:var(--space-100);margin-top:var(--space-200);
+  padding-left:var(--space-200);border-left:var(--border-width-100) solid var(--line)}
+.brief-note{display:grid;grid-template-columns:calc(var(--space-400) + var(--space-100)) minmax(0,1fr);gap:var(--space-200);
+  font-size:var(--font-size-300);line-height:var(--font-line-height-normal);color:var(--ink-muted)}
+.brief-note time{line-height:inherit}
+
+.brief-note-form{display:flex;flex-wrap:wrap;gap:var(--space-100);margin-top:var(--space-200)}
+.brief-note-form .eis-input{flex:1 1 calc(var(--space-400) * 6)}
+
+.brief-wikilink{color:var(--ink)}
+
+.brief-empty{padding:var(--space-300) var(--space-200)}
+
+/* no open task in the note: message and the form to add one */
+.brief-all-done{display:flex;flex-direction:column;align-items:flex-start;gap:var(--space-200);padding:var(--space-400) var(--space-300)}
+.brief-all-done h2{font-size:var(--font-size-500);font-weight:var(--font-weight-medium);line-height:var(--font-line-height-snug)}
+.brief-all-done p{max-inline-size:60ch;color:var(--ink-muted)}
+.brief-add-task{display:flex;flex-wrap:wrap;align-items:flex-end;gap:var(--space-200);inline-size:100%}
+.brief-add-task__text{flex:1 1 calc(var(--space-400) * 5)}
+.brief-add-task__actions{display:flex;gap:var(--space-100)}
+.brief-all-done + details{border-top:var(--border-width-100) solid var(--line)}
+
+.brief-markdown{margin:0;padding:var(--space-200);max-block-size:60vh;overflow:auto;white-space:pre-wrap;
+  font-family:var(--font-family-mono);font-size:var(--font-size-200);line-height:var(--font-line-height-normal)}
+
+@media (max-width:760px){
+  .brief-note{grid-template-columns:minmax(0,1fr);gap:0}
+}
+@media (max-width:420px){
+  .brief-toolbar__fields,.brief-toolbar .eis-field{inline-size:100%}
+}
+
+/* message about the file (conflict, failed save). Sticky: the user is usually down the list when it shows */
+.brief-notice{position:sticky;top:var(--space-200);z-index:1;margin:0;padding:var(--space-200);background:var(--surface-raised);border:var(--border-width-100) solid var(--accent);border-radius:var(--radius-100);
+  font-size:var(--font-size-200);color:var(--ink)}
+
+/* call to settings when the folder of the daily notes is not chosen yet */
+.brief-setup{display:flex;flex-direction:column;align-items:flex-start;gap:var(--space-200);padding:var(--space-300) var(--space-200)}

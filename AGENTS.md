@@ -12,6 +12,7 @@ O plugin ajuda a fazer um brief diário identificando tarefas e respostas que vo
 - `docs/` guarda specs, decisões e documentação do projeto. Nada aqui entra no pacote.
 - `scripts/` guarda os scripts do projeto. `pack.sh` empacota o plugin; `pii-patterns.txt` lista padrões que não podem aparecer em `src/`. Ele é local e fica fora do git (o modelo versionado é `pii-patterns.example.txt`). Nunca copie o conteúdo dele para arquivos versionados.
 - `dist/` é gerado por `scripts/pack.sh` e fica fora do git. Não edite nada lá.
+- `src/app/` é a página da daily (HTML, CSS e JS puros, abre direto do disco, sem servidor nem build). Ela lê e grava a nota pela File System Access API e é uma página só, com telas por `#hash`: não divida em vários HTML (no `file://` alguns navegadores separam o armazenamento por arquivo). `src/app/vendor/eis-ds.css` é gerado por `scripts/vendor-eis-ds.py`; nunca edite à mão. Os testes da lógica ficam em `tests/` (`npm test`, fora do pacote). Depois de mudar a página, abra-a num navegador e confira a tela antes de commitar.
 - `AGENTS.md`, `CLAUDE.md` e `README.md` ficam na raiz do projeto, nunca em `src/`. Um `CLAUDE.md` na raiz do plugin não é carregado como contexto e faz o `claude plugin validate` emitir aviso.
 
 ## Regras

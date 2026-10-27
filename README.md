@@ -8,12 +8,23 @@ It works in Claude Code, Cowork and Hermes.
 
 - `brief-setup`: creates, shows (`--show`) or edits the config file `eis-daily-brief.json`. Interactive. The first question is the folder where the file will live.
 - `brief-generate`: writes the note for the day from the config. Runs unattended, so it can be scheduled. Without a config it stops with `STATUS: BLOCKED` and says how to make the file reachable. Flags: `--date YYYY-MM-DD`, `--config PATH`, `--force`.
+- `brief-view`: opens the daily page (below) in the host's preview pane or in the default browser.
 
 ## What the note has
 
 Agenda (today and tomorrow, with conflicts), tasks grouped by topic (new ones and open ones migrated from the previous note), pending issues by person, important topics and concluded items. Every line cites its source: a message permalink, an e-mail thread, an issue link or a note in your vault.
 
 Sources, each one optional: calendar, messenger, e-mail, meeting notes, status reports, a tracker, and the previous daily note. Any tool the session has for a source works (connector, MCP server, skill or CLI). A source that is on but has no tool is skipped and reported as a warning.
+
+## The daily page
+
+The plugin ships a local web page, `src/app/index.html`, that shows the latest daily note as a task dashboard: open tasks, new this week, due today and overdue; tasks grouped by topic, with filters and sorting. Marking a task done, adding a comment or adding a task writes to the note at once, in the brief's format, and changes made in the note show on the page in a few seconds.
+
+- No server and no install: plain HTML, CSS and JavaScript, opened straight from disk.
+- The first time, pick the folder of the daily notes in **Configurações** (the same folder as `output.folder`). Until then it shows sample data.
+- It needs a Chromium browser (Chrome, Edge, Arc, Dia, Brave) or a host preview pane that opens local files (Hermes desktop does). Safari and Firefox can't pick folders. Chat artifacts and inline widgets run sandboxed and can't reach your files.
+- Filters, sorting and the chosen folder stay in the browser. The page never writes anything but the note.
+- The interface text is in Portuguese for now.
 
 ## Install
 
@@ -79,12 +90,16 @@ eis-daily-brief/
 │   ├── .claude-plugin/plugin.json   manifest for Claude Code and Cowork
 │   ├── plugin.json                  Agent Plugins v1 manifest (Hermes)
 │   ├── references/config.md
-│   └── skills/
+│   ├── skills/
+│   └── app/                         the daily page (index.html, js/, css/, vendor/eis-ds.css)
 ├── docs/                         specs and decisions
 ├── scripts/
 │   ├── pack.sh                   builds the package in dist/
+│   ├── vendor-eis-ds.py          rebuilds src/app/vendor/eis-ds.css from an eis-ds checkout
 │   ├── pii-patterns.example.txt  template for the pattern list
 │   └── pii-patterns.txt          patterns not allowed in src/ (local, not in git)
+├── tests/                        tests of the page's logic (node --test)
+├── package.json                  npm test (dev only, not packaged)
 ├── dist/                         generated builds (not in git)
 ├── AGENTS.md
 ├── CLAUDE.md
@@ -100,7 +115,10 @@ Test without packaging:
 ```
 claude --plugin-dir ./src
 hermes plugins validate ./src
+npm test
 ```
+
+The page's style is a trimmed copy of [eis-ds](https://github.com/diegoeis/eis-ds) (`src/app/vendor/eis-ds.css`), so the plugin depends on nothing outside itself. When the page starts using another eis-ds class, or eis-ds changes, rebuild it: `python3 scripts/vendor-eis-ds.py /path/to/eis-ds`. Never edit that file by hand.
 
 ## Package
 
