@@ -1,70 +1,113 @@
 # eis-daily-brief
 
-O plugin ajuda a fazer um brief diário identificando tarefas e respostas que você precisa atuar. Ele separa em tópicos, pessoas, e atualiza as tarefas sozinho quando identifica que já foram feitas ao fazer a atualização diária.
+A plugin that builds a daily brief note with the tasks and replies you need to act on. It groups them by topic and by person, and closes tasks by itself when the daily update finds evidence that they were done.
+
+It works in Claude Code, Cowork and Hermes.
 
 ## Skills
 
-- `brief-setup` — cria, mostra (`--show`) ou edita o arquivo de configuração `eis-daily-brief.json`. Interativa. A primeira pergunta é a pasta onde o arquivo vai ficar.
-- `brief-generate` — gera a nota do dia a partir da config. Silenciosa, pode rodar agendada. Sem config, para com `STATUS: BLOCKED` pedindo para conectar a pasta do arquivo. Flags: `--date`, `--config`, `--force`.
+- `brief-setup`: creates, shows (`--show`) or edits the config file `eis-daily-brief.json`. Interactive. The first question is the folder where the file will live.
+- `brief-generate`: writes the note for the day from the config. Runs unattended, so it can be scheduled. Without a config it stops with `STATUS: BLOCKED` and says how to make the file reachable. Flags: `--date YYYY-MM-DD`, `--config PATH`, `--force`.
 
-## Configuração
+## What the note has
 
-Tudo que é pessoal (quem é você, idioma, pasta das notas, fontes ligadas, pessoas e canais prioritários, pastas de reuniões e reports) fica em `eis-daily-brief.json`, numa pasta escolhida no setup. O arquivo pode ser editado à mão; o brief relê antes de cada execução. O plugin nunca grava em `~/.claude/` nem em `${CLAUDE_PLUGIN_DATA}`. Schema em `src/references/config.md`.
+Agenda (today and tomorrow, with conflicts), tasks grouped by topic (new ones and open ones migrated from the previous note), pending issues by person, important topics and concluded items. Every line cites its source: a message permalink, an e-mail thread, an issue link or a note in your vault.
 
-Para agendar: a pasta do arquivo precisa estar conectada à sessão, ou o caminho vai em `--config`.
+Sources, each one optional: calendar, messenger, e-mail, meeting notes, status reports, a tracker, and the previous daily note. Any tool the session has for a source works (connector, MCP server, skill or CLI). A source that is on but has no tool is skipped and reported as a warning.
 
-## Fechamento automático de tarefas
+## Install
 
-Toda tarefa aberta, migrada ou nova, é fechada (`[x]` com `✅ data` e um sub-item com a evidência) quando:
+### Claude Code
 
-- a thread do Slack ou do e-mail mostra que você respondeu ou que quem pediu encerrou o assunto;
-- a issue linkada no tracker (Jira, Linear...) está num status de concluído, com a data em que chegou lá (desligue com `sources.tracker: false`);
-- o report mais recente mostra a tarefa feita ou decidida.
+```
+/plugin marketplace add diegoeis/eis-plugins
+/plugin install eis-daily-brief@eis-plugins
+```
 
-Sem evidência, a tarefa continua aberta.
+### Cowork
 
-## Estrutura
+Download the zip of the latest version (or build it with `./scripts/pack.sh`) and upload it in Claude Desktop > Skills > Personal plugins > +.
+
+### Hermes
+
+```
+hermes plugins install diegoeis/eis-daily-brief/src --enable
+```
+
+The skills show up as `eis-daily-brief:brief-setup` and `eis-daily-brief:brief-generate`. Update with `hermes plugins update eis-daily-brief`.
+
+## Configuration
+
+Everything personal (who you are, language, notes folder, sources that are on, priority people and channels, meeting and report folders) lives in `eis-daily-brief.json`, in a folder you choose during setup. You can edit it by hand; the brief reads it again before every run. The plugin never writes to `~/.claude/`, `${CLAUDE_PLUGIN_DATA}` or its own folder. Schema in [`src/references/config.md`](src/references/config.md).
+
+The skills look for the file in this order:
+
+1. `--config PATH` in the request (a folder or the file itself).
+2. The root of a folder connected to the session, or one level below. In Cowork, connect the folder. In Hermes and other hosts without folder connection, the working directory counts.
+3. A path the host keeps for you: persistent memory, your instructions file, or the `EIS_DAILY_BRIEF_CONFIG` environment variable.
+
+## Scheduling
+
+`brief-generate` asks no questions, so it can run on a schedule. Put the config path in the scheduled prompt:
+
+- **Cowork / Claude Desktop**: a scheduled task with `/brief-generate`, with the config folder connected.
+- **Hermes**: a cron job, for example `hermes cron create "15 8 * * 1-5" "/eis-daily-brief:brief-generate --config /path/to/eis-daily-brief.json" --skill eis-daily-brief:brief-generate`.
+
+## Closing tasks automatically
+
+Every open task, migrated or new, is closed (`[x]` with `✅ date` and a sub-item with the evidence) when:
+
+- the messenger or e-mail thread shows you replied, or the person who asked closed the matter;
+- the linked tracker issue (Jira, Linear...) is in a done status, dated when it got there (turn it off with `sources.tracker: false`);
+- the most recent report shows the task done or decided.
+
+Without evidence, the task stays open. When a closed task came from a checkbox in a vault note, that checkbox is ticked too.
+
+## Project layout
 
 ```
 eis-daily-brief/
-├── src/                    raiz do plugin: só o que entra no pacote
-│   ├── .claude-plugin/plugin.json
+├── src/                          plugin root: only this goes into the package
+│   ├── .claude-plugin/plugin.json   manifest for Claude Code and Cowork
+│   ├── plugin.json                  Agent Plugins v1 manifest (Hermes)
+│   ├── references/config.md
 │   └── skills/
-├── docs/                   specs e documentação do projeto
+├── docs/                         specs and decisions
 ├── scripts/
-│   ├── pack.sh             gera o pacote em dist/
-│   ├── pii-patterns.example.txt   modelo da lista de padrões
-│   └── pii-patterns.txt    padrões proibidos em src/ (local, fora do git)
-├── dist/                   builds gerados (fora do git)
+│   ├── pack.sh                   builds the package in dist/
+│   ├── pii-patterns.example.txt  template for the pattern list
+│   └── pii-patterns.txt          patterns not allowed in src/ (local, not in git)
+├── dist/                         generated builds (not in git)
 ├── AGENTS.md
 ├── CLAUDE.md
 └── README.md
 ```
 
-## Desenvolver
+## Develop
 
-Coloque skills, agents, hooks e outros arquivos do plugin dentro de `src/`, seguindo o [layout padrão de plugins](https://code.claude.com/docs/en/plugins-reference#standard-layout).
+Put skills, agents, hooks and other plugin files inside `src/`, following the [standard plugin layout](https://code.claude.com/docs/en/plugins-reference#standard-layout). Inside a skill, reach other plugin files with paths relative to the skill's folder (`../../references/config.md`), never `${CLAUDE_PLUGIN_ROOT}`: only Claude Code expands it.
 
-Para testar sem empacotar:
+Test without packaging:
 
 ```
 claude --plugin-dir ./src
+hermes plugins validate ./src
 ```
 
-## Empacotar
+## Package
 
-1. A partir do segundo pacote, suba a `version` em `src/.claude-plugin/plugin.json` (o primeiro é `0.1.0`).
-2. Rode:
+1. From the second package on, bump `version` in both `src/.claude-plugin/plugin.json` and `src/plugin.json`.
+2. Run:
 
 ```
 ./scripts/pack.sh
 ```
 
-O script valida o plugin com `claude plugin validate`, procura em `src/` os padrões listados em `scripts/pii-patterns.txt` e gera:
+The script checks that both manifests have the same version, validates the plugin with `claude plugin validate`, searches `src/` for the patterns in `scripts/pii-patterns.txt`, and builds:
 
-- `dist/vX.Y.Z/` — uma cópia limpa de `src/`
-- `dist/vX.Y.Z.zip` — o zip dessa pasta, pronto para importar
+- `dist/vX.Y.Z/`: a clean copy of `src/`
+- `dist/vX.Y.Z.zip`: the zip of that folder, ready to import
 
-Ele para se a versão já existir em `dist/`.
+It stops if the version already exists in `dist/`.
 
-`scripts/pii-patterns.txt` fica fora do git, então sua lista de termos sensíveis nunca chega ao repositório. Quem clonar o projeto cria a própria a partir de `scripts/pii-patterns.example.txt`.
+`scripts/pii-patterns.txt` stays out of git, so your list of sensitive terms never reaches the repository. Anyone who clones the project creates their own from `scripts/pii-patterns.example.txt`.

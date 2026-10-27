@@ -40,6 +40,14 @@ read_key() {
   fi
 }
 
+# src/plugin.json is the Agent Plugins v1 manifest (Hermes). It must carry the same version.
+HERMES_MANIFEST="$SRC/plugin.json"
+if [[ -f "$HERMES_MANIFEST" ]]; then
+  HV="$(MANIFEST="$HERMES_MANIFEST" read_key version)"
+  CV="$(read_key version)"
+  [[ "$HV" == "$CV" ]] || die "version differs: src/plugin.json has \"$HV\", src/.claude-plugin/plugin.json has \"$CV\". Bump both."
+fi
+
 NAME="$(read_key name)"
 VERSION="$(read_key version)"
 [[ -n "$NAME" ]] || die "\"name\" is empty or missing in plugin.json"
@@ -108,3 +116,4 @@ echo ""
 echo "Install:"
 echo "  Claude Code:  claude --plugin-dir \"$OUT_DIR\""
 echo "  Cowork:       Claude Desktop > Skills > Personal plugins > + > upload dist/v$VERSION.zip"
+echo "  Hermes:       hermes plugins install diegoeis/$NAME/src --enable   (or a local path: \"$OUT_DIR\")"

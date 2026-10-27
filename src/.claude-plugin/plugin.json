@@ -1,7 +1,7 @@
 {
   "name": "eis-daily-brief",
-  "version": "0.1.1",
-  "description": "O plugin ajuda a fazer um brief diário identificando tarefas e respostas que você precisa atuar. Ele separa em tópicos, pessoas, e atualiza as tarefas sozinho quando identifica que já foram feitas ao fazer a atualização diária.",
+  "version": "0.2.0",
+  "description": "Daily brief note from calendar, messenger, e-mail, meeting notes and reports: tasks, pending issues by person and important topics, with tasks closed automatically when the source shows they were done.",
   "author": {
     "name": "Diego Eis"
   }

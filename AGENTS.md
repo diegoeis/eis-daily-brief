@@ -7,7 +7,8 @@ O plugin ajuda a fazer um brief diário identificando tarefas e respostas que vo
 ## Onde as coisas ficam
 
 - `src/` é a raiz do plugin. Só o que está aqui entra no pacote. Arquivos do plugin (skills, agents, hooks, `.mcp.json`) ficam sempre dentro de `src/`, seguindo o layout padrão: https://code.claude.com/docs/en/plugins-reference#standard-layout
-- `src/.claude-plugin/plugin.json` é o manifesto e a única fonte da versão (a chave `version`).
+- `src/.claude-plugin/plugin.json` é o manifesto do Claude Code/Cowork; `src/plugin.json` é o manifesto Agent Plugins v1 (Hermes, com `$schema`). Os dois têm a mesma `version`; o `pack.sh` recusa se divergirem.
+- Dentro das skills, arquivos do plugin são referenciados por caminho relativo à pasta da skill (`../../references/config.md`), nunca por `${CLAUDE_PLUGIN_ROOT}` (só o Claude Code expande). Não cite nomes de ferramentas de um host específico: o plugin roda em Claude Code, Cowork e Hermes.
 - `docs/` guarda specs, decisões e documentação do projeto. Nada aqui entra no pacote.
 - `scripts/` guarda os scripts do projeto. `pack.sh` empacota o plugin; `pii-patterns.txt` lista padrões que não podem aparecer em `src/`. Ele é local e fica fora do git (o modelo versionado é `pii-patterns.example.txt`). Nunca copie o conteúdo dele para arquivos versionados.
 - `dist/` é gerado por `scripts/pack.sh` e fica fora do git. Não edite nada lá.
@@ -16,7 +17,7 @@ O plugin ajuda a fazer um brief diário identificando tarefas e respostas que vo
 ## Regras
 
 - Não crie arquivos do projeto (notas, rascunhos, specs) dentro de `src/`.
-- A cada novo pacote (depois do primeiro), suba a `version` em `src/.claude-plugin/plugin.json`. O `pack.sh` recusa uma versão que já existe em `dist/`.
+- A cada novo pacote (depois do primeiro), suba a `version` em `src/.claude-plugin/plugin.json` e em `src/plugin.json`. O `pack.sh` recusa uma versão que já existe em `dist/`.
 - Para empacotar, rode `./scripts/pack.sh` a partir da raiz do projeto.
 - Para testar localmente sem empacotar: `claude --plugin-dir ./src`.
 - Consulte a documentação oficial de plugins antes de criar componentes: https://code.claude.com/docs/en/plugins-reference

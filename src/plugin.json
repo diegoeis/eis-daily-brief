@@ -1,0 +1,10 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "eis-daily-brief",
+  "version": "0.2.0",
+  "description": "Daily brief note from calendar, messenger, e-mail, meeting notes and reports: tasks, pending issues by person and important topics, with tasks closed automatically when the source shows they were done.",
+  "author": {
+    "name": "Diego Eis"
+  },
+  "repository": "https://github.com/diegoeis/eis-daily-brief"
+}

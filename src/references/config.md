@@ -2,14 +2,15 @@
 
 All personal settings of the plugin live in one JSON file named `eis-daily-brief.json`, in a folder the user chose during `brief-setup`. The user may edit it by hand at any time; `brief-generate` reads it again before every run.
 
-Never store this file, a copy of it or a pointer to it in `~/.claude/`, `${CLAUDE_PLUGIN_DATA}`, `${CLAUDE_PLUGIN_ROOT}` or any other hidden location. In Cowork the plugin can only read and write inside folders connected to the session, so the file must live in a folder the user connects.
+Never store this file, a copy of it or a pointer to it in `~/.claude/`, `${CLAUDE_PLUGIN_DATA}`, the plugin's own folder or any other hidden location. In Cowork the plugin can only read and write inside folders connected to the session, so the file must live in a folder the user connects.
 
 ## Finding the file
 
 Every skill looks for the file in this order and stops at the first hit:
 
 1. A path given in the request, as `--config {{path}}` or in prose (a folder or the file itself). This is the way for scheduled runs and agents without a connected folder.
-2. `eis-daily-brief.json` at the root of a folder connected to the session, or one level below it.
+2. `eis-daily-brief.json` at the root of a folder connected to the session, or one level below it. On hosts without folder connection, the session's working directory counts as the connected folder.
+3. A path the host keeps for this user across sessions: an entry in the host's persistent memory, a line in the user's instructions file, or the `EIS_DAILY_BRIEF_CONFIG` environment variable when the session can read environment variables.
 
 Nothing else: no searching parent folders, home directories or hidden folders.
 

@@ -5,13 +5,13 @@ description: Create, show or edit eis-daily-brief.json, the personal config that
 
 # brief-setup
 
-Fill the config the first time, then add or change things in it. The config schema and the rules for finding the file are in `${CLAUDE_PLUGIN_ROOT}/references/config.md`; read it before step 2.
+Fill the config the first time, then add or change things in it. The config schema and the rules for finding the file are in `../../references/config.md` (relative to this skill's folder); read it before step 2.
 
 Write the conversation in the language the user writes in.
 
 ## What must always be true
 
-- The only file this skill writes is `eis-daily-brief.json`, in the folder the user chose. Never write to `~/.claude/`, `${CLAUDE_PLUGIN_DATA}`, `${CLAUDE_PLUGIN_ROOT}` or any hidden location, and never create a pointer file anywhere else.
+- The only file this skill writes is `eis-daily-brief.json`, in the folder the user chose. Never write to `~/.claude/`, `${CLAUDE_PLUGIN_DATA}`, the plugin's own folder or any hidden location, and never create a pointer file anywhere else.
 - Every question, form or folder picker is preceded by one or two sentences saying why it is asked and what will be done with the answer. In Cowork, text written between tool calls is not shown to the user, so that context goes through the user-message tool before the picker.
 - Never invent values. What can be inferred from the connected tools is proposed and confirmed, never saved silently.
 - Nothing is written before the user confirms the final summary.
@@ -29,6 +29,8 @@ Look for an existing `eis-daily-brief.json` as described in `references/config.m
   - every time the brief runs, it reads that file again, so the folder must be connected (or passed with `--config`) on every run.
 
   Then ask for the folder. In Cowork use the native folder picker (request a folder connection); on other hosts, ask for the path. If a folder is already connected, offer it as the default.
+
+  On hosts without folder connection (the session just runs in a working directory), tell the user that later runs will only find the file if its path is passed with `--config` or kept by the host, and offer to save the path in the host's persistent memory when the host has one (see "Finding the file" in `references/config.md`).
 
 ### 2. First fill (new config)
 
@@ -48,4 +50,4 @@ Show a short summary of the current config (counts and key values, not the raw J
 
 Show the final values in a short readable summary and the diff when editing. Save only after the user confirms. Write valid JSON with `schemaVersion: 1`, two-space indentation.
 
-Finish with: the path of the file, a one-line reminder that it can be edited by hand, and the next step (`/brief-generate`, or schedule it with the folder connected or `--config`).
+Finish with: the path of the file, a one-line reminder that it can be edited by hand, and the next step (`/brief-generate`, or schedule it with the folder connected or with `--config {{path}}` in the scheduled prompt).
