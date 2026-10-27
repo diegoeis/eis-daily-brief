@@ -24,9 +24,17 @@ Sources, each one optional: calendar, messenger, e-mail, meeting notes, status r
 /plugin install eis-daily-brief@eis-plugins
 ```
 
-### Cowork
+### Cowork / Claude Desktop (zip)
 
-Download the zip of the latest version (or build it with `./scripts/pack.sh`) and upload it in Claude Desktop > Skills > Personal plugins > +.
+The `src/` folder is the whole plugin. Zip its contents, not the folder itself, so `.claude-plugin/plugin.json` sits at the root of the zip:
+
+```
+git clone https://github.com/diegoeis/eis-daily-brief.git
+cd eis-daily-brief/src
+zip -r ../eis-daily-brief.zip . -x '*.DS_Store'
+```
+
+Then upload `eis-daily-brief.zip` in Claude Desktop > Skills > Personal plugins > +. If you have the repo checked out, `./scripts/pack.sh` builds the same zip in `dist/` and validates it first.
 
 ### Hermes
 
