@@ -7,8 +7,8 @@ It works in Claude Code, Cowork and Hermes.
 ## Skills
 
 - `brief-setup`: creates, shows (`--show`) or edits the config file `eis-daily-brief.json`. Interactive. The first question is the folder where the file will live.
-- `brief-generate`: writes the note for the day from the config. Runs unattended, so it can be scheduled. Without a config it stops with `STATUS: BLOCKED` and says how to make the file reachable. Flags: `--date YYYY-MM-DD`, `--config PATH`, `--force`.
-- `brief-view`: opens the daily page (below) in the host's preview pane or in the default browser.
+- `brief-generate`: writes the note for the day from the config. Runs unattended, so it can be scheduled. Without a config it stops with `STATUS: BLOCKED` and says how to make the file reachable. When you run it yourself, it ends by offering to open the daily page; scheduled runs never ask. Flags: `--date YYYY-MM-DD`, `--config PATH`, `--force`, `--no-view`.
+- `brief-view`: opens the daily page (below) in the host's preview pane or in the default browser. When today's note doesn't exist yet, it runs `brief-generate` first. Flag: `--config PATH`.
 
 ## What the note has
 

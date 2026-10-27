@@ -1,11 +1,11 @@
 ---
 name: brief-generate
-description: Generate the daily brief as a Markdown note - agenda, tasks (new and migrated from the previous daily, closed automatically when the source shows they were done), pending issues by person, important topics and concluded items - from calendar, messenger, e-mail, meeting notes, reports and the previous daily, using the people, channels and folders saved in eis-daily-brief.json. Use when the user says "gera minha daily", "roda o daily brief", "monta a nota do dia", "daily de hoje", "generate my daily brief", or runs /brief-generate, and when a scheduled task asks for the daily brief. Arguments - "--date YYYY-MM-DD" builds the note for another date (default today); "--config PATH" names the folder or file of the config; "--force" overwrites an existing note for that date. Runs unattended - no questions, no connector suggestions, no HTML artifacts. Stops when the config is not found. Does not create or edit the config (use brief-setup).
+description: Generate the daily brief as a Markdown note - agenda, tasks (new and migrated from the previous daily, closed automatically when the source shows they were done), pending issues by person, important topics and concluded items - from calendar, messenger, e-mail, meeting notes, reports and the previous daily, using the people, channels and folders saved in eis-daily-brief.json. Use when the user says "gera minha daily", "roda o daily brief", "monta a nota do dia", "daily de hoje", "generate my daily brief", or runs /brief-generate, and when a scheduled task asks for the daily brief. Arguments - "--date YYYY-MM-DD" builds the note for another date (default today); "--config PATH" names the folder or file of the config; "--force" overwrites an existing note for that date. Runs unattended - no questions while building, no connector suggestions, no HTML artifacts; only at the end of a run a person started does it offer to open the daily page (brief-view), never in a scheduled run. "--no-view" skips that offer. brief-view also runs this skill when today's note is missing. Stops when the config is not found. Does not create or edit the config (use brief-setup).
 ---
 
 # brief-generate
 
-Build the daily note for the run date and write it to the user's notes folder. Runs unattended: never ask questions, never suggest connectors, never build HTML artifacts. Agents may run in parallel to gather sources faster.
+Build the daily note for the run date and write it to the user's notes folder. Runs unattended: never ask questions, never suggest connectors, never build HTML artifacts. The one exception is the offer at the very end ("After the chat output"), and only when a person started the run. Agents may run in parallel to gather sources faster.
 
 Start the chat output with one line `STATUS: OK | WARN | BLOCKED`.
 
@@ -65,3 +65,16 @@ Write to `output.folder` + `output.pattern`, creating folders as needed.
 ## Chat output
 
 `STATUS` line, the path of the note, and up to five bullets with the main points (conflicts, urgent topics, tasks closed automatically, sources skipped).
+
+## After the chat output: offer the daily page
+
+After the chat output, offer to open the daily page, the one `brief-view` opens.
+
+- **Skip the offer** when nobody is there to answer or the page is already on its way:
+  - the run came from a schedule (a scheduled task, a cron job, any prompt that started with no person in the conversation);
+  - the request has `--no-view`;
+  - `brief-view` called this skill (it opens the page right after).
+- **Offer it** after `STATUS: OK` or `WARN`, and after `BLOCKED` because the note for the date already exists (the note is there to see). Never after any other `BLOCKED`.
+- Ask one yes/no question, in the user's language, with the host's way to ask the user (a choice prompt when it has one, else a plain question). For example: "Quer abrir a página da daily?"
+- **Yes**: follow the `brief-view` skill (its `SKILL.md` is `../brief-view/SKILL.md`, relative to this skill's folder), skipping its step 1: the note was just written. Pass `--config` along when this run had it.
+- **No, or no answer**: end the run. Do not ask again.

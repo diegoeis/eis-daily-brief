@@ -32,6 +32,12 @@
 - **eis-ds copiado e enxugado** em `src/app/vendor/eis-ds.css` por `scripts/vendor-eis-ds.py` (só as classes que a página usa), para o plugin não depender de nada fora dele.
 - **Skill `brief-view`** só abre a página: painel de preview do host, senão navegador padrão, senão o link `file://`.
 
+## 2026-10-27 — v0.4.0, generate e view encadeados
+
+- **`brief-view` gera antes de abrir**: confere se a nota de hoje (`output.folder` + `output.pattern`) existe; se não, segue o `brief-generate` (sem `--force`) e abre a página mesmo se ele terminar `BLOCKED`. Sem config, só avisa e abre.
+- **`brief-generate` oferece abrir a página** no fim, com uma pergunta de sim ou não. Só quando uma pessoa iniciou a execução: agendamento (tarefa agendada, cron), `--no-view` ou chamada vinda do `brief-view` pulam a oferta. A regra "roda sem perguntas" continua valendo durante a geração.
+- **Uma skill chama a outra pelo caminho do `SKILL.md`** (`../brief-view/SKILL.md`), sem nome de ferramenta de host: funciona igual no Claude e no Hermes. Cada lado sabe pular a parte que o outro já fez, para não haver laço.
+
 ## Pendente
 
 - Testar `brief-setup` no Cowork (seletor de pasta) e `brief-generate` agendado com `--config`.
