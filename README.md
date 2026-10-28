@@ -7,12 +7,12 @@ It works in Claude Code, Cowork and Hermes.
 ## Skills
 
 - `brief-setup`: creates, shows (`--show`) or edits your workspace, `.eis-daily-brief/`, with the config and your copy of the daily page. Interactive. The first question is the folder where the workspace will live.
-- `brief-generate`: writes the note for the day from the config. Runs unattended, so it can be scheduled. Without a config it stops with `STATUS: BLOCKED` and says how to make the file reachable. When you run it yourself, it ends by offering to open the daily page; scheduled runs never ask. Flags: `--date YYYY-MM-DD`, `--config PATH`, `--force`, `--no-view`.
+- `brief-generate`: writes the note for the day from the config, or updates it when it already exists. Runs unattended, so it can be scheduled, also several times a day. Without a config it stops with `STATUS: BLOCKED` and says how to make the file reachable. When you run it yourself, it ends by offering to open the daily page; scheduled runs never ask. Flags: `--date YYYY-MM-DD`, `--config PATH`, `--force` (rebuild the day's note from the previous one, dropping edits), `--no-view`.
 - `brief-view`: opens your copy of the daily page (below) in the host's preview pane or in the default browser, or gives you its address when the session can't open it. When today's note doesn't exist yet, it runs `brief-generate` first. Flag: `--config PATH`.
 
 ## What the note has
 
-Agenda (today and tomorrow, with conflicts), tasks grouped by topic (new ones and open ones migrated from the previous note), pending issues by person, important topics and concluded items. Every line cites its source: a message permalink, an e-mail thread, an issue link or a note in your vault.
+Agenda (today and tomorrow, with conflicts), tasks grouped by topic (new ones and open ones migrated from the previous note; inside each group, nearest due date first, then most recently created, then highest priority), pending issues by person, important topics and concluded items. Every line cites its source: a message permalink, an e-mail thread, an issue link or a note in your vault.
 
 Sources, each one optional: calendar, messenger, e-mail, meeting notes, status reports, a tracker, and the previous daily note. Any tool the session has for a source works (connector, MCP server, skill or CLI). A source that is on but has no tool is skipped and reported as a warning.
 
@@ -85,15 +85,21 @@ The skills look for the file in this order:
 - **Cowork / Claude Desktop**: a scheduled task with `/brief-generate`, with the config folder connected.
 - **Hermes**: a cron job, for example `hermes cron create "15 8 * * 1-5" "/eis-daily-brief:brief-generate --config /path/to/.eis-daily-brief" --skill eis-daily-brief:brief-generate`.
 
+## Running it again during the day
+
+When the day's note already exists, `brief-generate` updates it instead of stopping: the note is the base, so every task, comment and check you made by hand or on the page stays. The run closes the tasks that were done, adds the new ones, sorts each group again and rewrites the agenda, pending issues, topics and concluded items. If you edit the note while it runs, your edit wins and the run's changes are applied on top. When nothing changed, the file is left untouched. A task you closed never comes back as new.
+
 ## Closing tasks automatically
 
 Every open task, migrated or new, is closed (`[x]` with `✅ date` and a sub-item with the evidence) when:
 
 - the messenger or e-mail thread shows you replied, or the person who asked closed the matter;
 - the linked tracker issue (Jira, Linear...) is in a done status, dated when it got there (turn it off with `sources.tracker: false`);
+- the task came from a vault note (a meeting note, for example) and its checkbox there is done; when the note shows nothing, the messenger, e-mail, tracker and later meeting notes are searched for evidence of the same action;
+- the task has no link (you added it by hand): the same search across the other sources;
 - the most recent report shows the task done or decided.
 
-Without evidence, the task stays open. When a closed task came from a checkbox in a vault note, that checkbox is ticked too.
+A mention, a plan or partial progress is not evidence. Without evidence, the task stays open. When a closed task came from a checkbox in a vault note, that checkbox is ticked too.
 
 ## Project layout
 

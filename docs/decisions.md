@@ -55,6 +55,14 @@
 - **Fora do escopo**: Logseq/outliner, org-mode, tarefas em tabela.
 - **Prova**: o parser novo dá o mesmo modelo e as mesmas edições que o antigo em todas as dailies reais do autor; um formato bem diferente (`# TODO`, `###`, `DD/MM/YYYY`, marcas em texto) passa por parse, marcar, desmarcar, comentar e adicionar.
 
+## 2026-10-27 — v0.7.0, atualização da daily no mesmo dia
+
+- **Problema**: rodar de novo no mesmo dia parava com `BLOCKED` (nota existe), e o `--force` regerava a partir da daily anterior, apagando o que o usuário marcou e comentou na nota ou na página. Um cron de hora em hora não servia para nada depois da 1ª execução.
+- **Decisão**: três modos. *Create* (nota não existe, base = daily anterior), *update* (nota existe, base = a própria nota) e *rebuild* (`--force`, como create). No update, toda tarefa da nota fica como está (abertas, feitas, comentários, tarefas criadas à mão ou pela página); só entram fechamento, sub-item de dedup e posição. Agenda, pendências, tópicos e concluídos são reescritos. Antes de gravar, relê a nota e aplica as mudanças sobre a versão nova se ela mudou durante a execução. Sem mudança, não grava.
+- **Tarefa feita não volta**: dedup de novas contra as tarefas feitas da base e da daily anterior.
+- **Ordem dentro do grupo**: abertas por 📅 mais próximo (atrasadas primeiro, sem data depois), depois ➕ mais recente, depois prioridade mais alta (marcas de `tasks.priority`; sem marca = entre medium e low, como no Obsidian Tasks). Feitas no fim, ✅ mais recente primeiro.
+- **Fechamento por outras fontes**: tarefa vinda de nota do vault fecha pelo checkbox da nota; como nota de reunião quase nunca é atualizada, sem evidência ali a skill busca no messenger, e-mail, tracker e notas de reunião posteriores. Tarefa sem link segue a mesma busca. Menção, plano ou progresso parcial não fecham.
+
 ## Pendente
 
 - Testar `brief-setup` no Cowork (seletor de pasta) e `brief-generate` agendado com `--config`.
