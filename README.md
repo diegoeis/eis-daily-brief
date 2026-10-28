@@ -18,7 +18,7 @@ Sources, each one optional: calendar, messenger, e-mail, meeting notes, status r
 
 ## The daily page
 
-The plugin ships a local web page, `src/app/`, that shows the latest daily note as a task dashboard: open tasks, new this week, due today and overdue; tasks grouped by topic, with filters and sorting. Marking a task done, adding a comment or adding a task writes to the note at once, in the brief's format, and changes made in the note show on the page within 15 seconds (one file check while the tab is visible; nothing runs while it is hidden).
+The plugin ships a local web page, `src/app/`, that shows the latest daily note as a task dashboard: open tasks, new this week, due today and overdue; tasks grouped by topic, with filters and sorting. Marking a task done, adding a comment or adding a task writes to the note at once, in the brief's format, and changes made in the note show on the page within 5 seconds (one file check while the tab is visible; nothing runs while it is hidden).
 
 - No server and no install: plain HTML, CSS and JavaScript, opened straight from disk.
 - You open your copy, `.eis-daily-brief/app/index.html` in your workspace, never the plugin's folder: the plugin folder moves on every update (in some hosts it lives in a temporary folder), and the browser keeps your choices per page address. `brief-setup` and `brief-view` keep the copy current, so its address never changes.
