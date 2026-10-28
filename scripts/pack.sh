@@ -67,6 +67,21 @@ if [[ -n "$NESTED" ]]; then
   die "found a nested .claude-plugin/plugin.json inside src/ (Claude.ai marketplace sync rejects it): $NESTED"
 fi
 
+# Claude Desktop rejects a skill whose frontmatter description has more than 1024 characters,
+# and 'claude plugin validate' doesn't catch it.
+LONG="$(python3 - "$SRC" <<'PY'
+import pathlib, re, sys
+for p in sorted(pathlib.Path(sys.argv[1]).glob("skills/*/SKILL.md")):
+    fm = p.read_text(encoding="utf-8").split("---")[1]
+    m = re.search(r"^description:\s*(.*)$", fm, re.M)
+    n = len(m.group(1).strip().strip('"')) if m else 0
+    if n > 1024: print(f"{p.parent.name} ({n})")
+PY
+)"
+if [[ -n "$LONG" ]]; then
+  die "skill description over 1024 characters (Claude Desktop rejects it): $LONG"
+fi
+
 # Validates the plugin with the official CLI, when available.
 if command -v claude >/dev/null 2>&1; then
   echo "Validating src/ with 'claude plugin validate'..."
