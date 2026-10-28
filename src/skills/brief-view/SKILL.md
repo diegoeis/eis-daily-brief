@@ -1,20 +1,18 @@
 ---
 name: brief-view
-description: Open the daily brief page - a local web page that shows the latest daily note as a task dashboard (open, new this week, due today, overdue; filters by topic; sort) and writes every change back to the markdown in the brief's format (mark done, add a comment, add a task). Use when the user says "abre a daily", "mostra minha daily", "abre o painel da daily", "quero ver minhas tarefas", "open my daily brief", "show the daily dashboard", or runs /brief-view. Before opening, checks that today's note exists; when it doesn't, runs brief-generate first. Opens the page in the host's preview pane when it has one, otherwise in the default browser. "--config PATH" names the workspace (the chosen folder, .eis-daily-brief/ or its config.json). Copies the page into the workspace (.eis-daily-brief/app/) and opens that copy, so its address never changes. Does not change the config (use brief-setup).
+description: Open the daily brief page - a local web page that shows the latest daily note as a task dashboard (open, new this week, due today, overdue; filters by topic; sort) and writes every change back to the markdown in the brief's format (mark done, add a comment, add a task). Use when the user says "abre a daily", "mostra minha daily", "abre o painel da daily", "quero ver minhas tarefas", "open my daily brief", "show the daily dashboard", or runs /brief-view. Before opening, runs brief-generate, which creates today's note or updates it when it exists; "--no-generate" only opens the page. Opens the page in the host's preview pane when it has one, otherwise in the default browser. "--config PATH" names the workspace (the chosen folder, .eis-daily-brief/ or its config.json). Copies the page into the workspace (.eis-daily-brief/app/) and opens that copy, so its address never changes. Does not change the config (use brief-setup).
 ---
 
 # brief-view
 
-Make sure today's daily note exists, then open the user's copy of the daily page, in their workspace (`.eis-daily-brief/app/`). The page reads and writes the latest daily note on disk by itself, so this skill only checks the note, keeps the copy current, opens it and tells the user what to do the first time.
+Bring today's daily note up to date, then open the user's copy of the daily page, in their workspace (`.eis-daily-brief/app/`). The page reads and writes the latest daily note on disk by itself, so this skill only runs the brief, keeps the copy current, opens it and tells the user what to do the first time.
 
 Write to the user in the language they write in.
 
-## 1. Make sure today's note exists
+## 1. Bring today's note up to date
 
 1. Find the workspace and its config as described in `../../references/config.md` (relative to this skill's folder).
-2. **Config found and valid**, and `brief-generate` did not call this skill (when it did, it just wrote the note: go to step 2). Today's note is `output.folder` + `output.pattern`, with `YYYY`, `MM` and `DD` replaced by today's local date.
-   - **The file exists**: go to step 2.
-   - **It doesn't**: tell the user in one line that today's note is missing and will be generated first. Then follow the `brief-generate` skill (its `SKILL.md` is `../brief-generate/SKILL.md`, relative to this skill's folder) for today, passing `--config` along when this run had it, and never `--force`. It must not offer the page at its end: this skill opens it next. Show its chat output, then go to step 2 whatever its `STATUS`. When it ends `BLOCKED`, the page shows the latest earlier note.
+2. **Config found and valid**: go straight to step 2 when `brief-generate` called this skill (it just wrote the note) or when the request has `--no-generate`. Otherwise tell the user in one line that the brief runs first, then follow the `brief-generate` skill (its `SKILL.md` is `../brief-generate/SKILL.md`, relative to this skill's folder) for today: it creates today's note when it doesn't exist and updates it when it does. Pass `--config` along when this run had it, and never `--force`. It must not offer the page at its end: this skill opens it next. Show its chat output, then go to step 2 whatever its `STATUS`. When it ends `BLOCKED`, the page shows the latest note it finds.
 3. **Config not found or invalid**: stop. Say so in one line, with the reason, and that `/brief-setup` creates the workspace with the config and the page. Without a workspace there is no page copy to open.
 
 ## 2. Get the page ready
@@ -34,7 +32,7 @@ Never render the page as a chat artifact or inline widget: those run sandboxed, 
 ## 4. Tell the user, in at most four lines
 
 - The page reads the folder of the daily notes: `output.folder` in the config (name it). The first time, open **Configurações → Escolher pasta** and pick that folder. Until then the page shows sample data.
-- Marking a task, adding a comment or adding a task writes to the note at once, in the brief's format. Changes made in the note (by hand or by `brief-generate`) show on the page in a few seconds.
+- Marking a task, adding a comment or adding a task writes to the note at once, in the brief's format. Changes made in the note (by hand or by `brief-generate`) show on the page within 15 seconds, or as soon as the tab comes back to the front.
 - It needs a Chromium browser (Chrome, Edge, Arc, Dia, Brave) or the host's preview pane. Safari and Firefox can't pick folders.
 - The address never changes, plugin updates included: the copy is updated in place.
 

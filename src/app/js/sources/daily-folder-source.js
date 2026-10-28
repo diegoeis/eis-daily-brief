@@ -15,7 +15,7 @@
 
   var KEY = "daily-folder";
   var DF = root.DailyFiles;
-  var current = null; // { handle, path, text, lastModified }
+  var current = null; // { handle, path, date, text, lastModified }
   var queue = Promise.resolve(); // saves run one at a time: each one checks the text the previous one wrote
 
   function fail(name, message) { var e = new Error(message || name); e.name = name; return e; }
@@ -38,7 +38,7 @@
       return folder().then(function (dir) { return DF.findLatest(dir, today(), root.Workspace.pattern); }).then(function (found) {
         if (!found) throw fail("NoNote");
         return DF.read(found.handle).then(function (file) {
-          current = { handle: found.handle, path: found.path, text: file.text, lastModified: file.lastModified };
+          current = { handle: found.handle, path: found.path, date: found.date, text: file.text, lastModified: file.lastModified };
           return { path: found.path, markdown: file.text };
         });
       });
@@ -57,12 +57,15 @@
     },
 
     /* True when the open note changed on disk, or when a newer note appeared in the folder
-       (the skill wrote today's note while the page was open, or the day turned). */
+       (the skill wrote today's note while the page was open, or the day turned).
+       The open note's date is checked first: one file stat per call. The folder is only walked
+       while the open note is not today's, since no newer note can appear after today's. */
     hasChanged: function () {
       if (!current) return Promise.resolve(false);
       var opened = current;
       return opened.handle.getFile().then(function (file) {
         if (file.lastModified !== opened.lastModified) return true;
+        if (opened.date === today()) return false;
         return folder().then(function (dir) { return DF.findLatest(dir, today(), root.Workspace.pattern); })
           .then(function (found) { return Boolean(found) && found.path !== opened.path; });
       });

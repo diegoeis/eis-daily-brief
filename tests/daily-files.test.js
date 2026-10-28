@@ -59,6 +59,7 @@ test("findLatest picks the latest note by its name, across months", async () => 
   try {
     const found = await DF.findLatest(f.handle, "2026-10-26");
     assert.equal(found.path, "daily/2026-10/2026-10-12.md");
+    assert.equal(found.date, "2026-10-12");
     assert.equal((await DF.read(found.handle)).text, "b");
   } finally { f.cleanup(); }
 });
@@ -120,6 +121,8 @@ test("findLatest follows output.pattern: flat, nested and other separators", asy
     assert.equal((await DF.findLatest(flat.handle, "2026-10-26", "YYYY-MM-DD.md")).path, "daily/2026-10-25.md");
     assert.equal((await DF.findLatest(nested.handle, "2026-10-26", "YYYY/MM/DD.md")).path, "daily/2026/10/02.md");
     assert.equal((await DF.findLatest(other.handle, "2026-10-26", "notes/DD.MM.YYYY.md")).path, "daily/notes/26.10.2026.md");
+    assert.equal((await DF.findLatest(nested.handle, "2026-10-26", "YYYY/MM/DD.md")).date, "2026-10-02");
+    assert.equal((await DF.findLatest(other.handle, "2026-10-26", "notes/DD.MM.YYYY.md")).date, "2026-10-26");
   } finally { flat.cleanup(); nested.cleanup(); other.cleanup(); }
 });
 

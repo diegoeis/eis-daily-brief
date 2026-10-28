@@ -65,6 +65,11 @@
 - **Busca dirigida, não varredura** (v0.7.1): varrer várias fontes por tarefa, desde a criação, custaria tokens demais num cron de hora em hora. A busca é recortada pelo contexto da tarefa, da mais barata para a mais cara, parando na 1ª evidência: (1) notas seguintes da mesma série (mesma pasta, mesmo título sem a data, ou propriedade de série); (2) DMs e e-mails só com as pessoas citadas na tarefa, ou com as 1-2 pessoas da nota de origem (reunião grande sem pessoa citada pula este passo); (3) só as issues citadas. Tarefas agrupadas por pessoa e por série: cada DM/série é lida uma vez por execução. Janela incremental: a partir de `lastCheck` em `.eis-daily-brief/state.json`, gravado no fim de cada execução.
 - **v0.7.2**: o passo de pessoas começa pelas notas do vault que citam a pessoa (propriedade people/attendees ou link para a nota dela) modificadas na janela, antes de DM e e-mail. Thread e issue ligadas a uma tarefa só são abertas inteiras quando tiveram atividade depois do início da janela (última resposta, última atualização); issues numa consulta só. Uso pessoal do autor: cron às 8h (cria a nota) e 18h (atualiza), em vez de hora em hora.
 
+## 2026-10-27 — v0.8.0, brief-view sempre roda o brief
+
+- **`brief-view` roda o `brief-generate` antes de abrir**, não só quando a nota falta: com o modo update, o generate cria ou atualiza, então um único `brief-view` agendado gera, atualiza e abre. `--no-generate` só abre (para quem quer olhar sem gastar uma execução do brief). Substitui a regra da v0.4.0.
+- **Página confere menos**: de 4 s para 15 s, só com a aba visível (já era assim), e a varredura da pasta atrás de nota mais nova só roda enquanto a nota aberta não é a de hoje; com a de hoje aberta, cada checagem é um `getFile()` só. `findLatest` passou a devolver `date`.
+
 ## Pendente
 
 - Testar `brief-setup` no Cowork (seletor de pasta) e `brief-generate` agendado com `--config`.

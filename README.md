@@ -8,7 +8,7 @@ It works in Claude Code, Cowork and Hermes.
 
 - `brief-setup`: creates, shows (`--show`) or edits your workspace, `.eis-daily-brief/`, with the config and your copy of the daily page. Interactive. The first question is the folder where the workspace will live.
 - `brief-generate`: writes the note for the day from the config, or updates it when it already exists. Runs unattended, so it can be scheduled, also several times a day. Without a config it stops with `STATUS: BLOCKED` and says how to make the file reachable. When you run it yourself, it ends by offering to open the daily page; scheduled runs never ask. Flags: `--date YYYY-MM-DD`, `--config PATH`, `--force` (rebuild the day's note from the previous one, dropping edits), `--no-view`.
-- `brief-view`: opens your copy of the daily page (below) in the host's preview pane or in the default browser, or gives you its address when the session can't open it. When today's note doesn't exist yet, it runs `brief-generate` first. Flag: `--config PATH`.
+- `brief-view`: opens your copy of the daily page (below) in the host's preview pane or in the default browser, or gives you its address when the session can't open it. Before opening, it runs `brief-generate`, which creates today's note or updates it, so one scheduled `brief-view` does both. Flags: `--config PATH`, `--no-generate` (only open the page).
 
 ## What the note has
 
@@ -18,7 +18,7 @@ Sources, each one optional: calendar, messenger, e-mail, meeting notes, status r
 
 ## The daily page
 
-The plugin ships a local web page, `src/app/`, that shows the latest daily note as a task dashboard: open tasks, new this week, due today and overdue; tasks grouped by topic, with filters and sorting. Marking a task done, adding a comment or adding a task writes to the note at once, in the brief's format, and changes made in the note show on the page in a few seconds.
+The plugin ships a local web page, `src/app/`, that shows the latest daily note as a task dashboard: open tasks, new this week, due today and overdue; tasks grouped by topic, with filters and sorting. Marking a task done, adding a comment or adding a task writes to the note at once, in the brief's format, and changes made in the note show on the page within 15 seconds (one file check while the tab is visible; nothing runs while it is hidden).
 
 - No server and no install: plain HTML, CSS and JavaScript, opened straight from disk.
 - You open your copy, `.eis-daily-brief/app/index.html` in your workspace, never the plugin's folder: the plugin folder moves on every update (in some hosts it lives in a temporary folder), and the browser keeps your choices per page address. `brief-setup` and `brief-view` keep the copy current, so its address never changes.

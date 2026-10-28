@@ -59,7 +59,8 @@
   }
 
   /* The latest note by the date in its path. Notes dated after `today` (YYYY-MM-DD) are skipped,
-     so a note prepared ahead of time does not replace today's. Returns null when there is none. */
+     so a note prepared ahead of time does not replace today's. Returns { handle, path, date }
+     (date as YYYY-MM-DD), or null when there is none. */
   async function findLatest(folder, today, pattern) {
     var segments = compilePattern(pattern);
     var limit = today ? today.replace(/-/g, "") : null;
@@ -79,7 +80,7 @@
       found.sort(function (a, b) { return a.key < b.key ? 1 : a.key > b.key ? -1 : a.name < b.name ? 1 : -1; });
       for (var i = 0; i < found.length; i++) {
         var f = found[i];
-        if (last) return { handle: f.handle, path: path + "/" + f.name };
+        if (last) return { handle: f.handle, path: path + "/" + f.name, date: f.parts.YYYY + "-" + f.parts.MM + "-" + f.parts.DD };
         var hit = await walk(f.handle, level + 1, f.parts, path + "/" + f.name);
         if (hit) return hit;
       }

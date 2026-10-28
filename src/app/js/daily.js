@@ -64,7 +64,7 @@
   // The real source (folder) when one is set in settings, else the mock. "panel" = what the note area asks of the user.
   var source = window.DailySource;
   var state = { path: "", markdown: "", model: DM.parse(""), prefs: prefsStore.load(), noteFormLine: null, addingTask: false, panel: null };
-  var CHECK_EVERY_MS = 4000;
+  var CHECK_EVERY_MS = 15000;
   var today = DM.toDateKey(new Date());
   var el = function (id) { return document.getElementById(id); };
 
@@ -108,8 +108,9 @@
     });
   }
 
-  /* A change made in the file (Obsidian, the skill) shows here: check the file's date every few
-     seconds while the tab is visible, and look for the latest note again when the tab comes back. */
+  /* A change made in the file (Obsidian, the skill) shows here: check the file's date every
+     15 s while the tab is visible (nothing runs while it is hidden), and load the latest note
+     again when the tab comes back. */
   function watch() {
     // Set up once; the source may change later (mock → folder), so check it on every tick.
     setInterval(function () {
