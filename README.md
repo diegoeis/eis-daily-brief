@@ -62,11 +62,15 @@ Everything the plugin keeps for you lives in one folder, `.eis-daily-brief/`, th
 
 ```
 <your folder>/.eis-daily-brief/
-├── config.json   who you are, language, notes folder, sources, priority people and channels, meeting and report folders
-└── app/          your copy of the daily page
+├── config.json         who you are, language, notes folder, sources, priority people and channels, meeting and report folders
+├── daily-format.json   optional: how you write tasks, when it isn't the plugin's default
+├── page-settings.js    what the page needs from the two files above (written by the skills)
+└── app/                your copy of the daily page
 ```
 
-You can edit `config.json` by hand; the skills read it again before every run. The plugin never writes to `~/.claude/`, `${CLAUDE_PLUGIN_DATA}` or its own folder. Schema in [`src/references/config.md`](src/references/config.md). A config from before v0.5.0 (`eis-daily-brief.json` straight in the folder) still works; `brief-setup` offers to move it.
+You can edit `config.json` by hand; the skills read it again before every run. The plugin never writes to `~/.claude/`, `${CLAUDE_PLUGIN_DATA}` or its own folder. Schema in [`src/references/config.md`](src/references/config.md). **Daily format.** How tasks are written (section heading, groups, task lines, date marks, comments) is data, not code: [`src/references/daily-format.json`](src/references/daily-format.json) is the default, described in [`daily-format.md`](src/references/daily-format.md) with a JSON Schema. If you already write daily notes your own way, `brief-setup` reads a few of them and proposes a `daily-format.json` for your workspace; `brief-generate` writes and the page reads and edits by it. The page also finds your notes by `output.pattern` (for example `YYYY/MM/DD.md`).
+
+A config from before v0.5.0 (`eis-daily-brief.json` straight in the folder) still works; `brief-setup` offers to move it.
 
 The skills look for the file in this order:
 

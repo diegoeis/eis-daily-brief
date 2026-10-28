@@ -1,0 +1,45 @@
+{
+  "$schema": "./daily-format.schema.json",
+  "version": 1,
+  "dates": {
+    "format": "YYYY-MM-DD"
+  },
+  "tasks": {
+    "section": {
+      "heading": "## Tasks",
+      "endsAt": ["## ", "---"]
+    },
+    "group": {
+      "before": "**",
+      "after": "**",
+      "default": "Needs to be done"
+    },
+    "item": {
+      "open": "- [ ] ",
+      "done": ["- [x] ", "- [X] "],
+      "newPrefix": "new - ",
+      "sourceSeparators": [" — ", " -- "]
+    },
+    "fields": {
+      "created": "➕",
+      "due": "📅",
+      "completed": "✅",
+      "ignore": ["⏳", "🛫"]
+    },
+    "priority": {
+      "🔺": "highest",
+      "⏫": "high",
+      "🔼": "medium",
+      "🔽": "low",
+      "⏬": "lowest",
+      "⬇️": "low",
+      "⬇": "low"
+    },
+    "comment": {
+      "indent": "    ",
+      "prefix": "- ",
+      "line": "{date} - {text}",
+      "closedPrefixes": ["Fechada:", "Fechado:", "Closed:"]
+    }
+  }
+}

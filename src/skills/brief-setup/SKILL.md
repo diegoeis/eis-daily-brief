@@ -11,7 +11,7 @@ Write the conversation in the language the user writes in.
 
 ## What must always be true
 
-- This skill writes only inside `.eis-daily-brief/` in the folder the user chose: `config.json` and the page copy in `app/`. Never write to `~/.claude/`, `${CLAUDE_PLUGIN_DATA}`, the plugin's own folder or any other place, and never create a pointer file anywhere else.
+- This skill writes only inside `.eis-daily-brief/` in the folder the user chose: `config.json`, `daily-format.json`, `page-settings.js` and the page copy in `app/`. Never write to `~/.claude/`, `${CLAUDE_PLUGIN_DATA}`, the plugin's own folder or any other place, and never create a pointer file anywhere else.
 - Every question, form or folder picker is preceded by one or two sentences saying why it is asked and what will be done with the answer. In Cowork, text written between tool calls is not shown to the user, so that context goes through the user-message tool before the picker.
 - Never invent values. What can be inferred from the connected tools is proposed and confirmed, never saved silently.
 - Nothing is written before the user confirms the final summary.
@@ -42,10 +42,11 @@ Ask in short rounds, at most five related fields per round, and skip anything al
 3. **Priority people**: names grouped as the user wants (e.g. leadership, own team, stakeholders), with an optional lead for each. When a messenger is connected, propose the people the user talks to most in the last weeks and let them pick.
 4. **Priority channels**: name and URL. When a messenger is connected, propose the channels the user is active in.
 5. **Meetings and reports**: folders with meeting notes, terms found in meeting titles to read, terms for high-priority meetings, folders with status reports, path of the notes vault. When the user doesn't use one of these, leave it out.
+6. **Daily format**: when `output.folder` already has daily notes (found by `output.pattern`), ask whether the brief should keep writing tasks the way those notes do. On a yes, describe their format as "Describing a user's format" in `../../references/daily-format.md` says, and keep the result for step 4. On a no, or with no notes yet, use the default format: write no file.
 
 ### 3. Edit mode (existing config)
 
-Show a short summary of the current config (counts and key values, not the raw JSON) and ask what to change. Accept free text ("adiciona a Maria no time", "tira o canal X", "troca a pasta da daily"). Change only what was asked and keep every other key, including keys the user added by hand.
+Show a short summary of the current config (counts and key values, not the raw JSON) and whether the workspace has its own daily format, and ask what to change. "Troca o formato da daily" redoes question 6 of the first fill; "volta ao formato padrão" deletes `daily-format.json` after a yes. Accept free text ("adiciona a Maria no time", "tira o canal X", "troca a pasta da daily"). Change only what was asked and keep every other key, including keys the user added by hand.
 
 ### 4. Confirm and save
 
@@ -53,7 +54,8 @@ Show the final values in a short readable summary and the diff when editing. Sav
 
 1. Create `.eis-daily-brief/` in the chosen folder when it doesn't exist.
 2. Write `config.json` there: valid JSON with `schemaVersion: 1`, two-space indentation.
-3. Install or update the page copy in `.eis-daily-brief/app/`, as "The page" in `references/config.md` says.
+3. When the user confirmed a daily format, write it as `daily-format.json` there (two-space indentation, valid against `../../references/daily-format.schema.json`).
+4. Install or update the page copy in `.eis-daily-brief/app/` and write `page-settings.js`, as "The page" in `references/config.md` says.
 
 Finish with:
 - the path of `config.json` and a one-line reminder that it can be edited by hand;

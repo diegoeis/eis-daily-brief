@@ -6,6 +6,9 @@
   "use strict";
 
   var DM = window.DailyMarkdown;
+  var WS = window.Workspace; // the daily format and file pattern from the user's workspace
+  // The mock note is written in the default format, whatever the user's is.
+  function fmt() { return source.kind === "mock" ? DM.DEFAULT : WS.format; }
   var MD = window.InlineMarkdown;
   var F = window.Format;
   var esc = MD.escapeHtml;
@@ -45,10 +48,11 @@
     panels: {
       setup: { title: "Pasta das daily notes", text: "Escolha a pasta onde a skill grava as daily notes para a tela ler e gravar a nota de verdade.", link: "Configurar pasta" },
       permission: { title: "Acesso à pasta", text: "O navegador pede para liberar de novo a pasta das daily notes.", allow: "Permitir acesso" },
-      noNote: { title: "Nenhuma nota na pasta", text: "A pasta escolhida não tem nota no padrão AAAA-MM/AAAA-MM-DD.md até hoje.", link: "Trocar a pasta" }
+      noNote: { title: "Nenhuma nota na pasta", text: function (p) { return "A pasta escolhida não tem nota no padrão " + p + " até hoje."; }, link: "Trocar a pasta" }
     },
     conflict: "A nota mudou fora do painel. Recarreguei a versão do arquivo: refaça a última alteração.",
-    saveError: "Não foi possível gravar a nota. Nada foi alterado no arquivo."
+    saveError: "Não foi possível gravar a nota. Nada foi alterado no arquivo.",
+    badSettings: function (list) { return "Configuração da página inválida, usando o padrão: " + list.join("; ") + "."; }
   };
 
   var prefsStore = window.ViewPrefs.create(
@@ -69,7 +73,7 @@
   function show(note) {
     state.path = note.path;
     state.markdown = note.markdown;
-    state.model = DM.parse(note.markdown);
+    state.model = DM.parse(note.markdown, fmt());
     state.panel = source.kind === "mock" ? "setup" : null;
     render();
   }
@@ -80,7 +84,7 @@
       var name = e && e.name;
       // Folder set in settings but not saved in this browser: show the mock and the call to settings.
       if (name === "NoFolder") { source = window.MockDailySource; return load(); }
-      state.path = ""; state.markdown = ""; state.model = DM.parse("");
+      state.path = ""; state.markdown = ""; state.model = DM.parse("", fmt());
       state.panel = name === "PermissionNeeded" ? "permission" : name === "NoNote" ? "noNote" : null;
       render();
       if (!state.panel) el("tasks").innerHTML = '<p class="brief-empty eis-mono">' + esc(TEXT.loadError) + "</p>";
@@ -93,9 +97,9 @@
   }
 
   function commit(markdown) {
-    notice("");
+    notice(WS.problems.length ? TEXT.badSettings(WS.problems) : "");
     state.markdown = markdown;
-    state.model = DM.parse(markdown);
+    state.model = DM.parse(markdown, fmt());
     render();
     return source.save(markdown).catch(function (e) {
       if (e && e.name === "ConflictError") { notice(TEXT.conflict); return load(); }
@@ -179,7 +183,7 @@
     el("setup-panel").hidden = !p;
     if (!p) return;
     el("setup-h").textContent = p.title;
-    el("setup-text").textContent = p.text;
+    el("setup-text").textContent = typeof p.text === "function" ? p.text(WS.pattern) : p.text;
     el("setup-link").hidden = !p.link;
     el("setup-link").textContent = p.link || "";
     el("setup-allow").hidden = !p.allow;
@@ -324,7 +328,7 @@
 
     tasks.addEventListener("change", function (e) {
       if (!e.target.matches(".eis-checkbox")) return;
-      commit(DM.setTaskDone(state.markdown, Number(e.target.dataset.line), e.target.checked, today));
+      commit(DM.setTaskDone(state.markdown, Number(e.target.dataset.line), e.target.checked, today, fmt()));
     });
 
     tasks.addEventListener("click", function (e) {
@@ -353,13 +357,13 @@
         var task = form.elements.text.value;
         if (!task.trim()) return;
         state.addingTask = false;
-        commit(DM.addTask(state.markdown, { text: task, created: today, due: form.elements.due.value || null }));
+        commit(DM.addTask(state.markdown, { text: task, created: today, due: form.elements.due.value || null }, fmt()));
         return;
       }
       var text = form.elements.note.value;
       if (!text.trim()) return;
       state.noteFormLine = null;
-      commit(DM.addTaskNote(state.markdown, Number(form.dataset.line), today, text));
+      commit(DM.addTaskNote(state.markdown, Number(form.dataset.line), today, text, fmt()));
     });
 
     el("setup-allow").addEventListener("click", function () {
@@ -380,6 +384,7 @@
   }
 
   bind();
+  if (WS.problems.length) notice(TEXT.badSettings(WS.problems));
   // A folder chosen in the settings view: drop the mock and read the folder.
   window.addEventListener("eis-daily-brief:folder-changed", function () {
     source = window.DailyFolderSource;

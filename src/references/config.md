@@ -6,6 +6,8 @@ Everything the plugin keeps for a user lives in one folder, `.eis-daily-brief/`,
 <folder the user chose>/
 └── .eis-daily-brief/          the workspace
     ├── config.json            all personal settings (schema below)
+    ├── daily-format.json      optional: how the user writes tasks (see daily-format.md); absent = the default
+    ├── page-settings.js       what the page needs from the two files above (see "The page"); written by the skills
     └── app/                   the user's copy of the daily page (see "The page")
         ├── index.html
         └── VERSION            plugin version of this copy
@@ -37,6 +39,13 @@ The plugin ships a page, `app/` in the plugin's own folder, that shows the lates
 2. If `.eis-daily-brief/app/VERSION` exists and holds that version, the copy is current: do nothing.
 3. Otherwise replace `.eis-daily-brief/app/` with the plugin's `app/` folder: every file and subfolder, same names, nothing else. Use a shell copy when the session has one; else read and write each file. Then write the version in `.eis-daily-brief/app/VERSION`.
 4. The copy holds no personal data: never write config values or notes into it.
+5. Write `.eis-daily-brief/page-settings.js` (outside `app/`, so updates never replace it). A browser page can't read a `.json` from disk but can load a script, so this file carries what the page needs, as one line of JavaScript:
+
+   ```js
+   window.EisDailyBriefSettings = {"pattern": "<output.pattern>", "format": <daily-format.json contents, or null>};
+   ```
+
+   Write it every time, even when the copy was current: the config or the format may have changed. Valid JSON after the `=`, nothing else in the file. It holds no personal data beyond the file pattern and the format.
 
 **The address to give the user** is the absolute path of `.eis-daily-brief/app/index.html` **as the user's computer sees it** (`file:///…`). Hosts that run the session in an isolated environment mount the user's folders under another path: map it back to the user's path (the host shows both, or use the folder path the user gave in setup). If that is not possible, say it is `<folder you chose>/.eis-daily-brief/app/index.html`.
 
@@ -89,7 +98,7 @@ The plugin ships a page, `app/` in the plugin's own folder, that shows the lates
 - `me` identifies the user in messenger, email and calendar ("did I reply?", "am I the organizer?"). Required.
 - `language` is the language of everything written in the daily note. Section names of the template never change.
 - `windowDays` is how far back calendar, messenger and email are read. The closing check ignores it.
-- `output.folder` is required. It is also the folder the user picks in the page's settings. `pattern` is relative to it; `YYYY`, `MM` and `DD` are replaced by the run date.
+- `output.folder` is required. It is also the folder the user picks in the page's settings. The page finds the latest note by `output.pattern` (through `page-settings.js`). `pattern` is relative to it; `YYYY`, `MM` and `DD` are replaced by the run date.
 - `sources` turns each source on or off. A source that is on but has no connected tool is skipped silently. `tracker` is only used to close tasks that link to an issue (it never creates tasks); a missing `tracker` key counts as on.
 - `people` and `channels` are the priority list for the messenger; messages from anyone else that ask the user something directly still count, but these are read first.
 - `meetings.folders`, `reports.folders` and `vault.path` are optional; a missing one turns that part off.

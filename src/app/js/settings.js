@@ -40,5 +40,6 @@
   el("settings-today").textContent = F.longDate(today);
   el("settings-today").setAttribute("datetime", today);
   render("");
+  el("daily-pattern").textContent = window.Workspace.pattern;
   window.HandleStore.get(KEY).then(function (handle) { render(handle && handle.name); });
 })();

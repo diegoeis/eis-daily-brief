@@ -35,7 +35,7 @@
     kind: "folder",
 
     load: function () {
-      return folder().then(function (dir) { return DF.findLatest(dir, today()); }).then(function (found) {
+      return folder().then(function (dir) { return DF.findLatest(dir, today(), root.Workspace.pattern); }).then(function (found) {
         if (!found) throw fail("NoNote");
         return DF.read(found.handle).then(function (file) {
           current = { handle: found.handle, path: found.path, text: file.text, lastModified: file.lastModified };
@@ -63,7 +63,7 @@
       var opened = current;
       return opened.handle.getFile().then(function (file) {
         if (file.lastModified !== opened.lastModified) return true;
-        return folder().then(function (dir) { return DF.findLatest(dir, today()); })
+        return folder().then(function (dir) { return DF.findLatest(dir, today(), root.Workspace.pattern); })
           .then(function (found) { return Boolean(found) && found.path !== opened.path; });
       });
     },

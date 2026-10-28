@@ -1,0 +1,89 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/diegoeis/eis-daily-brief/src/references/daily-format.schema.json",
+  "title": "eis-daily-brief daily format",
+  "description": "How tasks are written in a daily note: the section, groups, task lines, date fields, priority marks and comments. Read and written by brief-generate and by the daily page. See daily-format.md.",
+  "type": "object",
+  "required": ["version", "dates", "tasks"],
+  "additionalProperties": false,
+  "properties": {
+    "$schema": { "type": "string" },
+    "version": { "const": 1 },
+    "dates": {
+      "type": "object",
+      "required": ["format"],
+      "additionalProperties": false,
+      "properties": {
+        "format": {
+          "description": "Date as written in the note. Tokens YYYY, MM and DD, each once, with any separators.",
+          "type": "string",
+          "pattern": "^(?=.*YYYY)(?=.*MM)(?=.*DD).+$"
+        }
+      }
+    },
+    "tasks": {
+      "type": "object",
+      "required": ["section", "group", "item", "fields", "comment"],
+      "additionalProperties": false,
+      "properties": {
+        "section": {
+          "type": "object",
+          "required": ["heading", "endsAt"],
+          "additionalProperties": false,
+          "properties": {
+            "heading": { "description": "The whole line that opens the tasks section.", "type": "string", "minLength": 1 },
+            "endsAt": { "description": "A line that starts with any of these ends the section.", "type": "array", "items": { "type": "string", "minLength": 1 }, "minItems": 1 }
+          }
+        },
+        "group": {
+          "type": "object",
+          "required": ["before", "after", "default"],
+          "additionalProperties": false,
+          "properties": {
+            "before": { "description": "Text before the group name on its own line.", "type": "string", "minLength": 1 },
+            "after": { "description": "Text after the group name; may be empty.", "type": "string" },
+            "default": { "description": "Group for tasks with no team, project or topic; new tasks from the page go here.", "type": "string", "minLength": 1 }
+          }
+        },
+        "item": {
+          "type": "object",
+          "required": ["open", "done"],
+          "additionalProperties": false,
+          "properties": {
+            "open": { "description": "Start of an open task line.", "type": "string", "minLength": 1 },
+            "done": { "description": "Starts of a done task line. The first one is written.", "type": "array", "items": { "type": "string", "minLength": 1 }, "minItems": 1 },
+            "newPrefix": { "description": "Prefix the brief puts on tasks new today; empty for none.", "type": "string" },
+            "sourceSeparators": { "description": "Text between the description and the source; the last one on the line counts.", "type": "array", "items": { "type": "string", "minLength": 1 } }
+          }
+        },
+        "fields": {
+          "type": "object",
+          "required": ["created", "due", "completed"],
+          "additionalProperties": false,
+          "properties": {
+            "created": { "description": "Mark written before the creation date.", "type": "string", "minLength": 1 },
+            "due": { "description": "Mark written before the due date.", "type": "string", "minLength": 1 },
+            "completed": { "description": "Mark written before the completion date; added when a task is marked done.", "type": "string", "minLength": 1 },
+            "ignore": { "description": "Other date marks: kept in the line, hidden on the page.", "type": "array", "items": { "type": "string", "minLength": 1 } }
+          }
+        },
+        "priority": {
+          "description": "Priority marks and their level.",
+          "type": "object",
+          "additionalProperties": { "enum": ["highest", "high", "medium", "low", "lowest"] }
+        },
+        "comment": {
+          "type": "object",
+          "required": ["indent", "prefix", "line"],
+          "additionalProperties": false,
+          "properties": {
+            "indent": { "description": "Indent written before a comment under a task.", "type": "string", "minLength": 1 },
+            "prefix": { "description": "Start of a comment line, after the indent.", "type": "string", "minLength": 1 },
+            "line": { "description": "The rest of the line. Must hold {text}; {date} is optional.", "type": "string", "pattern": "\\{text\\}" },
+            "closedPrefixes": { "description": "A comment that starts with one of these is the evidence that closed the task.", "type": "array", "items": { "type": "string", "minLength": 1 } }
+          }
+        }
+      }
+    }
+  }
+}

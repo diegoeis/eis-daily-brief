@@ -46,6 +46,15 @@
 - **Compatibilidade**: `eis-daily-brief.json` solto na pasta continua sendo lido; o workspace dele é o `.eis-daily-brief/` ao lado. O setup oferece mover.
 - **Sem workspace, o `brief-view` para** e indica o `brief-setup`: não há cópia da página para abrir, e abrir a do plugin traria de volta o endereço instável.
 
+## 2026-10-27 — v0.6.0, formato da daily como dado
+
+- **Problema**: a página tinha o formato das tarefas e o padrão `YYYY-MM/YYYY-MM-DD.md` fixos no código. Quem usa outro `output.pattern` via "Nenhuma nota"; quem escreve tarefas de outro jeito via zero tarefas.
+- **Decisão**: o formato das tarefas vira um JSON declarativo e versionado (`references/daily-format.json`, com JSON Schema), no espírito dos design tokens do W3C. O `brief-generate` escreve e a página lê e edita pelo mesmo arquivo. Só texto literal e marcadores (`YYYY`, `{date}`, `{text}`), nunca regex. Só a seção de tarefas; o resto da nota segue o template.
+- **Formato do usuário**: opcional, em `.eis-daily-brief/daily-format.json`. O `brief-setup` lê algumas notas, propõe o JSON e grava só após confirmação. A LLM trabalha uma vez; a página segue previsível e sem tokens.
+- **Página recebe config por script**: `file://` não lê JSON, mas carrega `<script>`. As skills escrevem `.eis-daily-brief/page-settings.js` (padrão + formato) fora de `app/`, para atualizações não apagarem. Sem o arquivo, a página usa os padrões. Inválido: usa o padrão e avisa.
+- **Fora do escopo**: Logseq/outliner, org-mode, tarefas em tabela.
+- **Prova**: o parser novo dá o mesmo modelo e as mesmas edições que o antigo em todas as dailies reais do autor; um formato bem diferente (`# TODO`, `###`, `DD/MM/YYYY`, marcas em texto) passa por parse, marcar, desmarcar, comentar e adicionar.
+
 ## Pendente
 
 - Testar `brief-setup` no Cowork (seletor de pasta) e `brief-generate` agendado com `--config`.

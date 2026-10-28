@@ -19,7 +19,7 @@ Write to the user in the language they write in.
 
 ## 2. Get the page ready
 
-Install or update the user's copy in `.eis-daily-brief/app/`, as "The page" in `../../references/config.md` says: nothing to do when its `VERSION` matches the plugin's. The plugin's own `app/` folder (`../../app/`, relative to this skill's folder) is only the source of that copy: never open it. If it is missing, stop and say the plugin install is incomplete.
+Install or update the user's copy in `.eis-daily-brief/app/` and write `.eis-daily-brief/page-settings.js`, as "The page" in `../../references/config.md` says: the copy is left alone when its `VERSION` matches the plugin's, but `page-settings.js` is written every time. The plugin's own `app/` folder (`../../app/`, relative to this skill's folder) is only the source of that copy: never open it. If it is missing, stop and say the plugin install is incomplete.
 
 ## 3. Open it
 
@@ -40,5 +40,5 @@ Never render the page as a chat artifact or inline widget: those run sandboxed, 
 
 ## Constraints
 
-- This skill writes only the page copy in `.eis-daily-brief/app/`. The daily note is written only by `brief-generate`, when step 1 runs it. The page writes only the daily note the user's folder holds, and only what the user does on it.
+- This skill writes only the page copy in `.eis-daily-brief/app/` and `.eis-daily-brief/page-settings.js`. The daily note is written only by `brief-generate`, when step 1 runs it. The page writes only the daily note the user's folder holds, and only what the user does on it.
 - Do not copy the page anywhere else, edit it or serve it over the network.

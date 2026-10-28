@@ -111,3 +111,26 @@ test("writeIfUnchanged refuses and keeps the file when it changed outside", asyn
     assert.equal(fs.readFileSync(path.join(f.dir, "2026-10/2026-10-26.md"), "utf8"), "edited in Obsidian");
   } finally { f.cleanup(); }
 });
+
+test("findLatest follows output.pattern: flat, nested and other separators", async () => {
+  const flat = folder({ "2026-10-20.md": "a", "2026-10-25.md": "b", "2026-10-27.md": "future", "readme.md": "x" });
+  const nested = folder({ "2026/09/30.md": "sep", "2026/10/02.md": "oct", "2026/11/01.md": "future", "2026/10/notes.md": "x" });
+  const other = folder({ "notes/26.10.2026.md": "a", "notes/01.11.2026.md": "future", "notes/02.10.2026.md": "b" });
+  try {
+    assert.equal((await DF.findLatest(flat.handle, "2026-10-26", "YYYY-MM-DD.md")).path, "daily/2026-10-25.md");
+    assert.equal((await DF.findLatest(nested.handle, "2026-10-26", "YYYY/MM/DD.md")).path, "daily/2026/10/02.md");
+    assert.equal((await DF.findLatest(other.handle, "2026-10-26", "notes/DD.MM.YYYY.md")).path, "daily/notes/26.10.2026.md");
+  } finally { flat.cleanup(); nested.cleanup(); other.cleanup(); }
+});
+
+test("findLatest skips a note whose name disagrees with its folder", async () => {
+  const f = folder({ "2026-09/2026-10-12.md": "wrong month", "2026-09/2026-09-01.md": "ok" });
+  try {
+    assert.equal((await DF.findLatest(f.handle, "2026-10-26")).path, "daily/2026-09/2026-09-01.md");
+  } finally { f.cleanup(); }
+});
+
+test("compilePattern refuses a pattern without the whole date", () => {
+  assert.throws(() => DF.compilePattern("YYYY-MM.md"), /YYYY, MM and DD/);
+  assert.throws(() => DF.compilePattern("YYYY//MM-DD.md"), /empty folder/);
+});
