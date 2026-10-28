@@ -53,6 +53,10 @@ VERSION="$(read_key version)"
 [[ -n "$NAME" ]] || die "\"name\" is empty or missing in plugin.json"
 [[ -n "$VERSION" ]] || die "\"version\" is empty or missing in plugin.json"
 
+# The daily page shows the version in its header; it must match the manifest.
+PAGE_VERSION="$(sed -n 's/.*eis-app-brand.*<span class="eis-mono">v\([^<]*\)<\/span>.*/\1/p' "$SRC/app/index.html")"
+[[ "$PAGE_VERSION" == "$VERSION" ]] || die "src/app/index.html shows v$PAGE_VERSION, plugin.json has $VERSION. Update the header."
+
 OUT_DIR="$DIST/v$VERSION"
 OUT_ZIP="$DIST/v$VERSION.zip"
 

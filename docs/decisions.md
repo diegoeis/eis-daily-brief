@@ -68,6 +68,7 @@
 ## 2026-10-27 — v0.8.0, brief-view sempre roda o brief
 
 - **`brief-view` roda o `brief-generate` antes de abrir**, não só quando a nota falta: com o modo update, o generate cria ou atualiza, então um único `brief-view` agendado gera, atualiza e abre. `--no-generate` só abre (para quem quer olhar sem gastar uma execução do brief). Substitui a regra da v0.4.0.
+- **v0.8.2**: o cabeçalho da página mostrava v0.6 fixo; agora mostra a versão do plugin e o `pack.sh` recusa se divergir.
 - **Página confere menos**: a cada 5 s, só com a aba visível (já era assim; chegou a ir para 15 s na v0.8.0 e voltou na v0.8.1, porque com a aba oculta nada roda), e a varredura da pasta atrás de nota mais nova só roda enquanto a nota aberta não é a de hoje; com a de hoje aberta, cada checagem é um `getFile()` só. `findLatest` passou a devolver `date`.
 
 ## Pendente
