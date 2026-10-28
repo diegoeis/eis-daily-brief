@@ -8,6 +8,7 @@ Everything the plugin keeps for a user lives in one folder, `.eis-daily-brief/`,
     ├── config.json            all personal settings (schema below)
     ├── daily-format.json      optional: how the user writes tasks (see daily-format.md); absent = the default
     ├── page-settings.js       what the page needs from the two files above (see "The page"); written by the skills
+    ├── state.json             written by brief-generate at the end of each run: {"lastCheck": ISO date-time}; start of the next run's search window
     └── app/                   the user's copy of the daily page (see "The page")
         ├── index.html
         └── VERSION            plugin version of this copy

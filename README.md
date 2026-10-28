@@ -65,6 +65,7 @@ Everything the plugin keeps for you lives in one folder, `.eis-daily-brief/`, th
 ├── config.json         who you are, language, notes folder, sources, priority people and channels, meeting and report folders
 ├── daily-format.json   optional: how you write tasks, when it isn't the plugin's default
 ├── page-settings.js    what the page needs from the two files above (written by the skills)
+├── state.json          when brief-generate last ran; the next run only reads what came after
 └── app/                your copy of the daily page
 ```
 
@@ -95,9 +96,11 @@ Every open task, migrated or new, is closed (`[x]` with `✅ date` and a sub-ite
 
 - the messenger or e-mail thread shows you replied, or the person who asked closed the matter;
 - the linked tracker issue (Jira, Linear...) is in a done status, dated when it got there (turn it off with `sources.tracker: false`);
-- the task came from a vault note (a meeting note, for example) and its checkbox there is done; when the note shows nothing, the messenger, e-mail, tracker and later meeting notes are searched for evidence of the same action;
-- the task has no link (you added it by hand): the same search across the other sources;
+- the task came from a vault note (a meeting note, for example) and its checkbox there is done; when the note shows nothing, a targeted search runs (below);
+- the task has no link (you added it by hand): the same targeted search;
 - the most recent report shows the task done or decided.
+
+The targeted search never sweeps a whole source. Cheapest first, it stops at the first evidence: (1) later notes of the same series as the source note (the next 1:1 with that person, the next session of a recurring sync: same folder, same title without the date); (2) the direct messages and e-mail threads with the people the task names, or with the one or two people of the source note; (3) tracker issues cited in the task or its note. Tasks are batched by person and series, so each DM or series is read once per run, and only what came after the last run (`state.json`) is read.
 
 A mention, a plan or partial progress is not evidence. Without evidence, the task stays open. When a closed task came from a checkbox in a vault note, that checkbox is ticked too.
 
