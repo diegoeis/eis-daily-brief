@@ -81,10 +81,10 @@ The skills look for the file in this order:
 
 ## Scheduling
 
-`brief-generate` asks no questions, so it can run on a schedule. Put the config path in the scheduled prompt:
+`brief-generate` asks no questions, so it can run on a schedule. Twice a day works well: in the morning it creates the day's note, at the end of the day it updates it. Put the config path in the scheduled prompt:
 
 - **Cowork / Claude Desktop**: a scheduled task with `/brief-generate`, with the config folder connected.
-- **Hermes**: a cron job, for example `hermes cron create "15 8 * * 1-5" "/eis-daily-brief:brief-generate --config /path/to/.eis-daily-brief" --skill eis-daily-brief:brief-generate`.
+- **Hermes**: a cron job, for example `hermes cron create "0 8,18 * * 1-5" "/eis-daily-brief:brief-generate --config /path/to/.eis-daily-brief" --skill eis-daily-brief:brief-generate`.
 
 ## Running it again during the day
 
@@ -100,7 +100,7 @@ Every open task, migrated or new, is closed (`[x]` with `✅ date` and a sub-ite
 - the task has no link (you added it by hand): the same targeted search;
 - the most recent report shows the task done or decided.
 
-The targeted search never sweeps a whole source. Cheapest first, it stops at the first evidence: (1) later notes of the same series as the source note (the next 1:1 with that person, the next session of a recurring sync: same folder, same title without the date); (2) the direct messages and e-mail threads with the people the task names, or with the one or two people of the source note; (3) tracker issues cited in the task or its note. Tasks are batched by person and series, so each DM or series is read once per run, and only what came after the last run (`state.json`) is read.
+The targeted search never sweeps a whole source. Cheapest first, it stops at the first evidence: (1) later notes of the same series as the source note (the next 1:1 with that person, the next session of a recurring sync: same folder, same title without the date); (2) the people the task names, or the one or two people of the source note: vault notes that cite them, then the direct messages and e-mail threads with them; (3) tracker issues cited in the task or its note. Tasks are batched by person and series, so each DM or series is read once per run, and only what came after the last run (`state.json`) is read. Threads and issues linked from a task are opened in full only when they moved since the last run (latest reply, last update); the tracker is checked in one query for all issues.
 
 A mention, a plan or partial progress is not evidence. Without evidence, the task stays open. When a closed task came from a checkbox in a vault note, that checkbox is ticked too.
 
