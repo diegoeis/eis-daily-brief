@@ -43,7 +43,7 @@ function fake(dir, counter) {
 }
 
 function setup(files) {
-  const root = fs.mkdtempSync(path.join(os.tmpdir(), "eis-daily-brief-src-"));
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), "eis-task-manager-src-"));
   const dir = path.join(root, "daily");
   fs.mkdirSync(dir, { recursive: true });
   const write = (rel, text) => {

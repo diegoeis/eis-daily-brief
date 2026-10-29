@@ -1,9 +1,9 @@
 ---
-name: brief-setup
-description: Create, show or edit the plugin's workspace - the .eis-daily-brief/ folder with config.json, the personal config every skill reads before each run, and the user's copy of the daily page - who the user is, output language, where daily notes are written, which sources are on, priority people and channels, meeting and report folders. Use when the user says "configura o daily brief", "setup do brief", "adiciona uma pessoa prioritária", "adiciona um canal", "muda a pasta da daily", "mostra minha config do brief", "set up my daily brief", or runs /brief-setup. With no config found it creates the workspace in a folder the user chooses; with one found it edits the config. "--show" prints the config path and contents. "--config PATH" names the folder or file. Interactive by nature; nothing is saved without the user's confirmation. Does not generate the daily note (use brief-generate).
+name: tasks-setup
+description: Create, show or edit the plugin's workspace - the .eis-task-manager/ folder with config.json, the personal config every skill reads before each run, and the user's copy of the daily page - who the user is, output language, where daily notes are written, which sources are on, priority people and channels, meeting and report folders. Use when the user says "configura o daily brief", "setup do brief", "adiciona uma pessoa prioritária", "adiciona um canal", "muda a pasta da daily", "mostra minha config do brief", "set up my daily brief", or runs /tasks-setup. With no config found it creates the workspace in a folder the user chooses; with one found it edits the config. "--show" prints the config path and contents. "--config PATH" names the folder or file. Interactive by nature; nothing is saved without the user's confirmation. Does not generate the daily note (use tasks-update).
 ---
 
-# brief-setup
+# tasks-setup
 
 Fill the config the first time, then add or change things in it. The workspace layout, the rules for finding it, the config schema and how to install the page are in `../../references/config.md` (relative to this skill's folder); read it before step 1.
 
@@ -11,7 +11,7 @@ Write the conversation in the language the user writes in.
 
 ## What must always be true
 
-- This skill writes only inside `.eis-daily-brief/` in the folder the user chose: `config.json`, `daily-format.json`, `page-settings.js` and the page copy in `app/`. Never write to `~/.claude/`, `${CLAUDE_PLUGIN_DATA}`, the plugin's own folder or any other place, and never create a pointer file anywhere else.
+- This skill writes only inside `.eis-task-manager/` in the folder the user chose: `config.json`, `daily-format.json`, `page-settings.js` and the page copy in `app/`. Never write to `~/.claude/`, `${CLAUDE_PLUGIN_DATA}`, the plugin's own folder or any other place, and never create a pointer file anywhere else.
 - Every question, form or folder picker is preceded by one or two sentences saying why it is asked and what will be done with the answer. In Cowork, text written between tool calls is not shown to the user, so that context goes through the user-message tool before the picker.
 - Never invent values. What can be inferred from the connected tools is proposed and confirmed, never saved silently.
 - Nothing is written before the user confirms the final summary.
@@ -23,9 +23,9 @@ Write the conversation in the language the user writes in.
 Look for an existing workspace as described in `references/config.md`.
 
 - **Found**: say where it is and go to step 3 (edit mode). With `--show`, print the path and the contents of `config.json` and stop.
-- **Found in the older layout** (`eis-daily-brief.json` straight in the folder): say so and offer to move it to `.eis-daily-brief/config.json` in the same folder. Move it only after a yes (create the folder, write the same content, then delete the old file); on a no, keep editing the old file. Either way, the page goes to `.eis-daily-brief/app/` next to it (step 4). Then go to step 3.
+- **Found in an older layout** (`.eis-daily-brief/`, or `eis-daily-brief.json` straight in the folder; see "Older layouts" in `references/config.md`): say so and offer to move it to `.eis-task-manager/` in the same folder. Move it only after a yes: create `.eis-task-manager/`, write `config.json` with the same content as the old config, move `daily-format.json` and `state.json` when they exist, then delete the old files and the old folder (its `app/` copy and `page-settings.js` are rebuilt in step 4). On a no, keep using the old files, and the page stays in the old folder. Then go to step 3.
 - **Not found**: tell the user, before asking anything else:
-  - a folder named `.eis-daily-brief` will be created inside the folder they choose (the root of their notes vault is a good place). It holds `config.json`, with all the settings, and `app/`, their copy of the daily page;
+  - a folder named `.eis-task-manager` will be created inside the folder they choose (the root of their notes vault is a good place). It holds `config.json`, with all the settings, and `app/`, their copy of the daily page;
   - they can edit `config.json` by hand whenever they want;
   - every time the brief runs, it reads that file again, so the chosen folder must be connected (or passed with `--config`) on every run.
 
@@ -52,12 +52,12 @@ Show a short summary of the current config (counts and key values, not the raw J
 
 Show the final values in a short readable summary and the diff when editing. Save only after the user confirms:
 
-1. Create `.eis-daily-brief/` in the chosen folder when it doesn't exist.
+1. Create `.eis-task-manager/` in the chosen folder when it doesn't exist.
 2. Write `config.json` there: valid JSON with `schemaVersion: 1`, two-space indentation.
 3. When the user confirmed a daily format, write it as `daily-format.json` there (two-space indentation, valid against `../../references/daily-format.schema.json`).
-4. Install or update the page copy in `.eis-daily-brief/app/` and write `page-settings.js`, as "The page" in `references/config.md` says.
+4. Install or update the page copy in `.eis-task-manager/app/` and write `page-settings.js`, as "The page" in `references/config.md` says.
 
 Finish with:
 - the path of `config.json` and a one-line reminder that it can be edited by hand;
-- the address of the page (`file:///…/.eis-daily-brief/app/index.html`, as the user's computer sees it). On its first opening the user picks the notes folder (`output.folder`) in **Configurações → Escolher pasta**: browsers never let a page open a folder from a path;
-- the next step: `/brief-generate`, or `/brief-view` to generate (when needed) and open the page, or a schedule with the folder connected or with `--config {{path}}` in the scheduled prompt.
+- the address of the page (`file:///…/.eis-task-manager/app/index.html`, as the user's computer sees it). On its first opening the user picks the notes folder (`output.folder`) in **Configurações → Escolher pasta**: browsers never let a page open a folder from a path;
+- the next step: `/tasks-update`, or `/tasks-view` to generate (when needed) and open the page, or a schedule with the folder connected or with `--config {{path}}` in the scheduled prompt.

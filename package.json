@@ -1,7 +1,7 @@
 {
-  "name": "eis-daily-brief-dev",
+  "name": "eis-task-manager-dev",
   "private": true,
-  "description": "Dev tasks for the eis-daily-brief project. Not part of the plugin package.",
+  "description": "Dev tasks for the eis-task-manager project. Not part of the plugin package.",
   "scripts": {
     "test": "node --test \"tests/**/*.test.js\""
   }

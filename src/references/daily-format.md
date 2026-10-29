@@ -2,10 +2,10 @@
 
 How tasks are written in a daily note, as data: the section, the groups, the task lines, the date marks, the priority marks and the comments. One file is the contract between the two sides that touch the tasks:
 
-- `brief-generate` writes the tasks section by it;
+- `tasks-update` writes the tasks section by it;
 - the daily page reads, marks done, comments and adds tasks by it.
 
-The plugin's default is [`daily-format.json`](daily-format.json), next to this file: the format of `../skills/brief-generate/templates/daily.md`. A user with their own way of writing tasks keeps a `daily-format.json` in their workspace (`.eis-daily-brief/daily-format.json`, see `config.md`); without one, the default applies. The schema is [`daily-format.schema.json`](daily-format.schema.json) (JSON Schema 2020-12). Same spirit as the W3C design tokens format: a small, versioned, declarative file that tools on both sides read.
+The plugin's default is [`daily-format.json`](daily-format.json), next to this file: the format of `../skills/tasks-update/templates/daily.md`. A user with their own way of writing tasks keeps a `daily-format.json` in their workspace (`.eis-task-manager/daily-format.json`, see `config.md`); without one, the default applies. The schema is [`daily-format.schema.json`](daily-format.schema.json) (JSON Schema 2020-12). Same spirit as the W3C design tokens format: a small, versioned, declarative file that tools on both sides read.
 
 Only the tasks section is described. The rest of the note (agenda, pending issues, topics) follows the template.
 
@@ -40,7 +40,7 @@ How a task line is read, in this order: the start (`open` or `done`), `newPrefix
 - **Out of scope**: formats with another structure, such as outliner blocks (Logseq `TODO`/`DONE`), org-mode or tasks in tables. They do not fit this file; do not stretch the schema for them.
 - **Changing the format** of existing notes is not this file's job. A new format applies to the notes written after it; the page reads the latest note by the format in force.
 
-## Describing a user's format (brief-setup)
+## Describing a user's format (tasks-setup)
 
 When the user already writes daily notes in their own way and wants to keep it:
 

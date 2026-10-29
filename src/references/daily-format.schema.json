@@ -1,8 +1,8 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://github.com/diegoeis/eis-daily-brief/src/references/daily-format.schema.json",
-  "title": "eis-daily-brief daily format",
-  "description": "How tasks are written in a daily note: the section, groups, task lines, date fields, priority marks and comments. Read and written by brief-generate and by the daily page. See daily-format.md.",
+  "$id": "https://github.com/diegoeis/eis-task-manager/src/references/daily-format.schema.json",
+  "title": "eis-task-manager daily format",
+  "description": "How tasks are written in a daily note: the section, groups, task lines, date fields, priority marks and comments. Read and written by tasks-update and by the daily page. See daily-format.md.",
   "type": "object",
   "required": ["version", "dates", "tasks"],
   "additionalProperties": false,

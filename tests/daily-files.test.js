@@ -39,7 +39,7 @@ function dirHandle(p) {
 }
 
 function folder(files) {
-  const root = fs.mkdtempSync(path.join(os.tmpdir(), "eis-daily-brief-"));
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), "eis-task-manager-"));
   const dir = path.join(root, "daily");
   for (const [rel, text] of Object.entries(files)) {
     fs.mkdirSync(path.join(dir, path.dirname(rel)), { recursive: true });

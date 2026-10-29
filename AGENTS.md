@@ -1,6 +1,6 @@
 # AGENTS.md
 
-Projeto do plugin `eis-daily-brief` para Claude Code e Cowork.
+Projeto do plugin `eis-task-manager` para Claude Code e Cowork.
 
 O plugin ajuda a fazer um brief diário identificando tarefas e respostas que você precisa atuar. Ele separa em tópicos, pessoas, e atualiza as tarefas sozinho quando identifica que já foram feitas ao fazer a atualização diária.
 

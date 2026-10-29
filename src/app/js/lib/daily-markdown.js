@@ -1,5 +1,5 @@
 /* daily-markdown.js
-   Reads and edits the daily note written by the eis-daily-brief skill.
+   Reads and edits the daily note written by the eis-task-manager skills.
    The markdown file is the contract: the UI reads it and every change the UI makes
    is a change to the markdown text, in the same format the skill writes.
 

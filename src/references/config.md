@@ -1,14 +1,14 @@
-# Workspace and config - .eis-daily-brief/
+# Workspace and config - .eis-task-manager/
 
-Everything the plugin keeps for a user lives in one folder, `.eis-daily-brief/`, created by `brief-setup` inside a folder the user chose (for example the root of their notes vault):
+Everything the plugin keeps for a user lives in one folder, `.eis-task-manager/`, created by `tasks-setup` inside a folder the user chose (for example the root of their notes vault):
 
 ```
 <folder the user chose>/
-└── .eis-daily-brief/          the workspace
+└── .eis-task-manager/          the workspace
     ├── config.json            all personal settings (schema below)
     ├── daily-format.json      optional: how the user writes tasks (see daily-format.md); absent = the default
     ├── page-settings.js       what the page needs from the two files above (see "The page"); written by the skills
-    ├── state.json             written by brief-generate at the end of each run: {"lastCheck": ISO date-time}; start of the next run's search window
+    ├── state.json             written by tasks-update at the end of each run: {"lastCheck": ISO date-time}; start of the next run's search window
     └── app/                   the user's copy of the daily page (see "The page")
         ├── index.html
         └── VERSION            plugin version of this copy
@@ -16,39 +16,42 @@ Everything the plugin keeps for a user lives in one folder, `.eis-daily-brief/`,
 
 The user may edit `config.json` by hand at any time; every skill reads it again before every run. The leading dot keeps the folder out of note apps (Obsidian, for example, ignores dot folders).
 
-Never store the workspace, a copy of it or a pointer to it in `~/.claude/`, `${CLAUDE_PLUGIN_DATA}`, the plugin's own folder or any other place than the folder the user chose. In Cowork the plugin can only read and write inside folders connected to the session, so the user must connect the folder that holds `.eis-daily-brief/`.
+Never store the workspace, a copy of it or a pointer to it in `~/.claude/`, `${CLAUDE_PLUGIN_DATA}`, the plugin's own folder or any other place than the folder the user chose. In Cowork the plugin can only read and write inside folders connected to the session, so the user must connect the folder that holds `.eis-task-manager/`.
 
-**Older layout.** Before v0.5.0 the config was a file named `eis-daily-brief.json` straight in the chosen folder. Skills still read it. Its workspace is the `.eis-daily-brief/` folder next to it (the page goes there). `brief-setup` offers to move the file to `.eis-daily-brief/config.json`.
+**Older layouts.** Skills still read them, and `tasks-setup` offers to move them to `.eis-task-manager/`:
+
+- Before v0.9.0 the plugin was named `eis-daily-brief` and the workspace was `.eis-daily-brief/`, with the same files inside. A run that finds it uses it as the workspace (it reads and writes there) until the user moves it.
+- Before v0.5.0 the config was a file named `eis-daily-brief.json` straight in the chosen folder. Its workspace is the `.eis-daily-brief/` folder next to it (the page goes there).
 
 ## Finding the workspace
 
 Every skill looks for it in this order and stops at the first hit:
 
-1. A path given in the request, as `--config {{path}}` or in prose: the chosen folder, the `.eis-daily-brief/` folder or the config file itself. This is the way for scheduled runs and agents without a connected folder.
-2. `.eis-daily-brief/config.json` (or the older `eis-daily-brief.json`) at the root of a folder connected to the session, or one level below it. On hosts without folder connection, the session's working directory counts as the connected folder.
-3. A path the host keeps for this user across sessions: an entry in the host's persistent memory, a line in the user's instructions file, or the `EIS_DAILY_BRIEF_CONFIG` environment variable when the session can read environment variables.
+1. A path given in the request, as `--config {{path}}` or in prose: the chosen folder, the `.eis-task-manager/` folder or the config file itself. This is the way for scheduled runs and agents without a connected folder.
+2. `.eis-task-manager/config.json` (or, in an older layout, `.eis-daily-brief/config.json` or `eis-daily-brief.json`) at the root of a folder connected to the session, or one level below it. On hosts without folder connection, the session's working directory counts as the connected folder.
+3. A path the host keeps for this user across sessions: an entry in the host's persistent memory, a line in the user's instructions file, or the `EIS_TASK_MANAGER_CONFIG` environment variable (or the older `EIS_DAILY_BRIEF_CONFIG`) when the session can read environment variables.
 
 Nothing else: no searching parent folders, home directories or other hidden folders.
 
 ## The page
 
-The plugin ships a page, `app/` in the plugin's own folder, that shows the latest daily note and writes changes back to it. The user opens **their copy** in `.eis-daily-brief/app/`, never the plugin's: the plugin folder moves on every update (and in some hosts lives in a temporary folder), and the browser keeps the chosen notes folder per page address. A copy in the workspace keeps one address forever.
+The plugin ships a page, `app/` in the plugin's own folder, that shows the latest daily note and writes changes back to it. The user opens **their copy** in `.eis-task-manager/app/`, never the plugin's: the plugin folder moves on every update (and in some hosts lives in a temporary folder), and the browser keeps the chosen notes folder per page address. A copy in the workspace keeps one address forever.
 
-**Install or update the copy** (`brief-setup` after saving, `brief-view` before opening):
+**Install or update the copy** (`tasks-setup` after saving, `tasks-view` before opening):
 
 1. Read the plugin version from the plugin's manifest (`plugin.json` at the plugin root, two levels above a skill's folder).
-2. If `.eis-daily-brief/app/VERSION` exists and holds that version, the copy is current: do nothing.
-3. Otherwise replace `.eis-daily-brief/app/` with the plugin's `app/` folder: every file and subfolder, same names, nothing else. Use a shell copy when the session has one; else read and write each file. Then write the version in `.eis-daily-brief/app/VERSION`.
+2. If `.eis-task-manager/app/VERSION` exists and holds that version, the copy is current: do nothing.
+3. Otherwise replace `.eis-task-manager/app/` with the plugin's `app/` folder: every file and subfolder, same names, nothing else. Use a shell copy when the session has one; else read and write each file. Then write the version in `.eis-task-manager/app/VERSION`.
 4. The copy holds no personal data: never write config values or notes into it.
-5. Write `.eis-daily-brief/page-settings.js` (outside `app/`, so updates never replace it). A browser page can't read a `.json` from disk but can load a script, so this file carries what the page needs, as one line of JavaScript:
+5. Write `.eis-task-manager/page-settings.js` (outside `app/`, so updates never replace it). A browser page can't read a `.json` from disk but can load a script, so this file carries what the page needs, as one line of JavaScript:
 
    ```js
-   window.EisDailyBriefSettings = {"pattern": "<output.pattern>", "format": <daily-format.json contents, or null>};
+   window.EisTaskManagerSettings = {"pattern": "<output.pattern>", "format": <daily-format.json contents, or null>};
    ```
 
    Write it every time, even when the copy was current: the config or the format may have changed. Valid JSON after the `=`, nothing else in the file. It holds no personal data beyond the file pattern and the format.
 
-**The address to give the user** is the absolute path of `.eis-daily-brief/app/index.html` **as the user's computer sees it** (`file:///…`). Hosts that run the session in an isolated environment mount the user's folders under another path: map it back to the user's path (the host shows both, or use the folder path the user gave in setup). If that is not possible, say it is `<folder you chose>/.eis-daily-brief/app/index.html`.
+**The address to give the user** is the absolute path of `.eis-task-manager/app/index.html` **as the user's computer sees it** (`file:///…`). Hosts that run the session in an isolated environment mount the user's folders under another path: map it back to the user's path (the host shows both, or use the folder path the user gave in setup). If that is not possible, say it is `<folder you chose>/.eis-task-manager/app/index.html`.
 
 ## Schema
 

@@ -107,7 +107,7 @@ def main():
         chunks.append("/* " + src + " */\n" + prune(strip_comments(css), used))
 
     header = (
-        "/* eis-ds, trimmed for the eis-daily-brief page. GENERATED: do not edit.\n"
+        "/* eis-ds, trimmed for the eis-task-manager page. GENERATED: do not edit.\n"
         "   Source: https://github.com/diegoeis/eis-ds @ " + commit + "\n"
         "   Built by scripts/vendor-eis-ds.py with only the eis-* classes the page uses. */\n"
     )

@@ -1,7 +1,7 @@
 {
-  "name": "eis-daily-brief",
-  "version": "0.8.2",
-  "description": "Daily brief note from calendar, messenger, e-mail, meeting notes and reports: tasks, pending issues by person and important topics, with tasks closed automatically when the source shows they were done.",
+  "name": "eis-task-manager",
+  "version": "0.9.0",
+  "description": "Task manager built on a daily note from calendar, messenger, e-mail, meeting notes and reports: your tasks and obligations, pending issues by person and important topics, with tasks closed automatically when the source shows they were done.",
   "author": {
     "name": "Diego Eis"
   }

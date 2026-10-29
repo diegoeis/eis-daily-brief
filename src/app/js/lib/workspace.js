@@ -1,7 +1,7 @@
 /* workspace.js
    What the page takes from the user's workspace. The skills write ../page-settings.js, next to this
-   app folder (.eis-daily-brief/page-settings.js), from config.json and daily-format.json:
-     window.EisDailyBriefSettings = { pattern: "YYYY-MM/YYYY-MM-DD.md", format: { ...daily format... } | null }
+   app folder (.eis-task-manager/page-settings.js), from config.json and daily-format.json:
+     window.EisTaskManagerSettings = { pattern: "YYYY-MM/YYYY-MM-DD.md", format: { ...daily format... } | null }
    A missing file (or a missing part) means the defaults. An invalid part falls back to its
    default and is listed in `problems`, so the page can say so.
    Exposes window.Workspace = { pattern, format (compiled), problems: [] }. */
@@ -10,7 +10,7 @@
 
   var DM = root.DailyMarkdown;
   var DF = root.DailyFiles;
-  var given = root.EisDailyBriefSettings || {};
+  var given = root.EisTaskManagerSettings || root.EisDailyBriefSettings || {}; // old name: page-settings.js written before v0.9.0
   var ws = { pattern: DF.DEFAULT_PATTERN, format: DM.DEFAULT, problems: [], custom: false };
 
   if (given.pattern) {

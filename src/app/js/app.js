@@ -17,7 +17,7 @@
       if (a.dataset.viewLink === name) a.setAttribute("aria-current", "page");
       else a.removeAttribute("aria-current");
     });
-    document.title = TITLES[name] + " — Daily brief";
+    document.title = TITLES[name] + " — Task manager";
     window.scrollTo(0, 0);
   }
 

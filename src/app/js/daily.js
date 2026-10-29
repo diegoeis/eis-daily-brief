@@ -56,7 +56,7 @@
   };
 
   var prefsStore = window.ViewPrefs.create(
-    "eis-daily-brief:view:v1",
+    "eis-daily-brief:view:v1", // name kept from before v0.9.0 so saved view choices survive the rename
     { status: "open", group: "", sort: "note", collapsed: [] },
     { status: ["open", "done", "all"], sort: ["note", "due", "oldest", "newest"] }
   );
@@ -387,7 +387,7 @@
   bind();
   if (WS.problems.length) notice(TEXT.badSettings(WS.problems));
   // A folder chosen in the settings view: drop the mock and read the folder.
-  window.addEventListener("eis-daily-brief:folder-changed", function () {
+  window.addEventListener("eis-task-manager:folder-changed", function () {
     source = window.DailyFolderSource;
     load();
   });

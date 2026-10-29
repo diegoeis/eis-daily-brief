@@ -4,7 +4,7 @@
 (function (root) {
   "use strict";
 
-  var DB = "eis-daily-brief", STORE = "handles";
+  var DB = "eis-daily-brief", STORE = "handles"; // name kept from before v0.9.0: renaming it would make users pick the folder again
 
   function open() {
     return new Promise(function (resolve, reject) {

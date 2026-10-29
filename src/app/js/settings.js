@@ -4,7 +4,7 @@
    page gets a handle (File System Access API), with the folder name.
    The handle goes to IndexedDB (HandleStore), the only record that a folder is set.
    This view lives in the same page as the daily (index.html): after a new folder is chosen it
-   tells the daily view to load again ("eis-daily-brief:folder-changed"). */
+   tells the daily view to load again ("eis-task-manager:folder-changed"). */
 (function () {
   "use strict";
 
@@ -30,7 +30,7 @@
     window.showDirectoryPicker({ id: "daily-notes", mode: "readwrite" }).then(function (handle) {
       return window.HandleStore.set(KEY, handle).then(function () {
         render(handle.name);
-        window.dispatchEvent(new CustomEvent("eis-daily-brief:folder-changed"));
+        window.dispatchEvent(new CustomEvent("eis-task-manager:folder-changed"));
       });
     }).catch(function (e) {
       if (e && e.name !== "AbortError") el("daily-folder-error").textContent = TEXT.failed;
