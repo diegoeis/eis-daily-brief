@@ -450,15 +450,6 @@
     return joinLines(lines, markdown);
   }
 
-  /* Removes one comment under a task. */
-  function deleteTaskNote(markdown, lineIndex, F) {
-    F = F || DEFAULT;
-    var lines = splitLines(markdown);
-    noteAt(lines, lineIndex, F);
-    lines.splice(lineIndex, 1);
-    return joinLines(lines, markdown);
-  }
-
   /* Local date as YYYY-MM-DD (never toISOString, which shifts to UTC). */
   function toDateKey(d) {
     var pad = function (n) { return String(n).padStart(2, "0"); };
@@ -468,7 +459,7 @@
   var api = {
     compile: compile, validateFormat: validateFormat, DEFAULT: DEFAULT,
     parse: parse, setTaskDone: setTaskDone, addTaskNote: addTaskNote, addTask: addTask,
-    editTask: editTask, setTaskCancelled: setTaskCancelled, editTaskNote: editTaskNote, deleteTaskNote: deleteTaskNote,
+    editTask: editTask, setTaskCancelled: setTaskCancelled, editTaskNote: editTaskNote,
     LEVELS: LEVELS,
     toDateKey: toDateKey, DEFAULT_GROUP: DEFAULT.defaultGroup
   };

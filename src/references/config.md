@@ -46,10 +46,12 @@ The plugin ships a page, `app/` in the plugin's own folder, that shows the lates
 5. Write `.eis-task-manager/page-settings.js` (outside `app/`, so updates never replace it). A browser page can't read a `.json` from disk but can load a script, so this file carries what the page needs, as one line of JavaScript:
 
    ```js
-   window.EisTaskManagerSettings = {"pattern": "<output.pattern>", "format": <daily-format.json contents, or null>};
+   window.EisTaskManagerSettings = {"pattern": "<output.pattern>", "format": <daily-format.json contents, or null>, "vault": "<vault.path, or null>"};
    ```
 
-   Write it every time, even when the copy was current: the config or the format may have changed. Valid JSON after the `=`, nothing else in the file. It holds no personal data beyond the file pattern and the format.
+   With `vault`, the page turns each `[[Note]]` into a link that opens the note in Obsidian (`obsidian://open?vault=<folder name>&file=<Note>`), with the note's path as its tooltip.
+
+   Write it every time, even when the copy was current: the config or the format may have changed. Valid JSON after the `=`, nothing else in the file. It holds no personal data beyond the file pattern, the format and the vault path.
 
 **The address to give the user** is the absolute path of `.eis-task-manager/app/index.html` **as the user's computer sees it** (`file:///…`). Hosts that run the session in an isolated environment mount the user's folders under another path: map it back to the user's path (the host shows both, or use the folder path the user gave in setup). If that is not possible, say it is `<folder you chose>/.eis-task-manager/app/index.html`.
 

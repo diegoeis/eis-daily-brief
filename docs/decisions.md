@@ -87,6 +87,13 @@
 - **Tarefa se cancela, não se apaga**: um ícone na linha troca `- [ ]` por `- [-]` (status cancelado do Obsidian Tasks, já usado no vault, sem data); o mesmo botão reabre. Apagar tiraria a tarefa da nota e o próximo `tasks-update` a cadastraria de novo pela fonte, porque a dedup não teria contra o que comparar. Cancelada fica na nota, conta como fechada, não migra para a próxima daily e barra a mesma tarefa de voltar. Nova chave opcional `tasks.item.cancelled` no formato.
 - **Edição no lugar**: só a parte alterada da linha muda (texto, marca ou data); o resto fica como escrito. Descrição cortada por marcas no meio é reescrita com as mesmas partes.
 
+## 2026-10-29 — v0.11.0, edição por duplo clique, abas e links das fontes
+
+- **Duplo clique edita no lugar**: título (texto e prioridade), comentário e prazo. Enter ou "Salvar" grava; Esc descarta sem gravar. Saem os botões Editar/Apagar: comentário não se apaga mais pela página (dá para editar o texto).
+- **Abas**: Abertas, Vence hoje (aberta com prazo hoje), Feitas (sem as canceladas), Canceladas, Todas. Cancelar fica numa coluna própria, a última; a tarefa vai para Canceladas.
+- **Colunas**: número antes do checkbox. Comentários e o campo de novo comentário ficam acima do "+ Comentário".
+- **Links das fontes**: `[[Nota]]` abre no Obsidian (`obsidian://open?vault=…&file=…`, caminho no tooltip) quando o `page-settings.js` traz `vault` (de `vault.path`). A página não lê o vault, então o link do Granola vem da nota: o `tasks-update` escreve `[[Nota]] · [Granola](url)` quando a nota de origem tem `granola_url` no frontmatter, e completa tarefas antigas que não têm.
+
 ## Pendente
 
 

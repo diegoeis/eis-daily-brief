@@ -238,7 +238,7 @@ test("setTaskCancelled: [-] and back, only the start of that line changes", () =
   assert.throws(() => DM.setTaskCancelled(NOTE, 0, true));
 });
 
-test("editTaskNote and deleteTaskNote: keep the date, touch only that comment", () => {
+test("editTaskNote: keeps the date, touches only that comment", () => {
   const ship = DM.parse(NOTE).tasks[0];
   const n = ship.notes[0];
   const out = DM.editTaskNote(NOTE, n.line, " Ships  Tuesday ");
@@ -246,11 +246,14 @@ test("editTaskNote and deleteTaskNote: keep the date, touch only that comment", 
   const undated = "## Tasks\n\n- [ ] A\n  - loose note\n";
   assert.equal(DM.editTaskNote(undated, 3, "fixed"), "## Tasks\n\n- [ ] A\n  - fixed\n");
 
-  const gone = DM.deleteTaskNote(NOTE, n.line);
-  assert.equal(DM.parse(gone).tasks[0].notes.length, 0);
-  assert.equal(gone.split("\n").length, NOTE.split("\n").length - 1);
-
   assert.throws(() => DM.editTaskNote(NOTE, ship.line, "x"));
   assert.throws(() => DM.editTaskNote(NOTE, n.line, "  "));
-  assert.throws(() => DM.deleteTaskNote(NOTE, 0));
+});
+
+test("inline: [[wikilinks]] become links only with a link builder", () => {
+  const links = { wikiHref: (t) => "obsidian://open?vault=v&file=" + encodeURIComponent(t), wikiTitle: (t) => "/v/" + t + ".md" };
+  assert.equal(MD.toHtml("[[A & B|ab]]", links),
+    '<a class="eis-link brief-wikilink" href="obsidian://open?vault=v&amp;file=A%20%26%20B" title="/v/A &amp; B.md">ab</a>');
+  assert.equal(MD.toHtml("[[A]]"), '<span class="brief-wikilink">A</span>');
+  assert.equal(MD.toHtml("[[A]]", { wikiHref: () => "javascript:x", wikiTitle: () => "" }), '<span class="brief-wikilink">A</span>');
 });

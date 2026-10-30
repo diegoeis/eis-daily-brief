@@ -22,7 +22,7 @@
       today: "Vencem hoje", todaySub: function (n) { return n + " nos próximos 7 dias"; },
       overdue: "Atrasadas", overdueSub: function (n) { return n === 0 ? "nenhuma" : "a mais antiga há " + n + " dias"; }
     },
-    columns: { done: "Feita", idx: "#", task: "Tarefa", source: "Fonte", created: "Criada", due: "Prazo" },
+    columns: { done: "Feita", idx: "#", task: "Tarefa", source: "Fonte", created: "Criada", due: "Prazo", act: "Cancelar ou reabrir" },
     today: "HOJE",
     isNew: "Nova",
     priority: { highest: "Urgente", high: "Alta", medium: "Média", low: "Baixa", lowest: "Mínima" },
@@ -30,13 +30,10 @@
     groupOverdue: function (n) { return n + (n === 1 ? " atrasada" : " atrasadas"); },
     closed: "Fechada",
     addNote: "+ Comentário",
-    edit: "Editar",
-    remove: "Apagar",
-    confirmRemove: "Confirmar",
+    dblclick: "Clique duas vezes para editar",
     cancelTask: "Cancelar tarefa",
     reopenTask: "Reabrir tarefa",
     cancelled: "Cancelada",
-    removeNoteQ: "Apagar o comentário?",
     editTaskLabel: "Tarefa",
     editNoteLabel: "Comentário",
     noPriority: "Sem prioridade",
@@ -71,16 +68,16 @@
   var prefsStore = window.ViewPrefs.create(
     "eis-daily-brief:view:v1", // name kept from before v0.9.0 so saved view choices survive the rename
     { status: "open", group: "", sort: "note", collapsed: [] },
-    { status: ["open", "done", "all"], sort: ["note", "due", "priority", "oldest", "newest"] }
+    { status: ["open", "today", "done", "cancelled", "all"], sort: ["note", "due", "priority", "oldest", "newest"] }
   );
 
   // The real source (folder) when one is set in settings, else the mock. "panel" = what the note area asks of the user.
   var source = window.DailySource;
   /* Open forms, by the line they edit: one at a time.
-     noteFormLine = new comment under that task; editTaskLine / editNoteLine = editing that task or comment;
-     confirm = "task:<line>" or "note:<line>", waiting for the second click that deletes it. */
+     noteFormLine = new comment under that task; editTaskLine / editNoteLine / editDueLine = editing that
+     task's text and priority, that comment, that task's due date (opened by a double click). */
   var state = { path: "", markdown: "", model: DM.parse(""), prefs: prefsStore.load(), noteFormLine: null, addingTask: false,
-    editTaskLine: null, editNoteLine: null, confirm: null, panel: null };
+    editTaskLine: null, editNoteLine: null, editDueLine: null, panel: null };
   var CHECK_EVERY_MS = 5000;
   var today = DM.toDateKey(new Date());
   var el = function (id) { return document.getElementById(id); };
@@ -114,7 +111,7 @@
   }
 
   function closeForms() {
-    state.noteFormLine = null; state.addingTask = false; state.editTaskLine = null; state.editNoteLine = null; state.confirm = null;
+    state.noteFormLine = null; state.addingTask = false; state.editTaskLine = null; state.editNoteLine = null; state.editDueLine = null;
   }
 
   // Runs an edit of the note; an edit that fails (the line moved, empty text) changes nothing.
@@ -152,7 +149,7 @@
   }
 
   // A form is open: don't reload the note under the user's typing.
-  function isEditing() { return state.noteFormLine !== null || state.addingTask || state.editTaskLine !== null || state.editNoteLine !== null || state.confirm !== null; }
+  function isEditing() { return state.noteFormLine !== null || state.addingTask || state.editTaskLine !== null || state.editNoteLine !== null || state.editDueLine !== null; }
 
   function setPrefs(change) {
     Object.assign(state.prefs, change);
@@ -167,8 +164,10 @@
   function visibleTasks(tasks) {
     var p = state.prefs;
     var list = tasks.filter(function (t) {
-      if (p.status === "open" && t.done) return false;
-      if (p.status === "done" && !t.done) return false;
+      if (p.status === "open") return !t.done;
+      if (p.status === "today") return !t.done && t.due === today;
+      if (p.status === "done") return t.done && !t.cancelled;
+      if (p.status === "cancelled") return t.cancelled;
       return true;
     });
     var byKey = function (key, dir, empty) {
@@ -288,9 +287,15 @@
   }
 
   // Only the levels the format has a mark for; a format with no priority marks gets no field.
-  function prioritySelect(id, value) {
+  // compact: no visible label and no field wrapper, for the inline edit row.
+  function prioritySelect(id, value, compact) {
     var levels = DM.LEVELS.filter(function (l) { return fmt().priorityMark[l]; });
     if (!levels.length) return "";
+    if (compact) {
+      return '<label class="eis-visually-hidden" for="' + id + '">' + TEXT.priorityLabel + "</label>" +
+        '<select class="eis-select brief-inline-edit__priority" id="' + id + '" name="priority"><option value="">' + TEXT.noPriority + "</option>" +
+        levels.map(function (l) { return '<option value="' + l + '"' + (l === value ? " selected" : "") + ">" + TEXT.priority[l] + "</option>"; }).join("") + "</select>";
+    }
     return '<div class="eis-field"><label for="' + id + '">' + TEXT.priorityLabel + "</label>" +
       '<select class="eis-select" id="' + id + '" name="priority"><option value="">' + TEXT.noPriority + "</option>" +
       levels.map(function (l) {
@@ -332,10 +337,11 @@
       "<summary><h2>" + esc(group.name || TEXT.noGroup) + '</h2><span class="eis-mono">' +
       (overdue ? '<span class="eis-app-over">' + esc(TEXT.groupOverdue(overdue)) + "</span> · " : "") +
       tasks.length + "</span></summary>" +
-      '<table class="eis-table"><colgroup><col class="eis-app-col-check"><col class="eis-app-col-idx"><col><col class="eis-app-col-src"><col class="eis-app-col-date"><col class="eis-app-col-due"></colgroup>' +
+      '<table class="eis-table"><colgroup><col class="eis-app-col-idx"><col class="eis-app-col-check"><col><col class="eis-app-col-src"><col class="eis-app-col-date"><col class="eis-app-col-due"><col class="brief-col-act"></colgroup>' +
       '<thead class="eis-label"><tr>' +
-      '<th scope="col"><span class="eis-visually-hidden">' + c.done + '</span></th><th scope="col">' + c.idx + '</th><th scope="col">' + c.task +
-      '</th><th scope="col">' + c.source + '</th><th scope="col">' + c.created + '</th><th scope="col">' + c.due + "</th></tr></thead>" +
+      '<th scope="col">' + c.idx + '</th><th scope="col"><span class="eis-visually-hidden">' + c.done + '</span></th><th scope="col">' + c.task +
+      '</th><th scope="col">' + c.source + '</th><th scope="col">' + c.created + '</th><th scope="col">' + c.due +
+      '</th><th scope="col"><span class="eis-visually-hidden">' + c.act + "</span></th></tr></thead>" +
       "<tbody>" + tasks.map(renderTask).join("") + "</tbody></table></details>";
   }
 
@@ -345,30 +351,46 @@
     var meta = [];
     if (t.done && t.completed) meta.push("<em>" + esc(TEXT.doneOn(F.shortDate(t.completed))) + "</em>");
     meta.push(textButton("note-open", t.line, TEXT.addNote));
-    meta.push(textButton("task-edit", t.line, TEXT.edit));
-    if (fmt().cancelled && (!t.done || t.cancelled)) meta.push(cancelButton(t));
 
     var due = "—", dueClass = "";
     if (t.due) {
       due = '<time datetime="' + t.due + '">' + (t.due === today ? TEXT.today : F.shortDate(t.due)) + "</time>";
       if (!t.done) dueClass = t.due === today ? " eis-app-due--today" : (t.due < today ? " eis-app-due--over" : "");
     }
+    if (state.editDueLine === t.line) {
+      due = '<input class="eis-input brief-due-input" type="date" data-due-input data-line="' + t.line + '" value="' + (t.due || "") +
+        '" aria-label="' + esc(TEXT.columns.due) + '">';
+    }
+
+    // Title: "Fechada" or "Cancelada" first, then the text, then "Nova" and the priority.
+    var title = state.editTaskLine === t.line ? renderTaskForm(t)
+      : '<p class="eis-app-task-title' + (t.cancelled ? " brief-cancelled" : "") + '" id="' + id + '" data-edit-task="' + t.line + '" title="' + TEXT.dblclick + '">' +
+        (t.cancelled ? chip("eis-chip--outline", TEXT.cancelled) + " " : t.done ? chip("eis-chip--success", TEXT.closed) + " " : "") +
+        MD.toHtml(t.description, links()) +
+        (t.isNew ? chip("eis-chip--solid", TEXT.isNew) : "") +
+        (t.priority ? chip(/high/.test(t.priority) ? "" : "eis-chip--outline", TEXT.priority[t.priority]) : "") + "</p>";
 
     return "<tr>" +
+      '<td class="eis-mono">' + F.count(i + 1) + "</td>" +
       // Only the checkbox marks a task done: the title is not a <label>, it names the checkbox through aria-labelledby.
       '<td><input class="eis-checkbox" type="checkbox" aria-labelledby="' + id + '" data-line="' + t.line + '"' + (t.done && !t.cancelled ? " checked" : "") + (t.cancelled ? " disabled" : "") + "></td>" +
-      '<td class="eis-mono">' + F.count(i + 1) + "</td>" +
-      // Title: "Fechada" first, then the text, then "Nova" and the priority.
-      '<td><p class="eis-app-task-title' + (t.cancelled ? " brief-cancelled" : "") + '" id="' + id + '">' +
-      (t.cancelled ? chip("eis-chip--outline", TEXT.cancelled) + " " : t.done ? chip("eis-chip--success", TEXT.closed) + " " : "") +
-      MD.toHtml(t.description) +
-      (t.isNew ? chip("eis-chip--solid", TEXT.isNew) : "") +
-      (t.priority ? chip(/high/.test(t.priority) ? "" : "eis-chip--outline", TEXT.priority[t.priority]) : "") + "</p>" +
-      (state.editTaskLine === t.line ? renderTaskForm(t) : '<p class="eis-app-meta">' + meta.join("") + "</p>") +
-      renderNotes(t) + "</td>" +
-      '<td class="eis-mono" title="' + esc(t.source ? MD.toText(t.source) : "") + '">' + (t.source ? MD.toHtml(t.source) : "—") + "</td>" +
+      // Comments and the new-comment form sit above "+ Comentário".
+      "<td>" + title + renderNotes(t) + '<p class="eis-app-meta">' + meta.join("") + "</p></td>" +
+      '<td class="eis-mono" title="' + esc(t.source ? MD.toText(t.source) : "") + '">' + (t.source ? MD.toHtml(t.source, links()) : "—") + "</td>" +
       '<td class="eis-mono">' + (t.created ? '<time datetime="' + t.created + '">' + F.shortDate(t.created) + "</time>" : "—") + "</td>" +
-      '<td class="eis-mono' + dueClass + '">' + due + "</td></tr>";
+      '<td class="eis-mono brief-due' + dueClass + '" data-edit-due="' + t.line + '" title="' + TEXT.dblclick + '">' + due + "</td>" +
+      "<td>" + (fmt().cancelled && (!t.done || t.cancelled) ? cancelButton(t) : "") + "</td></tr>";
+  }
+
+  /* [[Note]] links open the note in Obsidian when the page knows the vault (page-settings.js). */
+  function links() {
+    if (!WS.vault) return null;
+    var root = WS.vault.replace(/[\\/]+$/, "");
+    var name = root.split(/[\\/]/).pop();
+    return {
+      wikiHref: function (target) { return "obsidian://open?vault=" + encodeURIComponent(name) + "&file=" + encodeURIComponent(target); },
+      wikiTitle: function (target) { return root + "/" + target + ".md"; }
+    };
   }
 
   function textButton(action, line, label) {
@@ -386,33 +408,23 @@
       '" title="' + label + '" aria-label="' + label + '">' + (t.cancelled ? ICON.reopen : ICON.cancel) + "</button>";
   }
 
-  // "Apagar", and after the first click the question and "Confirmar" / "Cancelar" in its place.
-  function removeButton(kind, line, question) {
-    if (state.confirm !== kind + ":" + line) return textButton(kind + "-remove", line, TEXT.remove);
-    return '<span class="brief-confirm" role="group"><span>' + question + "</span>" +
-      textButton(kind + "-remove-yes", line, TEXT.confirmRemove) + textButton("remove-cancel", line, TEXT.cancel) + "</span>";
-  }
-
+  // Double click on the title: its text and priority, saved with the button or Enter, Esc drops it.
   function renderTaskForm(t) {
-    return '<form class="brief-add-task brief-edit-task" data-form="task-edit" data-line="' + t.line + '">' +
-      '<div class="eis-field brief-add-task__text"><label for="edit-task-' + t.line + '">' + TEXT.editTaskLabel + "</label>" +
-      '<input class="eis-input" id="edit-task-' + t.line + '" name="text" autocomplete="off" required value="' + esc(t.description) + '"></div>' +
-      prioritySelect("edit-priority-" + t.line, t.priority) +
-      '<div class="eis-field"><label for="edit-due-' + t.line + '">' + TEXT.allDone.dueLabel + "</label>" +
-      '<input class="eis-input" id="edit-due-' + t.line + '" name="due" type="date" value="' + (t.due || "") + '"></div>' +
-      formActions("edit-cancel", true) + "</form>";
+    return '<form class="brief-inline-edit" data-form="task-edit" data-line="' + t.line + '">' +
+      '<label class="eis-visually-hidden" for="edit-task-' + t.line + '">' + TEXT.editTaskLabel + "</label>" +
+      '<input class="eis-input" id="edit-task-' + t.line + '" name="text" autocomplete="off" required value="' + esc(t.description) + '">' +
+      '<button class="eis-button eis-button--sm eis-button--black" type="submit">' + TEXT.save + "</button>" +
+      prioritySelect("edit-priority-" + t.line, t.priority, true) + "</form>";
   }
 
   function renderNotes(t) {
     var items = t.notes.map(function (n) {
       var body = state.editNoteLine === n.line
-        ? '<form class="brief-note-form" data-form="note-edit" data-line="' + n.line + '">' +
+        ? '<form class="brief-inline-edit" data-form="note-edit" data-line="' + n.line + '">' +
           '<label class="eis-visually-hidden" for="edit-note-' + n.line + '">' + TEXT.editNoteLabel + "</label>" +
           '<input class="eis-input" id="edit-note-' + n.line + '" name="note" autocomplete="off" required value="' + esc(n.text) + '">' +
-          '<button class="eis-button eis-button--sm eis-button--ghost" type="button" data-action="edit-cancel">' + TEXT.cancel + "</button>" +
           '<button class="eis-button eis-button--sm eis-button--black" type="submit">' + TEXT.save + "</button></form>"
-        : "<p>" + MD.toHtml(n.text) + ' <span class="brief-note__actions">' +
-          textButton("note-edit", n.line, TEXT.edit) + removeButton("note", n.line, TEXT.removeNoteQ) + "</span></p>";
+        : '<p data-edit-note="' + n.line + '" title="' + TEXT.dblclick + '">' + MD.toHtml(n.text, links()) + "</p>";
       return '<li class="brief-note">' +
         (n.date ? '<time class="eis-mono" datetime="' + n.date + '">' + F.shortDate(n.date) + "</time>" : "<span></span>") +
         "<div>" + body + "</div></li>";
@@ -453,18 +465,35 @@
       switch (action) {
         case "note-open": closeForms(); state.noteFormLine = line; render(); focus("note-" + line); break;
         case "task-open": closeForms(); state.addingTask = true; render(); focus("add-task-text"); break;
-        case "task-edit": closeForms(); state.editTaskLine = line; render(); focus("edit-task-" + line); break;
-        case "note-edit": closeForms(); state.editNoteLine = line; render(); focus("edit-note-" + line); break;
         case "task-cancel-it": edit(function () { return DM.setTaskCancelled(state.markdown, line, true, fmt()); }); break;
         case "task-reopen": edit(function () { return DM.setTaskCancelled(state.markdown, line, false, fmt()); }); break;
-        case "note-remove": closeForms(); state.confirm = "note:" + line; render(); break;
-        case "note-remove-yes": edit(function () { return DM.deleteTaskNote(state.markdown, line, fmt()); }); break;
-        case "note-cancel": case "task-cancel": case "edit-cancel": case "remove-cancel": closeForms(); render(); break;
+        case "note-cancel": case "task-cancel": closeForms(); render(); break;
       }
     });
 
+    // Double click opens the inline editor: task title (text and priority), comment, due date.
+    tasks.addEventListener("dblclick", function (e) {
+      var spot = e.target.closest("[data-edit-task], [data-edit-note], [data-edit-due]");
+      if (!spot || e.target.closest("a, input, select, button")) return;
+      var d = spot.dataset;
+      closeForms();
+      if (d.editTask !== undefined) state.editTaskLine = Number(d.editTask);
+      if (d.editNote !== undefined) state.editNoteLine = Number(d.editNote);
+      if (d.editDue !== undefined) state.editDueLine = Number(d.editDue);
+      if (window.getSelection) window.getSelection().removeAllRanges(); // the double click selected a word
+      render();
+      var input = tasks.querySelector(".brief-inline-edit .eis-input, [data-due-input]");
+      if (input) { input.focus(); if (input.type === "text") input.select(); }
+    });
+
     tasks.addEventListener("keydown", function (e) {
-      if (e.key === "Escape" && e.target.closest("form")) { closeForms(); render(); }
+      // Esc in a form or in the due input: drop it, nothing is written.
+      if (e.key === "Escape" && (e.target.closest("form") || e.target.matches("[data-due-input]"))) { closeForms(); render(); return; }
+      if (e.key === "Enter" && e.target.matches("[data-due-input]")) {
+        e.preventDefault();
+        var line = Number(e.target.dataset.line), value = e.target.value || null;
+        edit(function () { return DM.editTask(state.markdown, line, { due: value }, fmt()); });
+      }
     });
 
     tasks.addEventListener("submit", function (e) {
@@ -481,7 +510,7 @@
       }
       if (form.dataset.form === "task-edit") {
         if (!v("text").trim()) return;
-        edit(function () { return DM.editTask(state.markdown, line, { text: v("text"), priority: v("priority") || null, due: v("due") || null }, fmt()); });
+        edit(function () { return DM.editTask(state.markdown, line, { text: v("text"), priority: v("priority") || null }, fmt()); });
         return;
       }
       if (!v("note").trim()) return;
