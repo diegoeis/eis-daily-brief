@@ -103,7 +103,3 @@
 /* number first, then the checkbox: room for two digits */
 .eis-app-tasks .eis-table .eis-app-col-idx{width:56px}
 
-/* Settings sits in the sidebar footer; eis-ds hides the footer when the sidebar becomes the top bar, so show it there, at the end */
-@media (max-width:1024px){
-  .eis-app-sidebar__foot{display:block;margin:0 0 0 auto;padding:0;border:0}
-}

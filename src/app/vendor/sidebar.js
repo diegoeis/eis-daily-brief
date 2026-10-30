@@ -2,12 +2,13 @@
    Collapses and expands the app sidebar on wide screens (above 1024px).
    Collapsed, the sidebar shows only its toggle. The choice stays for the next visit (localStorage).
 
-   Use: put the toggle right before the sidebar footer (last if there is no footer) and load this script at the end of <body>:
+   Use: put the toggle last in the sidebar footer and load this script at the end of <body>:
      <aside class="eis-app-sidebar" id="sidebar" aria-label="Sidebar">
        …nav…
-       <button class="eis-app-sidebar__toggle" type="button" aria-controls="sidebar"
-               aria-expanded="true" aria-label="Sidebar" data-eis-app-sidebar-toggle></button>
-       <footer class="eis-app-sidebar__foot">…</footer>
+       <footer class="eis-app-sidebar__foot">
+         <button class="eis-app-sidebar__toggle" type="button" aria-controls="sidebar"
+                 aria-expanded="true" aria-label="Sidebar" data-eis-app-sidebar-toggle></button>
+       </footer>
      </aside>
      <script src="src/app/js/sidebar.js"></script>
 

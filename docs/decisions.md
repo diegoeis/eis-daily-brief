@@ -160,6 +160,10 @@
 - **Sidebar** recolhe para uma faixa de 64px pelo botão com seta no canto de baixo, acima do rodapé (eis-ds `eis-app-sidebar__toggle` + `vendor/sidebar.js`, copiado pelo `scripts/vendor-eis-ds.py`). A escolha fica no `localStorage`. Abaixo de 1024px a sidebar é a barra do topo e o botão some.
 - **Conteúdo** ocupa o espaço livre até 1200px (`--app-size-main`), no centro. Sidebar branca.
 
+## 2026-10-30 — v0.14.6, Settings no menu
+
+- **Settings** sai do rodapé da sidebar e vai para o menu, abaixo de Daily. O rodapé guarda só o botão de recolher a sidebar.
+
 ## Pendente
 
 

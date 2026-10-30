@@ -1,5 +1,5 @@
 /* eis-ds, trimmed for the eis-task-manager page. GENERATED: do not edit.
-   Source: https://github.com/diegoeis/eis-ds @ 955e499
+   Source: https://github.com/diegoeis/eis-ds @ 6f15f65
    Built by scripts/vendor-eis-ds.py with only the eis-* classes the page uses. */
 @import url("https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600&family=Geist+Mono:ital,wght@0,300;0,400;0,500;1,400&display=swap");
 
@@ -252,13 +252,13 @@ code{font-family:var(--font-family-mono);font-size:var(--font-size-200)}
 .eis-app-shell[data-eis-app-animate]{transition:grid-template-columns .2s ease}
 .eis-app-shell:has(.eis-app-sidebar__toggle[aria-expanded="false"]){grid-template-columns:var(--app-size-sidebar-collapsed) minmax(0,1fr)}
 .eis-app-sidebar{overflow-x:clip}
-.eis-app-sidebar > :not(.eis-app-sidebar__toggle){min-inline-size:calc(var(--app-size-sidebar) - var(--space-200) * 2);transition:opacity .2s ease}
-.eis-app-sidebar:has(.eis-app-sidebar__toggle[aria-expanded="false"]) > :not(.eis-app-sidebar__toggle){opacity:0;visibility:hidden;
-    transition:opacity .2s ease,visibility 0s linear .2s}
-.eis-app-sidebar__toggle{--bg:transparent;display:flex;align-items:center;justify-content:flex-start;flex:none;align-self:flex-start;
-    margin-top:auto;inline-size:var(--app-size-nav-item);block-size:var(--app-size-nav-item);padding:0 0 0 var(--space-100);
+.eis-app-sidebar > :not(.eis-app-sidebar__foot),.eis-app-sidebar__foot > :not(.eis-app-sidebar__toggle){min-inline-size:calc(var(--app-size-sidebar) - var(--space-200) * 2);transition:opacity .2s ease}
+.eis-app-sidebar:has(.eis-app-sidebar__toggle[aria-expanded="false"]) > :not(.eis-app-sidebar__foot),.eis-app-sidebar:has(.eis-app-sidebar__toggle[aria-expanded="false"]) .eis-app-sidebar__foot > :not(.eis-app-sidebar__toggle){opacity:0;visibility:hidden;transition:opacity .2s ease,visibility 0s linear .2s}
+.eis-app-sidebar:has(.eis-app-sidebar__toggle[aria-expanded="false"]) .eis-app-sidebar__foot{border-top-color:transparent}
+.eis-app-sidebar__toggle{--bg:transparent;display:flex;align-items:center;justify-content:flex-start;
+    inline-size:var(--app-size-nav-item);block-size:var(--app-size-nav-item);padding:var(--space-100);
     border:0;border-radius:var(--radius-100);background:var(--bg);color:var(--ink);cursor:pointer}
-.eis-app-sidebar__toggle ~ .eis-app-sidebar__foot{margin-top:0}
+.eis-app-sidebar__foot > * + .eis-app-sidebar__toggle{margin-top:var(--space-200)}
 .eis-app-sidebar__toggle:hover{--bg:var(--surface-canvas)}
 .eis-app-sidebar__toggle::before{content:"";inline-size:8px;block-size:8px;translate:2px 0;rotate:45deg;
     border-left:1.5px solid currentColor;border-bottom:1.5px solid currentColor}
@@ -266,7 +266,7 @@ code{font-family:var(--font-family-mono);font-size:var(--font-size-200)}
 .eis-app-sidebar__toggle[aria-expanded="false"]::before{rotate:225deg;translate:-2px 0}
 }
 @media (min-width:1025px) and (prefers-reduced-motion:reduce){
-.eis-app-shell[data-eis-app-animate],.eis-app-shell[data-eis-app-animate] .eis-app-sidebar__toggle::before,.eis-app-sidebar > :not(.eis-app-sidebar__toggle){transition:none}
+.eis-app-shell[data-eis-app-animate],.eis-app-shell[data-eis-app-animate] .eis-app-sidebar__toggle::before,.eis-app-sidebar > :not(.eis-app-sidebar__foot),.eis-app-sidebar__foot > :not(.eis-app-sidebar__toggle){transition:none}
 }
 .eis-app-main{padding:var(--space-300);display:flex;flex-direction:column;gap:var(--space-300);min-width:0;
   inline-size:100%;max-inline-size:calc(var(--app-size-main) + var(--space-300) * 2);margin-inline:auto}
