@@ -111,6 +111,10 @@
 
 - **Favicon**: a página usa o favicon do eis-ds (`src/shared/brand/` no eis-ds, tag v0.5.0). `scripts/vendor-eis-ds.py` copia `favicon.svg` e `apple-touch-icon.png` para `src/app/vendor/` junto com o CSS; o `index.html` linka os dois.
 
+## 2026-10-30 — v0.12.2, abas e "+ Tarefa" alinhados
+
+- **Toolbar**: "+ Tarefa" usa o botão de tamanho padrão (40px) e as abas de status ganharam a mesma altura no eis-ds (v0.5.1). Antes: abas 38px e botão `--sm` 32px, desalinhados.
+
 ## Pendente
 
 
