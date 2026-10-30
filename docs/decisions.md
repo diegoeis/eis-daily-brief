@@ -138,6 +138,10 @@
 
 - **Menu compartilhado**: a página carrega `../../nav.js` (gerado pelo `eis_ops.py register` na raiz da `eis-ops`) e ganha uma seção com links para as páginas dos outros plugins. Cada plugin com página tem `eis-ops-page.js` na própria pasta; se a pasta some, o link some. Com uma página só, a seção fica escondida.
 
+## 2026-10-30 — v0.14.1, comentários numa linha própria
+
+- **Tabela de tarefas**: cada tarefa vira duas linhas. A segunda (`brief-task-detail`, `colspan` da tabela toda) guarda os comentários, o formulário de comentário, a data de conclusão e as ações (`ul.brief-task-actions`, no lugar do `p.eis-app-meta`), alinhada ao texto da tarefa.
+
 ## Pendente
 
 

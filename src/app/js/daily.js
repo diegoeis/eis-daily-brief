@@ -30,6 +30,7 @@
     groupOverdue: function (n) { return n + " overdue"; },
     closed: "Closed",
     addNote: "+ Comment",
+    taskActions: "Task actions",
     dblclick: "Double-click to edit",
     openInObsidian: "Open in Obsidian",
     cancelTask: "Cancel task",
@@ -367,9 +368,7 @@
   function renderTask(t, i) {
     var id = "task-" + t.line;
     var chip = function (cls, text) { return ' <span class="eis-chip eis-chip--sm ' + cls + '">' + text + "</span>"; };
-    var meta = [];
-    if (t.done && t.completed) meta.push("<em>" + esc(TEXT.doneOn(F.shortDate(t.completed))) + "</em>");
-    meta.push(textButton("note-open", t.line, TEXT.addNote));
+    var actions = [textButton("note-open", t.line, TEXT.addNote)];
 
     var due = "—", dueClass = "";
     if (t.due) {
@@ -389,16 +388,20 @@
         (t.isNew ? chip("eis-chip--solid", TEXT.isNew) : "") +
         (t.priority ? chip(/high/.test(t.priority) ? "" : "eis-chip--outline", TEXT.priority[t.priority]) : "") + "</p>";
 
-    return "<tr>" +
+    return '<tr class="brief-task">' +
       '<td class="eis-mono">' + F.count(i + 1) + "</td>" +
       // Only the checkbox marks a task done: the title is not a <label>, it names the checkbox through aria-labelledby.
       '<td><input class="eis-checkbox" type="checkbox" aria-labelledby="' + id + '" data-line="' + t.line + '"' + (t.done && !t.cancelled ? " checked" : "") + (t.cancelled ? " disabled" : "") + "></td>" +
-      // Comments and the new-comment form sit above "+ Comentário".
-      "<td>" + title + renderNotes(t) + '<p class="eis-app-meta">' + meta.join("") + "</p></td>" +
+      "<td>" + title + "</td>" +
       '<td class="eis-mono" title="' + esc(t.source ? MD.toText(t.source) : "") + '">' + (t.source ? MD.toHtml(t.source, links()) : "—") + "</td>" +
       '<td class="eis-mono">' + (t.created ? '<time datetime="' + t.created + '">' + F.shortDate(t.created) + "</time>" : "—") + "</td>" +
       '<td class="eis-mono brief-due' + dueClass + '" data-edit-due="' + t.line + '" title="' + TEXT.dblclick + '">' + due + "</td>" +
-      "<td>" + (fmt().cancelled && (!t.done || t.cancelled) ? cancelButton(t) : "") + "</td></tr>";
+      "<td>" + (fmt().cancelled && (!t.done || t.cancelled) ? cancelButton(t) : "") + "</td></tr>" +
+      // Second row, across the whole table: the comments, the new-comment form, then the task's actions.
+      '<tr class="brief-task-detail"><td colspan="7">' + renderNotes(t) +
+      (t.done && t.completed ? '<p class="brief-task-done eis-mono">' + esc(TEXT.doneOn(F.shortDate(t.completed))) + "</p>" : "") +
+      '<ul class="brief-task-actions" aria-label="' + esc(TEXT.taskActions) + '">' +
+      actions.map(function (a) { return "<li>" + a + "</li>"; }).join("") + "</ul></td></tr>";
   }
 
   /* Notes open in Obsidian when the page knows the vault (page-settings.js): obsidian://open?file=<name>.md. */
