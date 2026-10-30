@@ -119,6 +119,10 @@
 
 - **Sem rolagem horizontal**: em telas estreitas (360–390px) as cinco abas de status quebram em duas linhas (eis-ds v0.5.2), em vez de empurrar a página para os lados.
 
+## 2026-10-30 — v0.12.4, comentários longos com rolagem
+
+- **Altura máxima de 250px por comentário**: o texto de um comentário longo (ação para a IA, resultado) para em 250px e rola por dentro, para a lista de tarefas não esticar.
+
 ## Pendente
 
 
