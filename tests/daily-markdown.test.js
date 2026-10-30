@@ -172,3 +172,85 @@ test("addTask: works when every task is done and keeps the separator", () => {
 test("addTask: refuses empty text", () => {
   assert.throws(() => DM.addTask(NOTE, { text: "  ", created: "2026-10-27" }));
 });
+
+test("addTask: writes the priority mark before the dates, as the notes do", () => {
+  const out = DM.addTask(NOTE, { text: "Fix the export", created: "2026-10-27", due: "2026-10-30", priority: "high" });
+  assert.ok(out.includes("- [ ] Fix the export ⏫ ➕ 2026-10-27 📅 2026-10-30\n"));
+  const added = DM.parse(out).tasks.find((t) => t.description === "Fix the export");
+  assert.equal(added.priority, "high");
+  assert.throws(() => DM.addTask(NOTE, { text: "x", created: "2026-10-27", priority: "huge" }));
+});
+
+test("editTask: text, priority and due, changing only that line", () => {
+  const [ship, answer, deck] = DM.parse(NOTE).tasks;
+  const lines = (md) => md.split("\n");
+  const changed = (md) => lines(md).filter((l, i) => l !== lines(NOTE)[i]).length;
+
+  let out = DM.editTask(NOTE, ship.line, { text: "Ship the new invoices screen" });
+  assert.equal(lines(out)[ship.line], "- [ ] Ship the new invoices screen ➕ 2026-10-23");
+  assert.equal(changed(out), 1);
+
+  out = DM.editTask(NOTE, ship.line, { priority: "highest", due: "2026-10-31" });
+  assert.equal(lines(out)[ship.line], "- [ ] Ship the invoices screen 🔺 ➕ 2026-10-23 📅 2026-10-31");
+
+  out = DM.editTask(NOTE, answer.line, { text: "Answer Bruno", priority: "medium", due: "2026-10-28" });
+  assert.equal(lines(out)[answer.line], "- [ ] new - Answer Bruno — [Slack DM](https://x.slack.com/p2) - 🔼 ➕ 2026-10-25 📅 2026-10-28");
+
+  out = DM.editTask(NOTE, deck.line, { priority: null, due: null });
+  assert.equal(lines(out)[deck.line], "- [ ] Strategy deck ➕ 2026-10-14");
+  out = DM.editTask(NOTE, deck.line, { priority: "low" });
+  assert.equal(lines(out)[deck.line], "- [ ] Strategy deck 🔽 ➕ 2026-10-14 📅 2026-11-15");
+
+  // nothing changes when the values are the same
+  assert.equal(DM.editTask(NOTE, deck.line, { text: "Strategy deck", priority: "high", due: "2026-11-15" }), NOTE);
+  assert.throws(() => DM.editTask(NOTE, deck.line, { text: "  " }));
+  assert.throws(() => DM.editTask(NOTE, 0, { text: "x" }));
+});
+
+test("editTask: a done task keeps its ✅, a task with no dates gets them at the end", () => {
+  const reply = DM.parse(NOTE).tasks[3];
+  const out = DM.editTask(NOTE, reply.line, { due: "2026-10-24" });
+  assert.equal(out.split("\n")[reply.line], "- [x] Reply to [[Davi Rocha]] — [Slack DM](https://x.slack.com/p3) - ➕ 2026-10-22 📅 2026-10-24 ✅ 2026-10-26");
+  const bare = "## Tasks\n\n**A**\n- [ ] Plain\n";
+  assert.equal(DM.editTask(bare, 3, { priority: "high", due: "2026-11-01" }), "## Tasks\n\n**A**\n- [ ] Plain ⏫ 📅 2026-11-01\n");
+});
+
+test("editTask: a description split by marks is written again with the same parts", () => {
+  const note = "## Tasks\n\n**A**\n- [ ] Call ➕ 2026-10-20 the bank — [[Ana Prado]]\n";
+  const out = DM.editTask(note, 3, { text: "Call the bank today" });
+  const t = DM.parse(out).tasks[0];
+  assert.equal(t.description, "Call the bank today");
+  assert.equal(t.source, "[[Ana Prado]]");
+  assert.equal(t.created, "2026-10-20");
+});
+
+test("setTaskCancelled: [-] and back, only the start of that line changes", () => {
+  const deck = DM.parse(NOTE).tasks[2];
+  const out = DM.setTaskCancelled(NOTE, deck.line, true);
+  assert.equal(out.split("\n")[deck.line], "- [-] Strategy deck ⏫ ➕ 2026-10-14 📅 2026-11-15");
+  const t = DM.parse(out).tasks[2];
+  assert.equal(t.cancelled, true);
+  assert.equal(t.done, true); // closed: out of the open counts
+  assert.equal(t.priority, "high");
+  assert.equal(DM.setTaskCancelled(out, deck.line, false), NOTE);
+  assert.equal(DM.parse(NOTE).tasks[2].cancelled, false);
+  assert.throws(() => DM.setTaskCancelled(NOTE, DM.parse(NOTE).tasks[3].line, true)); // done task
+  assert.throws(() => DM.setTaskCancelled(NOTE, 0, true));
+});
+
+test("editTaskNote and deleteTaskNote: keep the date, touch only that comment", () => {
+  const ship = DM.parse(NOTE).tasks[0];
+  const n = ship.notes[0];
+  const out = DM.editTaskNote(NOTE, n.line, " Ships  Tuesday ");
+  assert.equal(out.split("\n")[n.line], "    - 2026-10-26 - Ships Tuesday");
+  const undated = "## Tasks\n\n- [ ] A\n  - loose note\n";
+  assert.equal(DM.editTaskNote(undated, 3, "fixed"), "## Tasks\n\n- [ ] A\n  - fixed\n");
+
+  const gone = DM.deleteTaskNote(NOTE, n.line);
+  assert.equal(DM.parse(gone).tasks[0].notes.length, 0);
+  assert.equal(gone.split("\n").length, NOTE.split("\n").length - 1);
+
+  assert.throws(() => DM.editTaskNote(NOTE, ship.line, "x"));
+  assert.throws(() => DM.editTaskNote(NOTE, n.line, "  "));
+  assert.throws(() => DM.deleteTaskNote(NOTE, 0));
+});

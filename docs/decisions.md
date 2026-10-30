@@ -79,7 +79,16 @@
 - **Nomes internos mantidos**: o banco IndexedDB (`eis-daily-brief`, guarda a pasta escolhida) e a chave de preferências da página (`eis-daily-brief:view:v1`). Trocá-los faria todo usuário escolher a pasta de novo e perder filtros, sem ganho visível. As classes CSS `brief-*` também ficam.
 - **Nota diária**: o conceito de daily note continua (é onde as tarefas moram), assim como a tag `daily/brief` do template.
 
+## 2026-10-29 — v0.10.0, prioridade, editar e apagar na página
+
+- **Prioridade segue o padrão das notas**: as marcas do Obsidian Tasks (🔺 ⏫ 🔼 🔽 ⏬), que o vault já usa, logo antes das datas (`Texto ⏫ ➕ 2026-10-14`). O formato já lia essas marcas; agora a página e o `tasks-update` também escrevem, sempre a 1ª marca listada para o nível em `tasks.priority`.
+- **`tasks-update` só põe prioridade com sinal explícito na fonte**: marca no checkbox de origem (copiada) ou urgência dita em palavras. Nunca infere pela pessoa, canal ou prazo. Prioridade de tarefa existente é do usuário: o run não mexe.
+- **Página**: botão "+ Tarefa" sempre visível (antes só aparecia sem tarefas abertas), com grupo, prioridade e prazo; editar tarefa (texto, prioridade, prazo) e comentário (texto, mantém a data); apagar comentário, com confirmação em dois cliques na própria linha (sem `confirm()`, que pode não existir no painel do host). Nova ordenação "Prioridade" (sem marca = entre média e baixa).
+- **Tarefa se cancela, não se apaga**: um ícone na linha troca `- [ ]` por `- [-]` (status cancelado do Obsidian Tasks, já usado no vault, sem data); o mesmo botão reabre. Apagar tiraria a tarefa da nota e o próximo `tasks-update` a cadastraria de novo pela fonte, porque a dedup não teria contra o que comparar. Cancelada fica na nota, conta como fechada, não migra para a próxima daily e barra a mesma tarefa de voltar. Nova chave opcional `tasks.item.cancelled` no formato.
+- **Edição no lugar**: só a parte alterada da linha muda (texto, marca ou data); o resto fica como escrito. Descrição cortada por marcas no meio é reescrita com as mesmas partes.
+
 ## Pendente
+
 
 - Testar `tasks-setup` no Cowork (seletor de pasta) e `tasks-update` agendado com `--config`.
 - Inferência de pessoas e canais pelo messenger no setup: está descrita, não testada.

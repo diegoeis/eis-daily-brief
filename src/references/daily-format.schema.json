@@ -52,6 +52,7 @@
           "properties": {
             "open": { "description": "Start of an open task line.", "type": "string", "minLength": 1 },
             "done": { "description": "Starts of a done task line. The first one is written.", "type": "array", "items": { "type": "string", "minLength": 1 }, "minItems": 1 },
+            "cancelled": { "description": "Start of a cancelled task line; no cancelling when missing.", "type": "string", "minLength": 1 },
             "newPrefix": { "description": "Prefix the brief puts on tasks new today; empty for none.", "type": "string" },
             "sourceSeparators": { "description": "Text between the description and the source; the last one on the line counts.", "type": "array", "items": { "type": "string", "minLength": 1 } }
           }

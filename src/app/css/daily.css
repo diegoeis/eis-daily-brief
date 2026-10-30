@@ -19,9 +19,27 @@
 .brief-note{display:grid;grid-template-columns:calc(var(--space-400) + var(--space-100)) minmax(0,1fr);gap:var(--space-200);
   font-size:var(--font-size-300);line-height:var(--font-line-height-normal);color:var(--ink-muted)}
 .brief-note time{line-height:inherit}
+/* edit and delete of a comment: inline after its text, stronger when the comment is hovered */
+.brief-note__actions{white-space:nowrap;opacity:.6}
+.brief-note__actions .brief-text-button{margin-left:var(--space-100)}
+.brief-note:hover .brief-note__actions,.brief-note__actions:focus-within{opacity:1}
+/* cancel / reopen a task: icon only, next to the text actions */
+.brief-icon-button{display:inline-flex;align-items:center;justify-content:center;inline-size:var(--space-300);block-size:var(--space-300);
+  border:0;border-radius:var(--radius-100);background:none;padding:0;cursor:pointer;color:var(--ink-muted)}
+.brief-icon-button:hover{color:var(--accent-ink);background:var(--surface-canvas)}
+.brief-icon-button:focus-visible{outline:2px solid var(--ink);outline-offset:0}
+.brief-cancelled{text-decoration:line-through;text-decoration-color:var(--ink-muted);color:var(--ink-muted)}
+.brief-cancelled .eis-chip{text-decoration:none}
+/* "Apagar?" waiting for the second click */
+.brief-confirm{display:inline-flex;flex-wrap:wrap;gap:var(--space-100);font-family:var(--font-family-mono);font-size:var(--font-size-200);color:var(--accent-ink)}
+
+/* the "+ Tarefa" button or the form, above the groups */
+.brief-add-bar{padding:var(--space-200);border-bottom:var(--border-width-100) solid var(--line)}
+.brief-edit-task{margin-top:var(--space-200)}
 
 .brief-note-form{display:flex;flex-wrap:wrap;gap:var(--space-100);margin-top:var(--space-200)}
 .brief-note-form .eis-input{flex:1 1 calc(var(--space-400) * 6)}
+.brief-note .brief-note-form{margin-top:0}
 
 .brief-wikilink{color:var(--ink)}
 

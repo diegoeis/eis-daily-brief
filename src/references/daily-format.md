@@ -3,7 +3,7 @@
 How tasks are written in a daily note, as data: the section, the groups, the task lines, the date marks, the priority marks and the comments. One file is the contract between the two sides that touch the tasks:
 
 - `tasks-update` writes the tasks section by it;
-- the daily page reads, marks done, comments and adds tasks by it.
+- the daily page reads, marks done or cancelled, adds and edits tasks, adds, edits and deletes comments, and sets priorities by it.
 
 The plugin's default is [`daily-format.json`](daily-format.json), next to this file: the format of `../skills/tasks-update/templates/daily.md`. A user with their own way of writing tasks keeps a `daily-format.json` in their workspace (`.eis-task-manager/daily-format.json`, see `config.md`); without one, the default applies. The schema is [`daily-format.schema.json`](daily-format.schema.json) (JSON Schema 2020-12). Same spirit as the W3C design tokens format: a small, versioned, declarative file that tools on both sides read.
 
@@ -21,11 +21,12 @@ Only the tasks section is described. The rest of the note (agenda, pending issue
 | `tasks.group.default` | Group for tasks with no team, project or topic. New tasks from the page go here. | `Needs to be done` |
 | `tasks.item.open` | Start of an open task. | `- [ ] ` |
 | `tasks.item.done` | Starts of a done task; the first one is written. | `- [x] `, `- [X] ` |
+| `tasks.item.cancelled` | Start of a cancelled task (Obsidian Tasks status `-`). Cancelled tasks count as closed. Without it, the page can't cancel. | `- [-] ` |
 | `tasks.item.newPrefix` | Prefix on tasks new today; `""` for none. | `new - ` |
 | `tasks.item.sourceSeparators` | Text between the description and the source; the last one on the line counts. | ` — `, ` -- ` |
 | `tasks.fields.created` / `due` / `completed` | Mark written before each date. `completed` is added when a task is marked done and removed on undo. | `➕` / `📅` / `✅` |
 | `tasks.fields.ignore` | Other date marks: kept in the line, hidden on the page. | `⏳`, `🛫` |
-| `tasks.priority` | Mark → level (`highest`, `high`, `medium`, `low`, `lowest`). | Obsidian Tasks marks |
+| `tasks.priority` | Mark → level (`highest`, `high`, `medium`, `low`, `lowest`). Any listed mark is read; the first one listed for a level is the one written, right before the date marks (`Strategy deck ⏫ ➕ 2026-10-14`). A format with no marks has no priority on the page. | Obsidian Tasks marks (🔺 ⏫ 🔼 🔽 ⏬) |
 | `tasks.comment.indent` | Whitespace before a comment under a task. Any indent of 2+ spaces or a tab is read; this one is written. | 4 spaces |
 | `tasks.comment.prefix` | Start of a comment, after the indent. | `- ` |
 | `tasks.comment.line` | The rest of the comment, with `{text}` and optionally `{date}`. | `{date} - {text}` |

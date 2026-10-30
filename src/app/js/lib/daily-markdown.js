@@ -8,6 +8,7 @@
 
    Task line:  - [ ] {description} — [Source](url) - ➕ YYYY-MM-DD 📅 YYYY-MM-DD
    Done task:  - [x] {description} ... ✅ YYYY-MM-DD
+   Cancelled:  - [-] {description} ...   (the line as it was, with another start)
    Comment:        - YYYY-MM-DD - {note}
 
    compile(format) turns the JSON into what the functions use; every function takes that as its
@@ -104,14 +105,18 @@
       defaultGroup: t.group.default,
       open: t.item.open,
       done: t.item.done,
+      cancelled: t.item.cancelled || "",
       newPrefix: t.item.newPrefix || "",
       separators: t.item.sourceSeparators || [],
       marks: t.fields,
       fields: { created: marker(t.fields.created), due: marker(t.fields.due), completed: marker(t.fields.completed) },
       completedRe: new RegExp("\\s*" + escapeRe(t.fields.completed) + "\\s*" + date.group),
       anyMarkRe: new RegExp("\\s*(?:" + marks.map(escapeRe).join("|") + ")\\s*" + date.group, "g"),
+      firstMarkRe: new RegExp("\\s*(?:" + marks.map(escapeRe).join("|") + ")\\s*" + date.group),
       priorities: Object.keys(priority).sort(function (a, b) { return b.length - a.length; }), // "⬇️" before "⬇"
       priorityOf: priority,
+      // The mark written for each level: the first one the format lists for it.
+      priorityMark: Object.keys(priority).reduce(function (m, k) { if (!m[priority[k]]) m[priority[k]] = k; return m; }, {}),
       subRe: new RegExp("^(?: {2,}|\\t+)" + escapeRe(t.comment.prefix) + "(.*)$"),
       commentRe: commentRe,
       commentGroups: commentGroups,
@@ -128,6 +133,8 @@
 
   function taskStart(line, F) {
     if (line.indexOf(F.open) === 0) return { done: false, prefix: F.open, body: line.slice(F.open.length) };
+    // A cancelled task is closed like a done one: `done` is true for both, `cancelled` tells them apart.
+    if (F.cancelled && line.indexOf(F.cancelled) === 0) return { done: true, cancelled: true, prefix: F.cancelled, body: line.slice(F.cancelled.length) };
     for (var i = 0; i < F.done.length; i++) {
       if (line.indexOf(F.done[i]) === 0) return { done: true, prefix: F.done[i], body: line.slice(F.done[i].length) };
     }
@@ -230,6 +237,7 @@
         task = parseTaskBody(start.body, F);
         task.line = i;
         task.done = start.done;
+        task.cancelled = Boolean(start.cancelled);
         task.group = group.name;
         task.notes = [];
         group.tasks.push(task);
@@ -288,14 +296,15 @@
   }
 
   /* Adds an open task, the way the user writes one by hand:
-       {open}{text} {created mark} {date} [{due mark} {date}]   (due only when given)
+       {open}{text} [{priority mark}] {created mark} {date} [{due mark} {date}]   (priority and due only when given)
      It goes at the end of `group` (default: the format's default group). A missing group is
      created at the top of the tasks section; a missing section is added at the end of the note. */
   function addTask(markdown, task, F) {
     F = F || DEFAULT;
     var text = String(task.text || "").replace(/\s+/g, " ").trim();
     if (!text) throw new Error("Empty task");
-    var line = F.open + text + " " + F.marks.created + " " + F.date.fromKey(task.created) +
+    var line = F.open + text + (task.priority ? " " + markFor(task.priority, F) : "") +
+      " " + F.marks.created + " " + F.date.fromKey(task.created) +
       (task.due ? " " + F.marks.due + " " + F.date.fromKey(task.due) : "");
     var group = task.group || F.defaultGroup;
     var lines = splitLines(markdown);
@@ -333,6 +342,123 @@
     return joinLines(lines, markdown);
   }
 
+  function markFor(level, F) {
+    var mark = F.priorityMark[level];
+    if (!mark) throw new Error("The format has no mark for priority " + level);
+    return mark;
+  }
+
+  // Inserts `text` before the first date mark of a task body (where the user's notes put the
+  // priority: "Strategy deck ⏫ ➕ 2026-10-14"), or at its end when it has none.
+  function beforeMarks(body, text, F) {
+    var m = body.match(F.firstMarkRe);
+    if (!m) return body.replace(/\s+$/, "") + " " + text;
+    return body.slice(0, m.index) + " " + text + body.slice(m.index);
+  }
+
+  function withoutPriority(body, F) {
+    F.priorities.forEach(function (mark) { body = body.split(" " + mark).join("").split(mark).join(""); });
+    return body;
+  }
+
+  /* Changes a task in place. `change` may hold:
+       text      the new description (the source, dates and marks stay)
+       due       YYYY-MM-DD, or null to remove the due date
+       priority  a level (highest … lowest), or null to remove the mark
+     Keys left out are not touched; everything else on the line stays as written. */
+  function editTask(markdown, lineIndex, change, F) {
+    F = F || DEFAULT;
+    var lines = splitLines(markdown);
+    var start = taskAt(lines, lineIndex, F);
+    var body = start.body;
+    var task = parseTaskBody(body, F);
+
+    if ("text" in change) {
+      var text = String(change.text || "").replace(/\s+/g, " ").trim();
+      if (!text) throw new Error("Empty task");
+      if (text !== task.description) {
+        var from = task.isNew ? F.newPrefix.length : 0;
+        var at = task.description ? body.indexOf(task.description, from) : -1;
+        if (at !== -1) {
+          body = body.slice(0, at) + text + body.slice(at + task.description.length);
+        } else {
+          // The description is split by marks: write the line again with the same parts.
+          var tail = (body.match(F.anyMarkRe) || []).map(function (s) { return s.trim(); });
+          if (task.priority) tail.unshift(markFor(task.priority, F));
+          body = (task.isNew ? F.newPrefix : "") + text +
+            (task.source ? (F.separators[0] || " ") + task.source : "") + (tail.length ? " " + tail.join(" ") : "");
+        }
+      }
+    }
+
+    if ("priority" in change && (change.priority || null) !== parseTaskBody(body, F).priority) {
+      body = withoutPriority(body, F);
+      if (change.priority) body = beforeMarks(body, markFor(change.priority, F), F);
+    }
+
+    if ("due" in change && (change.due || null) !== parseTaskBody(body, F).due) {
+      var dueMark = F.marks.due + " " + (change.due ? F.date.fromKey(change.due) : "");
+      if (!change.due) body = body.replace(new RegExp("\\s*" + F.fields.due.source), "");
+      else if (F.fields.due.test(body)) body = body.replace(F.fields.due, dueMark);
+      else {
+        var created = body.match(F.fields.created);
+        if (created) {
+          var end = created.index + created[0].length;
+          body = body.slice(0, end) + " " + dueMark + body.slice(end);
+        } else {
+          body = beforeMarks(body, dueMark, F);
+        }
+      }
+    }
+
+    lines[lineIndex] = start.prefix + body;
+    return joinLines(lines, markdown);
+  }
+
+  /* Cancels an open task (its start becomes the format's cancelled start, the rest of the line stays)
+     or opens a cancelled one again. */
+  function setTaskCancelled(markdown, lineIndex, cancelled, F) {
+    F = F || DEFAULT;
+    if (!F.cancelled) throw new Error("The format has no cancelled start");
+    var lines = splitLines(markdown);
+    var start = taskAt(lines, lineIndex, F);
+    if (cancelled && start.done && !start.cancelled) throw new Error("A done task can't be cancelled");
+    lines[lineIndex] = (cancelled ? F.cancelled : F.open) + start.body;
+    return joinLines(lines, markdown);
+  }
+
+  function noteAt(lines, lineIndex, F) {
+    var s = (lines[lineIndex] || "").match(F.subRe);
+    var up = lineIndex - 1;
+    while (s && up >= 0 && F.subRe.test(lines[up])) up--;
+    if (!s || up < 0 || !taskStart(lines[up], F)) throw new Error("Line " + lineIndex + " is not a task comment");
+    return s;
+  }
+
+  /* Changes the text of a comment under a task; its date stays. */
+  function editTaskNote(markdown, lineIndex, text, F) {
+    F = F || DEFAULT;
+    var clean = String(text).replace(/\s+/g, " ").trim();
+    if (!clean) throw new Error("Empty note");
+    var lines = splitLines(markdown);
+    var s = noteAt(lines, lineIndex, F);
+    var note = parseNote(s[1], lineIndex, F);
+    var head = lines[lineIndex].slice(0, lines[lineIndex].length - s[1].length); // indent + prefix, as written
+    lines[lineIndex] = head + (note.date
+      ? F.format.tasks.comment.line.replace("{date}", F.date.fromKey(note.date)).replace("{text}", clean)
+      : clean);
+    return joinLines(lines, markdown);
+  }
+
+  /* Removes one comment under a task. */
+  function deleteTaskNote(markdown, lineIndex, F) {
+    F = F || DEFAULT;
+    var lines = splitLines(markdown);
+    noteAt(lines, lineIndex, F);
+    lines.splice(lineIndex, 1);
+    return joinLines(lines, markdown);
+  }
+
   /* Local date as YYYY-MM-DD (never toISOString, which shifts to UTC). */
   function toDateKey(d) {
     var pad = function (n) { return String(n).padStart(2, "0"); };
@@ -342,6 +468,8 @@
   var api = {
     compile: compile, validateFormat: validateFormat, DEFAULT: DEFAULT,
     parse: parse, setTaskDone: setTaskDone, addTaskNote: addTaskNote, addTask: addTask,
+    editTask: editTask, setTaskCancelled: setTaskCancelled, editTaskNote: editTaskNote, deleteTaskNote: deleteTaskNote,
+    LEVELS: LEVELS,
     toDateKey: toDateKey, DEFAULT_GROUP: DEFAULT.defaultGroup
   };
   if (isNode) module.exports = api;

@@ -28,6 +28,7 @@
           "- [x] ",
           "- [X] "
         ],
+        "cancelled": "- [-] ",
         "newPrefix": "new - ",
         "sourceSeparators": [
           " — ",

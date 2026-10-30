@@ -17,6 +17,7 @@
     "item": {
       "open": "- [ ] ",
       "done": ["- [x] ", "- [X] "],
+      "cancelled": "- [-] ",
       "newPrefix": "new - ",
       "sourceSeparators": [" — ", " -- "]
     },
