@@ -150,6 +150,11 @@
 
 - **Tabela de tarefas**: as colunas Source, Created e Due saem; viram uma linha (`dl.brief-task-meta`) abaixo do texto da tarefa. Ficam só #, checkbox, tarefa e o botão de cancelar. Duplo clique no Due continua abrindo o campo de data, agora na própria linha.
 
+## 2026-10-30 — v0.14.4, abas e "+ Task" no cabeçalho
+
+- **Abas**: Open, Today, Done, All. Done junta feitas e canceladas (a aba Cancelled saiu; quem tinha ela salva volta para Open). "Due today" virou "Today".
+- **"+ Task"** sai da linha das abas e vai para o cabeçalho, à direita do título, abaixo do caminho da daily.
+
 ## Pendente
 
 

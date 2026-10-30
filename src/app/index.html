@@ -19,7 +19,7 @@
 <body class="eis-app-shell">
 
 <aside class="eis-app-sidebar" aria-label="Sidebar">
-  <p class="eis-app-brand"><a href="#daily">TASK MANAGER</a> <span class="eis-mono">v0.14.3</span></p>
+  <p class="eis-app-brand"><a href="#daily">TASK MANAGER</a> <span class="eis-mono">v0.14.4</span></p>
   <nav class="eis-app-nav" aria-label="Main">
     <section class="eis-app-nav__section" aria-labelledby="nav-tasks">
       <h2 class="eis-label" id="nav-tasks">Tasks</h2>
@@ -41,6 +41,7 @@
   <header class="eis-app-page-head">
     <p class="eis-app-page-head__meta"><time class="eis-label" id="today"></time><span class="eis-mono" id="note-path"></span></p>
     <h1>Daily</h1>
+    <button class="eis-button eis-button--black" type="button" id="add-task-open">+ Task</button>
   </header>
 
   <p class="brief-notice eis-mono" id="notice" role="status" hidden></p>
@@ -53,12 +54,10 @@
     <fieldset class="eis-tabs">
       <legend>Status</legend>
       <label><input type="radio" name="status" value="open"><span>Open</span></label>
-      <label><input type="radio" name="status" value="today"><span>Due today</span></label>
+      <label><input type="radio" name="status" value="today"><span>Today</span></label>
       <label><input type="radio" name="status" value="done"><span>Done</span></label>
-      <label><input type="radio" name="status" value="cancelled"><span>Cancelled</span></label>
       <label><input type="radio" name="status" value="all"><span>All</span></label>
     </fieldset>
-    <button class="eis-button eis-button--black brief-toolbar__add" type="button" id="add-task-open">+ Task</button>
     <div class="brief-toolbar__fields">
       <div class="eis-field brief-toolbar__search">
         <label for="search">Search</label>

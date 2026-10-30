@@ -72,7 +72,7 @@
   var prefsStore = window.ViewPrefs.create(
     "eis-daily-brief:view:v1", // name kept from before v0.9.0 so saved view choices survive the rename
     { status: "open", group: "", sort: "note", collapsed: [] },
-    { status: ["open", "today", "done", "cancelled", "all"], sort: ["note", "due", "priority", "oldest", "newest"] }
+    { status: ["open", "today", "done", "all"], sort: ["note", "due", "priority", "oldest", "newest"] }
   );
 
   // The real source (folder) when one is set in settings, else the mock. "panel" = what the note area asks of the user.
@@ -178,8 +178,7 @@
       }
       if (p.status === "open") return !t.done;
       if (p.status === "today") return !t.done && t.due === today;
-      if (p.status === "done") return t.done && !t.cancelled;
-      if (p.status === "cancelled") return t.cancelled;
+      if (p.status === "done") return t.done; // done and cancelled
       return true;
     });
     var byKey = function (key, dir, empty) {
@@ -294,7 +293,7 @@
     return '<div class="brief-all-done"><h2>' + a.title + "</h2><p>" + a.text + "</p>" + action + "</div>";
   }
 
-  // Above the groups while adding a task (the "+ Tarefa" button sits in the toolbar).
+  // Above the groups while adding a task (the "+ Task" button sits in the page header).
   function renderAddBar() {
     return state.addingTask ? '<div class="brief-add-bar">' + renderAddForm() + "</div>" : "";
   }
