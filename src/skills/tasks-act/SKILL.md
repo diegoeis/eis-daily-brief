@@ -12,7 +12,7 @@ Start the chat output with one line `STATUS: OK | WARN | BLOCKED`. Write to the 
 ## 1. Find the note and the format
 
 1. Find the workspace and its config as described in `../../references/config.md` (relative to this skill's folder). Not found or invalid: stop with `STATUS: BLOCKED`, saying why and that `/tasks-setup` creates it.
-2. The format is `.eis-task-manager/daily-format.json` when the workspace has one, else `../../references/daily-format.json`; `../../references/daily-format.md` says what each key means. Without `tasks.comment.action`, there are no actions: say so and stop with `STATUS: OK`.
+2. The format is `eis-ops/task-manager/daily-format.json` when the workspace has one, else `../../references/daily-format.json`; `../../references/daily-format.md` says what each key means. Without `tasks.comment.action`, there are no actions: say so and stop with `STATUS: OK`.
 3. The note is the latest daily in `output.folder` by `output.pattern`, on or before today. None: stop with `STATUS: BLOCKED`.
 
 ## 2. Collect the pending actions
@@ -30,13 +30,13 @@ In the tasks section, a comment (a sub-item of a task, in the format's comment s
 
 Take only pending actions under **open** tasks, in the order of the note. Pending actions under done or cancelled tasks are not run: list them in the chat output. With `--dry-run`, list the pending actions (task, instruction) and stop.
 
-**Stale claims.** A running mark whose claim in `.eis-task-manager/act-state.json` is older than two hours, or has no claim there, belongs to a run that stopped midway. Never run it again (it may have half happened): mark it failed, with `Não executada: a execução anterior parou no meio; confira o que já foi feito e edite o comentário para tentar de novo.` as its result comment (step 4).
+**Stale claims.** A running mark whose claim in `eis-ops/task-manager/act-state.json` is older than two hours, or has no claim there, belongs to a run that stopped midway. Never run it again (it may have half happened): mark it failed, with `Não executada: a execução anterior parou no meio; confira o que já foi feito e edite o comentário para tentar de novo.` as its result comment (step 4).
 
 ## 3. Run each action
 
 **Claim it first**, so two runs (a schedule and a manual one, or two sessions) never do the same action:
 
-1. Add the action to `.eis-task-manager/act-state.json` (`{"running": [{"instruction": <text after the mark>, "task": <task description>, "started": <ISO 8601 date-time with offset>}]}`, creating the file).
+1. Add the action to `eis-ops/task-manager/act-state.json` (`{"running": [{"instruction": <text after the mark>, "task": <task description>, "started": <ISO 8601 date-time with offset>}]}`, creating the file).
 2. Read the note from disk. When the action's line is no longer pending (another run claimed it, or the user changed it), drop it from the state file and skip it.
 3. Replace the pending mark with the `running` mark (nothing else changes) and write the note, but only if it didn't change since step 2 (read it again and compare right before writing); if it changed, go back to step 2.
 
@@ -61,7 +61,7 @@ Record every action as soon as it ends, before running the next one, so an inter
    - failed: `Não executada: {reason, or the question the user needs to answer}`.
    Write it in the note's language (the config's `language`). A result comment never starts with an action mark.
 4. Write only if the note didn't change since step 1 (compare right before writing; if it changed, go back to step 1).
-5. Remove the action from `.eis-task-manager/act-state.json`.
+5. Remove the action from `eis-ops/task-manager/act-state.json`.
 6. Change nothing else in the note: no task is closed, added, edited or moved.
 
 ## Chat output
@@ -70,7 +70,7 @@ Record every action as soon as it ends, before running the next one, so an inter
 
 ## Constraints
 
-- The writes of this skill are the action lines and their result comments in the daily note, and `.eis-task-manager/act-state.json`. Any other write is what an action explicitly asked for.
+- The writes of this skill are the action lines and their result comments in the daily note, and `eis-ops/task-manager/act-state.json`. Any other write is what an action explicitly asked for.
 - Never run an action that is not a pending action comment written in the note, and never write the pending mark yourself.
 - Every link in a result comes from what the action actually created or read. Never invent results, links or ids.
 - Do not expose client names, document numbers or personal identifiers in the chat output beyond what is needed to recognize an item.

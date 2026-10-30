@@ -1,11 +1,11 @@
 ---
 name: tasks-view
-description: Open the daily brief page - a local web page that shows the latest daily note as a task dashboard (open, new this week, due today, overdue; filters by topic; sort) and writes every change back to the markdown in the brief's format (mark done or cancel; add a task, a comment or an AI action; edit tasks and comments). Use when the user says "abre a daily", "mostra minha daily", "abre o painel da daily", "quero ver minhas tarefas", "abre minhas tasks", "open my daily brief", "show the daily dashboard", or runs /tasks-view. Before opening, runs tasks-update, which creates today's note or updates it when it exists; "--no-generate" only opens the page. Opens the page in the host's preview pane when it has one, otherwise in the default browser. "--config PATH" names the workspace (the chosen folder, .eis-task-manager/ or its config.json). Copies the page into the workspace (.eis-task-manager/app/) and opens that copy, so its address never changes. Does not change the config (use tasks-setup).
+description: Open the daily brief page - a local web page that shows the latest daily note as a task dashboard (open, new this week, due today, overdue; filters by topic; sort) and writes every change back to the markdown in the brief's format (mark done or cancel; add a task, a comment or an AI action; edit tasks and comments). Use when the user says "abre a daily", "mostra minha daily", "abre o painel da daily", "quero ver minhas tarefas", "abre minhas tasks", "open my daily brief", "show the daily dashboard", or runs /tasks-view. Before opening, runs tasks-update, which creates today's note or updates it when it exists; "--no-generate" only opens the page. Opens the page in the host's preview pane when it has one, otherwise in the default browser. "--config PATH" names the workspace (the chosen folder, eis-ops/task-manager/ or its config.json). Copies the page into the workspace (eis-ops/task-manager/app/) and opens that copy, so its address never changes. Does not change the config (use tasks-setup).
 ---
 
 # tasks-view
 
-Bring today's daily note up to date, then open the user's copy of the daily page, in their workspace (`.eis-task-manager/app/`). The page reads and writes the latest daily note on disk by itself, so this skill only runs the brief, keeps the copy current, opens it and tells the user what to do the first time.
+Bring today's daily note up to date, then open the user's copy of the daily page, in their workspace (`eis-ops/task-manager/app/`). The page reads and writes the latest daily note on disk by itself, so this skill only runs the brief, keeps the copy current, opens it and tells the user what to do the first time.
 
 Write to the user in the language they write in.
 
@@ -17,11 +17,11 @@ Write to the user in the language they write in.
 
 ## 2. Get the page ready
 
-Install or update the user's copy in `.eis-task-manager/app/` and write `.eis-task-manager/page-settings.js`, as "The page" in `../../references/config.md` says: the copy is left alone when its `VERSION` matches the plugin's, but `page-settings.js` is written every time. The plugin's own `app/` folder (`../../app/`, relative to this skill's folder) is only the source of that copy: never open it. If it is missing, stop and say the plugin install is incomplete.
+Install or update the user's copy in `eis-ops/task-manager/app/` and write `eis-ops/task-manager/page-settings.js`, as "The page" in `../../references/config.md` says: the copy is left alone when its `VERSION` matches the plugin's, but `page-settings.js` is written every time. The plugin's own `app/` folder (`../../app/`, relative to this skill's folder) is only the source of that copy: never open it. If it is missing, stop and say the plugin install is incomplete.
 
 ## 3. Open it
 
-Open `.eis-task-manager/app/index.html`, at its address as the user's computer sees it (see "The page" in the reference). Use the first option the session has:
+Open `eis-ops/task-manager/app/index.html`, at its address as the user's computer sees it (see "The page" in the reference). Use the first option the session has:
 
 1. **A preview pane of the host** that opens local HTML files. In a pane the page runs as a real page: it can pick a folder and read and write files.
 2. **The default browser**, through a shell command: `open "<path>"` on macOS, `xdg-open "<path>"` on Linux, `start "" "<path>"` on Windows.
@@ -38,5 +38,5 @@ Never render the page as a chat artifact or inline widget: those run sandboxed, 
 
 ## Constraints
 
-- This skill writes only the page copy in `.eis-task-manager/app/` and `.eis-task-manager/page-settings.js`. The daily note is written only by `tasks-update`, when step 1 runs it. The page writes only the daily note the user's folder holds, and only what the user does on it.
+- This skill writes only the page copy in `eis-ops/task-manager/app/` and `eis-ops/task-manager/page-settings.js`. The daily note is written only by `tasks-update`, when step 1 runs it. The page writes only the daily note the user's folder holds, and only what the user does on it.
 - Do not copy the page anywhere else, edit it or serve it over the network.

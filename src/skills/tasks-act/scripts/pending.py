@@ -3,14 +3,15 @@
 
 Usage: python3 pending.py --config PATH [--today YYYY-MM-DD] [--stale-hours N]
 
-PATH is the chosen folder, its .eis-task-manager/ folder or the config.json. Reads the latest
+PATH is the chosen folder, its eis-ops/task-manager/ folder or the config.json (older layouts:
+.eis-task-manager/, .eis-daily-brief/). Reads the latest
 daily note (output.folder + output.pattern, on or before today) by the daily format (the
 workspace's daily-format.json, else the plugin's default) and prints one JSON object:
 
   {"note": path, "pending": [...], "stale": [...], "underClosed": n}
 
   pending      🤖 actions under open tasks: what tasks-act runs
-  stale        🤖⏳ actions whose claim in .eis-task-manager/act-state.json
+  stale        🤖⏳ actions whose claim in the workspace's act-state.json
                ({"running": [{"instruction", "task", "started"}]}) is older than
                --stale-hours (default 2) or missing: a run that stopped midway
   underClosed  🤖 actions under done or cancelled tasks (not run)
@@ -34,7 +35,8 @@ def workspace_of(path):
     path = os.path.abspath(os.path.expanduser(path))
     if os.path.isfile(path):
         return os.path.dirname(path), path
-    for ws in (path, os.path.join(path, ".eis-task-manager")):
+    for ws in (path, os.path.join(path, "eis-ops", "task-manager"), os.path.join(path, "task-manager"),
+               os.path.join(path, ".eis-task-manager"), os.path.join(path, ".eis-daily-brief")):
         if os.path.isfile(os.path.join(ws, "config.json")):
             return ws, os.path.join(ws, "config.json")
     raise SystemExit(json.dumps({"scan_error": "config.json not found from " + path}))

@@ -6,7 +6,7 @@ How tasks are written in a daily note, as data: the section, the groups, the tas
 - the daily page reads, marks done or cancelled, adds and edits tasks and comments (action comments for `tasks-act` included), and sets priorities by it;
 - `tasks-act` finds the action comments and records their results by it.
 
-The plugin's default is [`daily-format.json`](daily-format.json), next to this file: the format of `../skills/tasks-update/templates/daily.md`. A user with their own way of writing tasks keeps a `daily-format.json` in their workspace (`.eis-task-manager/daily-format.json`, see `config.md`); without one, the default applies. The schema is [`daily-format.schema.json`](daily-format.schema.json) (JSON Schema 2020-12). Same spirit as the W3C design tokens format: a small, versioned, declarative file that tools on both sides read.
+The plugin's default is [`daily-format.json`](daily-format.json), next to this file: the format of `../skills/tasks-update/templates/daily.md`. A user with their own way of writing tasks keeps a `daily-format.json` in their workspace (`eis-ops/task-manager/daily-format.json`, see `config.md`); without one, the default applies. The schema is [`daily-format.schema.json`](daily-format.schema.json) (JSON Schema 2020-12). Same spirit as the W3C design tokens format: a small, versioned, declarative file that tools on both sides read.
 
 Only the tasks section is described. The rest of the note (agenda, pending issues, topics) follows the template.
 

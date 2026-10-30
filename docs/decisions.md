@@ -123,6 +123,13 @@
 
 - **Altura máxima de 250px por comentário**: o texto de um comentário longo (ação para a IA, resultado) para em 250px e rola por dentro, para a lista de tarefas não esticar.
 
+## 2026-10-30 — v0.13.0, workspace em `eis-ops/task-manager/`
+
+- **Decisão**: o workspace sai de `.eis-task-manager/` (oculta) e vai para `eis-ops/task-manager/`, na mesma pasta escolhida no setup. `eis-ops/` é uma pasta visível compartilhada pelos plugins de assistente do usuário (o eis-answer-assistant vai para lá também); cada um tem sua subpasta e não mexe nas dos outros.
+- **Compatibilidade**: `.eis-task-manager/` entra em "Older layouts": continua sendo lida (skills e `pending.py`) e o `tasks-setup` oferece mover, agora incluindo `act-state.json`. `--config` aceita a pasta escolhida, `eis-ops/`, `eis-ops/task-manager/` ou o `config.json`.
+- **Página**: a cópia muda de endereço (`eis-ops/task-manager/app/index.html`), então o navegador pede a pasta das notas uma vez de novo.
+- **Regras comuns do eis-ops**: `src/eis-ops/` (`rules.md` + `eis_ops.py`) é cópia de `eis-plugins/eis-ops/`, sincronizada por `eis-plugins/scripts/sync-eis-ops.sh`; o `pack.sh` recusa se a cópia divergir. O setup acha a `eis-ops` pelo pointer `~/.config/eis-ops/eis-ops-pointer.json` (fora de qualquer harness; sessões isoladas não o veem e perguntam) e se registra na tabela do `eis-ops/AGENTS.md`.
+
 ## Pendente
 
 

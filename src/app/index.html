@@ -19,7 +19,7 @@
 <body class="eis-app-shell">
 
 <aside class="eis-app-sidebar" aria-label="Barra lateral">
-  <p class="eis-app-brand"><a href="#daily">TASK MANAGER</a> <span class="eis-mono">v0.12.4</span></p>
+  <p class="eis-app-brand"><a href="#daily">TASK MANAGER</a> <span class="eis-mono">v0.13.0</span></p>
   <nav class="eis-app-nav" aria-label="Principal">
     <section class="eis-app-nav__section" aria-labelledby="nav-tasks">
       <h2 class="eis-label" id="nav-tasks">Tarefas</h2>
@@ -117,7 +117,7 @@
           <output class="eis-input brief-folder__value" id="daily-folder" aria-describedby="daily-folder-hint"></output>
           <button class="eis-button" type="button" id="pick-folder">Escolher pasta</button>
         </div>
-        <p class="eis-field__hint" id="daily-folder-hint">A mesma pasta de <code>output.folder</code> no <code>.eis-task-manager/config.json</code>. A tela mostra a nota mais recente, achada pelo padrão <code id="daily-pattern">YYYY-MM/YYYY-MM-DD.md</code> (<code>output.pattern</code>).</p>
+        <p class="eis-field__hint" id="daily-folder-hint">A mesma pasta de <code>output.folder</code> no <code>eis-ops/task-manager/config.json</code>. A tela mostra a nota mais recente, achada pelo padrão <code id="daily-pattern">YYYY-MM/YYYY-MM-DD.md</code> (<code>output.pattern</code>).</p>
         <p class="eis-field__error" id="daily-folder-error" role="status"></p>
       </div>
     </div>
@@ -131,7 +131,7 @@
 <script src="js/lib/view-prefs.js"></script>
 <script src="js/lib/daily-files.js"></script>
 <script src="js/lib/handle-store.js"></script>
-<!-- The user's settings, written by the skills next to this folder (.eis-task-manager/page-settings.js).
+<!-- The user's settings, written by the skills next to this folder (eis-ops/task-manager/page-settings.js).
      Missing (the plugin's own copy, a fresh install): the defaults. -->
 <script src="../page-settings.js"></script>
 <script src="js/lib/workspace.js"></script>

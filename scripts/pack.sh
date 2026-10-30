@@ -57,6 +57,15 @@ VERSION="$(read_key version)"
 PAGE_VERSION="$(sed -n 's/.*eis-app-brand.*<span class="eis-mono">v\([^<]*\)<\/span>.*/\1/p' "$SRC/app/index.html")"
 [[ "$PAGE_VERSION" == "$VERSION" ]] || die "src/app/index.html shows v$PAGE_VERSION, plugin.json has $VERSION. Update the header."
 
+# src/eis-ops/ is a copy of eis-plugins/eis-ops/ (rules shared by every plugin's setup).
+# When the eis-plugins repo is next to this one, the copy must match it.
+EIS_OPS_SOURCE="$ROOT/../eis-plugins/eis-ops"
+if [[ -d "$EIS_OPS_SOURCE" ]]; then
+  for f in rules.md eis_ops.py; do
+    cmp -s "$EIS_OPS_SOURCE/$f" "$SRC/eis-ops/$f" || die "src/eis-ops/$f differs from eis-plugins/eis-ops/$f. Run eis-plugins/scripts/sync-eis-ops.sh."
+  done
+fi
+
 OUT_DIR="$DIST/v$VERSION"
 OUT_ZIP="$DIST/v$VERSION.zip"
 

@@ -6,7 +6,7 @@ It works in Claude Code, Cowork and Hermes.
 
 ## Skills
 
-- `tasks-setup`: creates, shows (`--show`) or edits your workspace, `.eis-task-manager/`, with the config and your copy of the daily page. Interactive. The first question is the folder where the workspace will live.
+- `tasks-setup`: creates, shows (`--show`) or edits your workspace, `eis-ops/task-manager/`, with the config and your copy of the daily page. Interactive. The first question is the folder where the workspace will live.
 - `tasks-update`: writes the note for the day from the config, or updates it when it already exists. Runs unattended, so it can be scheduled, also several times a day. Without a config it stops with `STATUS: BLOCKED` and says how to make the file reachable. When you run it yourself, it ends by offering to open the daily page; scheduled runs never ask. Flags: `--date YYYY-MM-DD`, `--config PATH`, `--force` (rebuild the day's note from the previous one, dropping edits), `--no-view`.
 - `tasks-view`: opens your copy of the daily page (below) in the host's preview pane or in the default browser, or gives you its address when the session can't open it. Before opening, it runs `tasks-update`, which creates today's note or updates it, so one scheduled `tasks-view` does both. Flags: `--config PATH`, `--no-generate` (only open the page).
 
@@ -23,7 +23,7 @@ Sources, each one optional: calendar, messenger, e-mail, meeting notes, status r
 The plugin ships a local web page, `src/app/`, that shows the latest daily note as a task dashboard: open tasks, new this week, due today and overdue; tasks grouped by topic, with filters and sorting. Tabs for open, due today, done, cancelled and all tasks. Marking a task done or cancelled (`- [-]`), adding a task or a comment, and editing by double click (task text and priority with the Obsidian Tasks marks 🔺 ⏫ 🔼 🔽 ⏬, comment, due date) write to the note at once, in the brief's format, and changes made in the note show on the page within 5 seconds (one file check while the tab is visible; nothing runs while it is hidden).
 
 - No server and no install: plain HTML, CSS and JavaScript, opened straight from disk.
-- You open your copy, `.eis-task-manager/app/index.html` in your workspace, never the plugin's folder: the plugin folder moves on every update (in some hosts it lives in a temporary folder), and the browser keeps your choices per page address. `tasks-setup` and `tasks-view` keep the copy current, so its address never changes.
+- You open your copy, `eis-ops/task-manager/app/index.html` in your workspace, never the plugin's folder: the plugin folder moves on every update (in some hosts it lives in a temporary folder), and the browser keeps your choices per page address. `tasks-setup` and `tasks-view` keep the copy current, so its address never changes.
 - The first time, pick the folder of the daily notes in **Configurações** (the same folder as `output.folder`). Until then it shows sample data.
 - It needs a Chromium browser (Chrome, Edge, Arc, Dia, Brave) or a host preview pane that opens local files (Hermes desktop does). Safari and Firefox can't pick folders. Chat artifacts and inline widgets run sandboxed and can't reach your files.
 - Filters, sorting and the chosen folder stay in the browser. The page never writes anything but the note.
@@ -60,10 +60,10 @@ The skills show up as `eis-task-manager:tasks-setup`, `eis-task-manager:tasks-up
 
 ## Configuration
 
-Everything the plugin keeps for you lives in one folder, `.eis-task-manager/`, that `tasks-setup` creates inside a folder you choose (the root of your notes vault works well; Obsidian ignores dot folders):
+Everything the plugin keeps for you lives in one folder, `eis-ops/task-manager/`, that `tasks-setup` creates inside a folder you choose (the root of your notes vault works well). `eis-ops/` is shared with your other assistant plugins; each keeps its own subfolder:
 
 ```
-<your folder>/.eis-task-manager/
+<your folder>/eis-ops/task-manager/
 ├── config.json         who you are, language, notes folder, sources, priority people and channels, meeting and report folders
 ├── daily-format.json   optional: how you write tasks, when it isn't the plugin's default
 ├── page-settings.js    what the page needs from the two files above (written by the skills)
@@ -73,7 +73,7 @@ Everything the plugin keeps for you lives in one folder, `.eis-task-manager/`, t
 
 You can edit `config.json` by hand; the skills read it again before every run. The plugin never writes to `~/.claude/`, `${CLAUDE_PLUGIN_DATA}` or its own folder. Schema in [`src/references/config.md`](src/references/config.md). **Daily format.** How tasks are written (section heading, groups, task lines, date marks, comments) is data, not code: [`src/references/daily-format.json`](src/references/daily-format.json) is the default, described in [`daily-format.md`](src/references/daily-format.md) with a JSON Schema. If you already write daily notes your own way, `tasks-setup` reads a few of them and proposes a `daily-format.json` for your workspace; `tasks-update` writes and the page reads and edits by it. The page also finds your notes by `output.pattern` (for example `YYYY/MM/DD.md`).
 
-A workspace from before v0.9.0, when the plugin was named `eis-daily-brief` (`.eis-daily-brief/`, or `eis-daily-brief.json` straight in the folder before v0.5.0), still works; `tasks-setup` offers to move it to `.eis-task-manager/`.
+An older workspace still works: `.eis-task-manager/` (v0.9.0 to v0.12), or from when the plugin was named `eis-daily-brief` (`.eis-daily-brief/`, or `eis-daily-brief.json` straight in the folder before v0.5.0); `tasks-setup` offers to move it to `eis-ops/task-manager/`.
 
 The skills look for the file in this order:
 
@@ -86,7 +86,7 @@ The skills look for the file in this order:
 `tasks-update` asks no questions, so it can run on a schedule. Twice a day works well: in the morning it creates the day's note, at the end of the day it updates it. Put the config path in the scheduled prompt:
 
 - **Cowork / Claude Desktop**: a scheduled task with `/tasks-update`, with the config folder connected.
-- **Hermes**: a cron job, for example `hermes cron create "0 8,18 * * 1-5" "/eis-task-manager:tasks-update --config /path/to/.eis-task-manager" --skill eis-task-manager:tasks-update`.
+- **Hermes**: a cron job, for example `hermes cron create "0 8,18 * * 1-5" "/eis-task-manager:tasks-update --config /path/to/eis-ops/task-manager" --skill eis-task-manager:tasks-update`.
 
 ## Running it again during the day
 

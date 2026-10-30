@@ -1,6 +1,6 @@
 /* workspace.js
    What the page takes from the user's workspace. The skills write ../page-settings.js, next to this
-   app folder (.eis-task-manager/page-settings.js), from config.json and daily-format.json:
+   app folder (eis-ops/task-manager/page-settings.js), from config.json and daily-format.json:
      window.EisTaskManagerSettings = { pattern: "YYYY-MM/YYYY-MM-DD.md", format: { ...daily format... } | null, vault: "/path/to/vault" | null, folder: "<output.folder>" | null }
    A missing file (or a missing part) means the defaults. An invalid part falls back to its
    default and is listed in `problems`, so the page can say so.
