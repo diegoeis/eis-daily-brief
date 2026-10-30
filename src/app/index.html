@@ -19,7 +19,7 @@
 <body class="eis-app-shell">
 
 <aside class="eis-app-sidebar" aria-label="Sidebar">
-  <p class="eis-app-brand"><a href="#daily">TASK MANAGER</a> <span class="eis-mono">v0.14.1</span></p>
+  <p class="eis-app-brand"><a href="#daily">TASK MANAGER</a> <span class="eis-mono">v0.14.2</span></p>
   <nav class="eis-app-nav" aria-label="Main">
     <section class="eis-app-nav__section" aria-labelledby="nav-tasks">
       <h2 class="eis-label" id="nav-tasks">Tasks</h2>
@@ -27,19 +27,13 @@
         <li><a href="#daily" data-view-link="daily">Daily <span class="eis-app-nav__count" id="nav-open-count"></span></a></li>
       </ul>
     </section>
-    <section class="eis-app-nav__section" aria-labelledby="nav-system">
-      <h2 class="eis-label" id="nav-system">System</h2>
-      <ul>
-        <li><a href="#settings" data-view-link="settings">Settings</a></li>
-      </ul>
-    </section>
     <!-- Links to the other eis-ops plugin pages, filled by ../../nav.js (see src/eis-ops/rules.md). -->
     <section class="eis-app-nav__section" data-eis-ops-nav hidden></section>
   </nav>
   <footer class="eis-app-sidebar__foot">
-    <dl>
-      <dt class="eis-label">Data</dt><dd class="eis-mono" id="source-kind">mock</dd>
-    </dl>
+    <nav class="eis-app-nav" aria-label="Settings">
+      <ul><li><a href="#settings" data-view-link="settings">Settings - Task Manager</a></li></ul>
+    </nav>
   </footer>
 </aside>
 

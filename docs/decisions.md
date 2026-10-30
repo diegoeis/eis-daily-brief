@@ -142,6 +142,10 @@
 
 - **Tabela de tarefas**: cada tarefa vira duas linhas. A segunda (`brief-task-detail`, `colspan` da tabela toda) guarda os comentários, o formulário de comentário, a data de conclusão e as ações (`ul.brief-task-actions`, no lugar do `p.eis-app-meta`), alinhada ao texto da tarefa.
 
+## 2026-10-30 — v0.14.2, Settings no rodapé da sidebar
+
+- **Sidebar**: o link "Settings - Task Manager" sai da seção System e fica no rodapé, no lugar de "Data: mock" (que saiu). Na barra do topo (até 1024px), onde o eis-ds esconde o rodapé, ele aparece no fim da barra. Mesmo padrão no eis-answer-assistant.
+
 ## Pendente
 
 

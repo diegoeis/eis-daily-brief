@@ -59,7 +59,6 @@
       dueLabel: "Due date (optional)"
     },
     loadError: "Couldn't read today's note.",
-    sourceKind: { mock: "mock", folder: "folder" },
     panels: {
       setup: { title: "Daily notes folder", text: "Choose the folder where the skill writes the daily notes, so the page can read and write the real note.", link: "Set up folder" },
       permission: { title: "Folder access", text: "The browser asks you to allow the daily notes folder again.", allow: "Allow access" },
@@ -221,7 +220,6 @@
     renderTasks(model.groups);
     el("markdown").textContent = state.markdown;
 
-    el("source-kind").textContent = TEXT.sourceKind[source.kind];
     renderPanel();
   }
 
