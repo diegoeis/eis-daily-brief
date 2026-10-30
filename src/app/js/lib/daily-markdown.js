@@ -480,6 +480,15 @@
     return joinLines(lines, markdown);
   }
 
+  /* Removes a comment under a task: only that line goes, the task and its other comments stay. */
+  function deleteTaskNote(markdown, lineIndex, F) {
+    F = F || DEFAULT;
+    var lines = splitLines(markdown);
+    noteAt(lines, lineIndex, F);
+    lines.splice(lineIndex, 1);
+    return joinLines(lines, markdown);
+  }
+
   /* Local date as YYYY-MM-DD (never toISOString, which shifts to UTC). */
   function toDateKey(d) {
     var pad = function (n) { return String(n).padStart(2, "0"); };
@@ -490,7 +499,7 @@
     compile: compile, validateFormat: validateFormat, DEFAULT: DEFAULT,
     parse: parse, setTaskDone: setTaskDone, addTaskNote: addTaskNote, addTask: addTask,
     editTask: editTask, setTaskCancelled: setTaskCancelled, editTaskNote: editTaskNote,
-    LEVELS: LEVELS,
+    deleteTaskNote: deleteTaskNote, LEVELS: LEVELS,
     toDateKey: toDateKey, DEFAULT_GROUP: DEFAULT.defaultGroup
   };
   if (isNode) module.exports = api;

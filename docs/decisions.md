@@ -170,6 +170,26 @@
 - Painéis brancos pelo token (`surface.panel`), fundo da página `neutral.0`, cabeçalho de painel em `surface.head`, raio `--radius-100`, títulos de painel com `eis-panel__title`.
 - `src/app/vendor/eis-ds.css` regerado do eis-ds 58ae1e8.
 
+## 2026-10-30 — v0.14.8, apagar comentário
+
+- Cada comentário de task ganha um ícone de lixeira inline, logo depois do texto (10px à esquerda). Um clique apaga a linha do markdown e o comentário some da lista (`DailyMarkdown.deleteTaskNote`). Sem confirmação, como cancelar task.
+- Ação 🤖⏳ em execução não tem o ícone: o `tasks-act` ainda vai gravar o resultado nela.
+- Prioridade sai do fim do título e vai para baixo do checkbox, com fundo por nível: highest vermelho (`--danger`), high laranja (`--accent`), medium neutral-300, low `--surface-head`, lowest só contorno. Coluna do checkbox passa a 88px. Candidato ao eis-ds (chip por nível).
+- No mobile o grid do eis-ds escondia a célula do checkbox; agora ela aparece abaixo do texto da task, com a prioridade.
+- A tabela de tasks perde o cabeçalho (`#`, Task): o grupo já diz o que é a lista; as larguras ficam no `colgroup`.
+
+## 2026-10-30 — v0.15.0, closing check lê DMs inteiras, MRs citados e escreve updates
+
+Caso real: duas tasks de DM ficaram abertas por dias. A mensagem de origem não tinha thread, então o "Only what moved" (último reply da thread) nunca a via mexer, e as respostas na DM vinham como mensagens novas. Os dois MRs citados nas tasks já estavam mergeados no GitLab, e o check só olhava issue linkada como fonte.
+
+- Fonte em DM: lê a conversa a partir da mensagem (thread + mensagens seguintes e suas threads). "Moveu" = qualquer mensagem na DM depois do início da janela.
+- Item de trabalho citado na task (issue ou MR por repo + número): estado no tracker/code host. MR mergeado ou fechado fecha task de mergear, aprovar, revisar ou responder se pode mergear; o sub-item diz quem mergeou e se foi sem review do `me`.
+- Updates: o que o check lê e não fecha vira um comentário por task e rodada que sintetiza a conversa (onde está, quem disse o quê, o que falta), com o link da última mensagem; não repete se esse link já está nos sub-itens.
+- `SKILL.md`, template, `config.md` (`tracker`) e README.
+- Task nova: a descrição é só o pedido da mensagem de origem; a conversa depois dela vai para o comentário de update. Caso real: task de churn criada com as respostas da thread embutidas na descrição e nenhum comentário.
+- Escrita: reler a nota imediatamente antes de gravar, comparar linha a linha com o que foi lido no início, aplicar as mudanças da rodada como edições pontuais sobre o texto relido (o usuário ganha na mesma linha) e dizer o que o usuário mudou. Sem conseguir reler, não grava. Caso real: a rodada das 14:45 viu a nota mudar no meio e não soube dizer o quê. Descartado: script de snapshot e merge de três vias (burocracia demais).
+- Página: opção "All tasks, no groups" no filtro de grupo. Uma tabela só, sem títulos de grupo; a ordenação vale para a lista inteira e cada task mostra o grupo nos metadados.
+
 ## Pendente
 
 

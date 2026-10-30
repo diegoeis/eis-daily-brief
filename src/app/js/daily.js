@@ -15,6 +15,7 @@
 
   var TEXT = {
     allGroups: "All groups",
+    noGrouping: "All tasks, no groups",
     noGroup: "No group",
     metrics: {
       open: "Open", openSub: function (n) { return "in " + n + (n === 1 ? " group" : " groups"); },
@@ -22,7 +23,7 @@
       today: "Due today", todaySub: function (n) { return n + " in the next 7 days"; },
       overdue: "Overdue", overdueSub: function (n) { return n === 0 ? "none" : "oldest " + n + (n === 1 ? " day ago" : " days ago"); }
     },
-    columns: { done: "Done", idx: "#", task: "Task", source: "Source", created: "Created", due: "Due", act: "Cancel or reopen" },
+    columns: { source: "Source", created: "Created", due: "Due" },
     today: "TODAY",
     isNew: "New",
     priority: { highest: "Highest", high: "High", medium: "Medium", low: "Low", lowest: "Lowest" },
@@ -38,6 +39,7 @@
     cancelled: "Cancelled",
     editTaskLabel: "Task",
     editNoteLabel: "Comment",
+    deleteNote: "Delete comment",
     noPriority: "No priority",
     priorityLabel: "Priority",
     groupLabel: "Group",
@@ -68,6 +70,9 @@
     saveError: "Couldn't save the note. Nothing was changed in the file.",
     badSettings: function (list) { return "Invalid page settings, using the defaults: " + list.join("; ") + "."; }
   };
+
+  // The "group" filter value that lists every task in one table, no group headings; sorting then runs on the whole list.
+  var FLAT = ":flat";
 
   var prefsStore = window.ViewPrefs.create(
     "eis-daily-brief:view:v1", // name kept from before v0.9.0 so saved view choices survive the rename
@@ -204,7 +209,7 @@
   function render() {
     var model = state.model;
     var groups = model.groups.map(function (g) { return g.name; });
-    if (state.prefs.group && groups.indexOf(state.prefs.group) === -1) state.prefs.group = "";
+    if (state.prefs.group && state.prefs.group !== FLAT && groups.indexOf(state.prefs.group) === -1) state.prefs.group = "";
 
     el("today").textContent = F.longDate(today);
     el("today").setAttribute("datetime", today);
@@ -243,7 +248,8 @@
     var form = el("toolbar");
     form.querySelector('input[name="status"][value="' + state.prefs.status + '"]').checked = true;
     el("sort").value = state.prefs.sort;
-    el("filter-group").innerHTML = ['<option value="">' + esc(TEXT.allGroups) + "</option>"].concat(groups.map(function (name) {
+    el("filter-group").innerHTML = ['<option value="">' + esc(TEXT.allGroups) + "</option>",
+      '<option value="' + FLAT + '">' + esc(TEXT.noGrouping) + "</option>"].concat(groups.map(function (name) {
       return '<option value="' + esc(name) + '">' + esc(name || TEXT.noGroup) + "</option>";
     })).join("");
     el("filter-group").value = state.prefs.group;
@@ -274,7 +280,7 @@
 
   function renderTasks(groups) {
     var selected = state.prefs.group;
-    var html = groups
+    var html = selected === FLAT ? renderFlat(visibleTasks(state.model.tasks)) : groups
       .filter(function (g) { return !selected || g.name === selected; })
       .map(function (g) { return { group: g, tasks: visibleTasks(g.tasks) }; })
       .filter(function (x) { return x.tasks.length > 0; })
@@ -349,16 +355,20 @@
   function renderGroup(group, tasks) {
     var open = state.prefs.collapsed.indexOf(group.name) === -1;
     var overdue = tasks.filter(isOverdue).length;
-    var c = TEXT.columns;
     return '<details data-group="' + esc(group.name) + '"' + (open ? " open" : "") + ">" +
       "<summary><h2>" + esc(group.name || TEXT.noGroup) + '</h2><span class="eis-mono">' +
       (overdue ? '<span class="eis-app-over">' + esc(TEXT.groupOverdue(overdue)) + "</span> · " : "") +
-      tasks.length + "</span></summary>" +
-      '<table class="eis-table"><colgroup><col class="eis-app-col-idx"><col class="eis-app-col-check"><col><col class="brief-col-act"></colgroup>' +
-      '<thead class="eis-label"><tr>' +
-      '<th scope="col">' + c.idx + '</th><th scope="col"><span class="eis-visually-hidden">' + c.done + '</span></th><th scope="col">' + c.task +
-      '</th><th scope="col"><span class="eis-visually-hidden">' + c.act + "</span></th></tr></thead>" +
-      "<tbody>" + tasks.map(renderTask).join("") + "</tbody></table></details>";
+      tasks.length + "</span></summary>" + renderTable(tasks) + "</details>";
+  }
+
+  // No grouping: one table with every visible task, in the chosen sort; each task names its group.
+  function renderFlat(tasks) {
+    return tasks.length ? '<div class="brief-flat">' + renderTable(tasks) + "</div>" : "";
+  }
+
+  function renderTable(tasks) {
+    return '<table class="eis-table"><colgroup><col class="eis-app-col-idx"><col class="eis-app-col-check brief-col-check"><col><col class="brief-col-act"></colgroup>' +
+      "<tbody>" + tasks.map(renderTask).join("") + "</tbody></table>";
   }
 
   function renderTask(t, i) {
@@ -376,20 +386,22 @@
         '" aria-label="' + esc(TEXT.columns.due) + '">';
     }
 
-    // Title: "Fechada" or "Cancelada" first, then the text, then "Nova" and the priority.
+    // Title: "Fechada" or "Cancelada" first, then the text, then "Nova" (the priority sits under the checkbox).
     var title = state.editTaskLine === t.line ? renderTaskForm(t)
       : '<p class="eis-app-task-title' + (t.cancelled ? " brief-cancelled" : "") + '" id="' + id + '" data-edit-task="' + t.line + '" title="' + TEXT.dblclick + '">' +
         (t.cancelled ? chip("eis-chip--outline", TEXT.cancelled) + " " : t.done ? chip("eis-chip--success", TEXT.closed) + " " : "") +
         MD.toHtml(t.description, links()) +
-        (t.isNew ? chip("eis-chip--solid", TEXT.isNew) : "") +
-        (t.priority ? chip(/high/.test(t.priority) ? "" : "eis-chip--outline", TEXT.priority[t.priority]) : "") + "</p>";
+        (t.isNew ? chip("eis-chip--solid", TEXT.isNew) : "") + "</p>";
 
     return '<tr class="brief-task">' +
       '<td class="eis-mono">' + F.count(i + 1) + "</td>" +
       // Only the checkbox marks a task done: the title is not a <label>, it names the checkbox through aria-labelledby.
-      '<td><input class="eis-checkbox" type="checkbox" aria-labelledby="' + id + '" data-line="' + t.line + '"' + (t.done && !t.cancelled ? " checked" : "") + (t.cancelled ? " disabled" : "") + "></td>" +
+      '<td><input class="eis-checkbox" type="checkbox" aria-labelledby="' + id + '" data-line="' + t.line + '"' + (t.done && !t.cancelled ? " checked" : "") + (t.cancelled ? " disabled" : "") + ">" +
+      // Under the checkbox: the priority, one background per level.
+      (t.priority ? '<span class="eis-chip eis-chip--sm brief-priority brief-priority--' + t.priority + '">' + TEXT.priority[t.priority] + "</span>" : "") + "</td>" +
       // Under the text: source, created and due (double click on the due date edits it).
       "<td>" + title + '<dl class="brief-task-meta eis-mono">' +
+      (state.prefs.group === FLAT ? '<div><dt>' + TEXT.groupLabel + "</dt><dd>" + esc(t.group || TEXT.noGroup) + "</dd></div>" : "") +
       '<div><dt>' + TEXT.columns.source + '</dt><dd title="' + esc(t.source ? MD.toText(t.source) : "") + '">' + (t.source ? MD.toHtml(t.source, links()) : "—") + "</dd></div>" +
       '<div><dt>' + TEXT.columns.created + "</dt><dd>" + (t.created ? '<time datetime="' + t.created + '">' + F.shortDate(t.created) + "</time>" : "—") + "</dd></div>" +
       '<div><dt>' + TEXT.columns.due + '</dt><dd class="brief-due' + dueClass + '" data-edit-due="' + t.line + '" title="' + TEXT.dblclick + '">' + due + "</dd></div>" +
@@ -433,7 +445,8 @@
   // Cancel an open task (- [-]) or reopen a cancelled one: one click, undone by the same button.
   var ICON = {
     cancel: '<svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><circle cx="8" cy="8" r="6.25" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M3.6 12.4 12.4 3.6" stroke="currentColor" stroke-width="1.5"/></svg>',
-    reopen: '<svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><path d="M3 8a5 5 0 1 0 1.6-3.7" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M3 2.5v3h3" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>'
+    reopen: '<svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><path d="M3 8a5 5 0 1 0 1.6-3.7" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M3 2.5v3h3" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>',
+    trash: '<svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><path d="M2.75 4.25h10.5M6.25 4.25v-1.5h3.5v1.5M4.25 4.25l.6 9h6.3l.6-9M6.75 6.75v4M9.25 6.75v4" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>'
   };
   function cancelButton(t) {
     var label = t.cancelled ? TEXT.reopenTask : TEXT.cancelTask;
@@ -461,6 +474,11 @@
       var chip = n.action ? '<span class="eis-chip eis-chip--sm ' + (n.action === "done" ? "eis-chip--success" : n.action === "failed" ? "brief-chip-failed" : "eis-chip--solid") +
         '">' + TEXT.action[n.action] + "</span> " : "";
       if (chip && state.editNoteLine !== n.line) body = body.replace(/^(<p[^>]*>)/, "$1" + chip);
+      // Inline, right after the comment's text: delete it (the line leaves the note). Not while tasks-act runs it.
+      if (state.editNoteLine !== n.line && n.action !== "running") {
+        body = body.replace(/<\/p>$/, '<button class="brief-icon-button brief-note__delete" type="button" data-action="note-delete" data-line="' + n.line +
+          '" title="' + TEXT.deleteNote + '" aria-label="' + TEXT.deleteNote + '">' + ICON.trash + "</button></p>");
+      }
       return '<li class="brief-note' + (n.action ? " brief-note--action" : "") + '">' +
         (n.date ? '<time class="eis-mono" datetime="' + n.date + '">' + F.shortDate(n.date) + "</time>" : "<span></span>") +
         "<div>" + body + "</div></li>";
@@ -513,6 +531,7 @@
         case "task-open": closeForms(); state.addingTask = true; render(); focus("add-task-text"); break;
         case "task-cancel-it": edit(function () { return DM.setTaskCancelled(state.markdown, line, true, fmt()); }); break;
         case "task-reopen": edit(function () { return DM.setTaskCancelled(state.markdown, line, false, fmt()); }); break;
+        case "note-delete": edit(function () { return DM.deleteTaskNote(state.markdown, line, fmt()); }); break;
         case "note-ai": {
           var on = btn.getAttribute("aria-pressed") !== "true";
           btn.setAttribute("aria-pressed", String(on));

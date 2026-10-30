@@ -109,7 +109,7 @@ The plugin ships a page, `app/` in the plugin's own folder, that shows the lates
 - `language` is the language of everything written in the daily note. Section names of the template never change.
 - `windowDays` is how far back calendar, messenger and email are read. The closing check ignores it.
 - `output.folder` is required. It is also the folder the user picks in the page's settings. The page finds the latest note by `output.pattern` (through `page-settings.js`). `pattern` is relative to it; `YYYY`, `MM` and `DD` are replaced by the run date.
-- `sources` turns each source on or off. A source that is on but has no connected tool is skipped silently. `tracker` is only used to close tasks that link to an issue (it never creates tasks); a missing `tracker` key counts as on.
+- `sources` turns each source on or off. A source that is on but has no connected tool is skipped silently. `tracker` is only used to close and update tasks that link to an issue or name an issue or merge request (it never creates tasks); a missing `tracker` key counts as on.
 - `people` and `channels` are the priority list for the messenger; messages from anyone else that ask the user something directly still count, but these are read first.
 - `meetings.folders`, `reports.folders` and `vault.path` are optional; a missing one turns that part off.
 - Unknown keys are kept as they are. Never delete a key the user added by hand.

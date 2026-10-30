@@ -16,7 +16,7 @@
 
 /* each task is two rows: the task, then a row across the whole table with its comments and actions,
    lined up with the task text (past the number and checkbox columns) */
-.eis-app-tasks .eis-table tr.brief-task-detail td{border-top:0;padding:0 var(--space-200) var(--space-200) calc(56px + 48px);text-align:left}
+.eis-app-tasks .eis-table tr.brief-task-detail td{border-top:0;padding:0 var(--space-200) var(--space-200) calc(56px + 88px);text-align:left}
 .brief-task-detail .brief-notes{margin-top:0;margin-bottom:var(--space-100)}
 .brief-task-detail .brief-note-form{margin-top:0;margin-bottom:var(--space-100)}
 .brief-task-done{margin:0 0 var(--space-100);font-size:var(--font-size-200);color:var(--ink-muted)}
@@ -28,6 +28,16 @@
 .brief-note{display:grid;grid-template-columns:calc(var(--space-400) + var(--space-100)) minmax(0,1fr);gap:var(--space-200);
   font-size:var(--font-size-300);line-height:var(--font-line-height-normal);color:var(--ink-muted)}
 .brief-note time{line-height:inherit}
+/* delete a comment: inline, right after its text */
+.brief-icon-button.brief-note__delete{margin-left:10px;inline-size:auto;block-size:auto;line-height:0;vertical-align:-2px}
+/* priority under the checkbox: one background per level, strongest first */
+.eis-app-tasks .eis-table .brief-col-check{width:88px}
+.brief-priority{display:flex;inline-size:fit-content;margin-top:var(--space-200)}
+.brief-priority--highest{--bg:var(--danger);--bd:var(--danger);--fg:var(--danger-on)}
+.brief-priority--high{--bg:var(--accent);--bd:var(--accent);--fg:var(--accent-on)}
+.brief-priority--medium{--bg:var(--color-neutral-300);--bd:var(--color-neutral-300);--fg:var(--ink)}
+.brief-priority--low{--bg:var(--surface-head);--bd:var(--surface-head);--fg:var(--ink)}
+.brief-priority--lowest{--bg:transparent;--bd:var(--line);--fg:var(--ink-muted)}
 /* a long comment (an AI action, its result) stops at 250px tall and scrolls inside, so the task list stays short */
 .brief-note > div{max-block-size:calc(var(--space-400) * 4 - var(--space-100) * 0.75);overflow-y:auto;overscroll-behavior:contain}
 /* cancel / reopen a task: icon only, next to the text actions */
@@ -83,6 +93,9 @@
 
 @media (max-width:760px){
   .brief-note{grid-template-columns:minmax(0,1fr);gap:0}
+  /* the eis-ds mobile grid hides the checkbox cell; it holds the priority too, so it shows under the task text */
+  .eis-app-tasks .eis-table tr.brief-task td:nth-child(2){display:flex;align-items:center;gap:var(--space-100);grid-column:2;grid-row:2;margin-top:var(--space-100)}
+  .brief-task .brief-priority{margin-top:0}
   /* four cells now (number, checkbox, task, cancel): the cancel button goes to the right of the text */
   .eis-app-tasks .eis-table tr.brief-task td:nth-child(4){grid-column:3;grid-row:1;margin-top:0}
   /* the eis-ds mobile grid puts every row in a card: the detail row joins the task's card */

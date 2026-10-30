@@ -29,6 +29,7 @@ Tomorrow (DD/MM):
 
 **{{Subject/Topic}}**
 - [ ] {{migrated task, exactly as it was written}}
+    - YYYY-MM-DD - {{update: one synthesis of what moved since the last run — where it stands, who said what, what is open}} — [{{Source name}}]({{permalink or link}})
 - [ ] new - {{new task, citing [[Person name]] when relevant}} — [{{Source name}}]({{url or path}}) - {{priority mark, only when the source gives one; else nothing}} ➕ YYYY-MM-DD 📅 YYYY-MM-DD
 - [x] {{task closed by a closing check}} ✅ YYYY-MM-DD
 - [-] {{task the user cancelled, kept as written}}

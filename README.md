@@ -90,21 +90,22 @@ The skills look for the file in this order:
 
 ## Running it again during the day
 
-When the day's note already exists, `tasks-update` updates it instead of stopping: the note is the base, so every task, comment and check you made by hand or on the page stays. The run closes the tasks that were done, adds the new ones, sorts each group again and rewrites the agenda, pending issues, topics and concluded items. If you edit the note while it runs, your edit wins and the run's changes are applied on top. When nothing changed, the file is left untouched. A task you closed never comes back as new.
+When the day's note already exists, `tasks-update` updates it instead of stopping: the note is the base, so every task, comment and check you made by hand or on the page stays. The run closes the tasks that were done, adds the new ones, sorts each group again and rewrites the agenda, pending issues, topics and concluded items. If you edit the note while it runs, your edit wins: the run reads the note again right before writing, compares it with what it read at the start, applies its changes on top of yours and tells you what you had changed. When nothing changed, the file is left untouched. A task you closed never comes back as new.
 
 ## Closing tasks automatically
 
 Every open task, migrated or new, is closed (`[x]` with `✅ date` and a sub-item with the evidence) when:
 
-- the messenger or e-mail thread shows you replied, or the person who asked closed the matter;
+- the messenger or e-mail thread shows you replied, or the person who asked closed the matter; for a message in a DM, the later messages of the DM count too, not only its thread;
 - the linked tracker issue (Jira, Linear...) is in a done status, dated when it got there (turn it off with `sources.tracker: false`);
+- the task names a merge request (or an issue) that was merged or closed, and the task was to merge, approve, review it or answer whether it could be merged;
 - the task came from a vault note (a meeting note, for example) and its checkbox there is done; when the note shows nothing, a targeted search runs (below);
 - the task has no link (you added it by hand): the same targeted search;
 - the most recent report shows the task done or decided.
 
 The targeted search never sweeps a whole source. Cheapest first, it stops at the first evidence: (1) later notes of the same series as the source note (the next 1:1 with that person, the next session of a recurring sync: same folder, same title without the date); (2) the people the task names, or the one or two people of the source note: vault notes that cite them, then the direct messages and e-mail threads with them; (3) tracker issues cited in the task or its note. Tasks are batched by person and series, so each DM or series is read once per run, and only what came after the last run (`state.json`) is read. Threads and issues linked from a task are opened in full only when they moved since the last run (latest reply, last update); the tracker is checked in one query for all issues.
 
-A mention, a plan or partial progress is not evidence. Without evidence, the task stays open. When a closed task came from a checkbox in a vault note, that checkbox is ticked too.
+A mention, a plan or partial progress is not evidence. Without evidence, the task stays open, but what moved since the last run (a reply in the DM or thread, a new status of the merge request or issue) is summed up in one dated comment under it per run, linking the latest message, never the same one twice. When a closed task came from a checkbox in a vault note, that checkbox is ticked too.
 
 ## Project layout
 

@@ -250,6 +250,24 @@ test("editTaskNote: keeps the date, touches only that comment", () => {
   assert.throws(() => DM.editTaskNote(NOTE, n.line, "  "));
 });
 
+test("deleteTaskNote: removes only that comment line", () => {
+  const ship = DM.parse(NOTE).tasks[0];
+  const n = ship.notes[0];
+  const out = DM.deleteTaskNote(NOTE, n.line);
+  const before = NOTE.split("\n");
+  before.splice(n.line, 1);
+  assert.equal(out, before.join("\n"));
+  const after = DM.parse(out).tasks[0];
+  assert.equal(after.description, ship.description);
+  assert.equal(after.notes.length, ship.notes.length - 1);
+  const undated = "## Tasks\n\n- [ ] A\n  - one\n  - two\n- [ ] B\n";
+  assert.equal(DM.deleteTaskNote(undated, 4), "## Tasks\n\n- [ ] A\n  - one\n- [ ] B\n");
+  assert.equal(DM.deleteTaskNote(undated, 3), "## Tasks\n\n- [ ] A\n  - two\n- [ ] B\n");
+
+  assert.throws(() => DM.deleteTaskNote(NOTE, ship.line));
+  assert.throws(() => DM.deleteTaskNote(undated, 0));
+});
+
 test("inline: [[wikilinks]] become links only with a link builder", () => {
   const links = { wikiHref: (t) => "obsidian://open?vault=v&file=" + encodeURIComponent(t), wikiTitle: (t) => "/v/" + t + ".md" };
   assert.equal(MD.toHtml("[[A & B|ab]]", links),
