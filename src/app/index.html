@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="pt-BR">
+<html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -18,25 +18,25 @@
 </head>
 <body class="eis-app-shell">
 
-<aside class="eis-app-sidebar" aria-label="Barra lateral">
-  <p class="eis-app-brand"><a href="#daily">TASK MANAGER</a> <span class="eis-mono">v0.13.0</span></p>
-  <nav class="eis-app-nav" aria-label="Principal">
+<aside class="eis-app-sidebar" aria-label="Sidebar">
+  <p class="eis-app-brand"><a href="#daily">TASK MANAGER</a> <span class="eis-mono">v0.13.1</span></p>
+  <nav class="eis-app-nav" aria-label="Main">
     <section class="eis-app-nav__section" aria-labelledby="nav-tasks">
-      <h2 class="eis-label" id="nav-tasks">Tarefas</h2>
+      <h2 class="eis-label" id="nav-tasks">Tasks</h2>
       <ul>
         <li><a href="#daily" data-view-link="daily">Daily <span class="eis-app-nav__count" id="nav-open-count"></span></a></li>
       </ul>
     </section>
     <section class="eis-app-nav__section" aria-labelledby="nav-system">
-      <h2 class="eis-label" id="nav-system">Sistema</h2>
+      <h2 class="eis-label" id="nav-system">System</h2>
       <ul>
-        <li><a href="#settings" data-view-link="settings">Configurações</a></li>
+        <li><a href="#settings" data-view-link="settings">Settings</a></li>
       </ul>
     </section>
   </nav>
   <footer class="eis-app-sidebar__foot">
     <dl>
-      <dt class="eis-label">Dados</dt><dd class="eis-mono" id="source-kind">mock</dd>
+      <dt class="eis-label">Data</dt><dd class="eis-mono" id="source-kind">mock</dd>
     </dl>
   </footer>
 </aside>
@@ -49,47 +49,47 @@
 
   <p class="brief-notice eis-mono" id="notice" role="status" hidden></p>
 
-  <section class="eis-panel" id="summary" aria-label="Resumo">
+  <section class="eis-panel" id="summary" aria-label="Summary">
     <dl class="eis-app-metrics" id="metrics"></dl>
   </section>
 
-  <form class="brief-toolbar" id="toolbar" action="#" aria-label="Filtros das tarefas">
+  <form class="brief-toolbar" id="toolbar" action="#" aria-label="Task filters">
     <fieldset class="eis-tabs">
       <legend>Status</legend>
-      <label><input type="radio" name="status" value="open"><span>Abertas</span></label>
-      <label><input type="radio" name="status" value="today"><span>Vence hoje</span></label>
-      <label><input type="radio" name="status" value="done"><span>Feitas</span></label>
-      <label><input type="radio" name="status" value="cancelled"><span>Canceladas</span></label>
-      <label><input type="radio" name="status" value="all"><span>Todas</span></label>
+      <label><input type="radio" name="status" value="open"><span>Open</span></label>
+      <label><input type="radio" name="status" value="today"><span>Due today</span></label>
+      <label><input type="radio" name="status" value="done"><span>Done</span></label>
+      <label><input type="radio" name="status" value="cancelled"><span>Cancelled</span></label>
+      <label><input type="radio" name="status" value="all"><span>All</span></label>
     </fieldset>
-    <button class="eis-button eis-button--black brief-toolbar__add" type="button" id="add-task-open">+ Tarefa</button>
+    <button class="eis-button eis-button--black brief-toolbar__add" type="button" id="add-task-open">+ Task</button>
     <div class="brief-toolbar__fields">
       <div class="eis-field brief-toolbar__search">
-        <label for="search">Buscar</label>
-        <input class="eis-input" type="search" id="search" name="search" autocomplete="off" placeholder="Filtrar tarefas">
+        <label for="search">Search</label>
+        <input class="eis-input" type="search" id="search" name="search" autocomplete="off" placeholder="Filter tasks">
       </div>
       <div class="eis-field">
-        <label for="filter-group">Grupo</label>
+        <label for="filter-group">Group</label>
         <select class="eis-select" id="filter-group" name="group"></select>
       </div>
       <div class="eis-field">
-        <label for="sort">Ordenar por</label>
+        <label for="sort">Sort by</label>
         <select class="eis-select" id="sort" name="sort">
-          <option value="note">Ordem da nota</option>
-          <option value="due">Prazo</option>
-          <option value="priority">Prioridade</option>
-          <option value="oldest">Mais antigas</option>
-          <option value="newest">Mais recentes</option>
+          <option value="note">Note order</option>
+          <option value="due">Due date</option>
+          <option value="priority">Priority</option>
+          <option value="oldest">Oldest</option>
+          <option value="newest">Newest</option>
         </select>
       </div>
     </div>
   </form>
 
-  <section class="eis-panel eis-app-tasks" id="tasks" aria-label="Tarefas por grupo" aria-live="polite"></section>
+  <section class="eis-panel eis-app-tasks" id="tasks" aria-label="Tasks by group" aria-live="polite"></section>
 
   <section class="eis-panel" id="markdown-panel">
     <details class="eis-disclosure">
-      <summary><h2 class="eis-label">Markdown da nota</h2><span class="eis-mono">o que a interface grava no arquivo</span></summary>
+      <summary><h2 class="eis-label">Note markdown</h2><span class="eis-mono">what the page writes to the file</span></summary>
       <pre class="brief-markdown" id="markdown"></pre>
     </details>
   </section>
@@ -105,19 +105,19 @@
 <main class="eis-app-main" id="view-settings" data-view="settings" hidden>
   <header class="eis-app-page-head">
     <p class="eis-app-page-head__meta"><time class="eis-label" id="settings-today"></time></p>
-    <h1>Configurações</h1>
+    <h1>Settings</h1>
   </header>
 
   <section class="eis-panel brief-settings" aria-labelledby="daily-h">
     <header class="eis-panel__head"><h2 class="eis-label" id="daily-h">Daily</h2><span class="eis-mono">eis-task-manager</span></header>
     <div class="brief-settings__body">
       <div class="eis-field">
-        <label for="daily-folder">Pasta das daily notes</label>
+        <label for="daily-folder">Daily notes folder</label>
         <div class="brief-folder">
           <output class="eis-input brief-folder__value" id="daily-folder" aria-describedby="daily-folder-hint"></output>
-          <button class="eis-button" type="button" id="pick-folder">Escolher pasta</button>
+          <button class="eis-button" type="button" id="pick-folder">Choose folder</button>
         </div>
-        <p class="eis-field__hint" id="daily-folder-hint">A mesma pasta de <code>output.folder</code> no <code>eis-ops/task-manager/config.json</code>. A tela mostra a nota mais recente, achada pelo padrão <code id="daily-pattern">YYYY-MM/YYYY-MM-DD.md</code> (<code>output.pattern</code>).</p>
+        <p class="eis-field__hint" id="daily-folder-hint">The same folder as <code>output.folder</code> in <code>eis-ops/task-manager/config.json</code>. The page shows the latest note, found by the pattern <code id="daily-pattern">YYYY-MM/YYYY-MM-DD.md</code> (<code>output.pattern</code>).</p>
         <p class="eis-field__error" id="daily-folder-error" role="status"></p>
       </div>
     </div>

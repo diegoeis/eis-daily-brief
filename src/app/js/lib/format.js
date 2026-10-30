@@ -1,10 +1,10 @@
 /* format.js
-   Dates and numbers for the interface, in pt-BR. Dates come in as "YYYY-MM-DD"
+   Dates and numbers for the interface, in English (en-GB: day before month). Dates come in as "YYYY-MM-DD"
    (local, the format the daily note uses). Every screen formats through here. */
 (function (root) {
   "use strict";
 
-  var LOCALE = "pt-BR";
+  var LOCALE = "en-GB";
   var DAY_MS = 24 * 60 * 60 * 1000;
 
   function fromKey(key) {

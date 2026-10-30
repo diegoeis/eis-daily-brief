@@ -31,7 +31,7 @@ Never render the page as a chat artifact or inline widget: those run sandboxed, 
 
 ## 4. Tell the user, in at most four lines
 
-- The page reads the folder of the daily notes: `output.folder` in the config (name it). The first time, open **Configurações → Escolher pasta** and pick that folder. Until then the page shows sample data.
+- The page reads the folder of the daily notes: `output.folder` in the config (name it). The first time, open **Settings → Choose folder** and pick that folder. Until then the page shows sample data.
 - Marking a task done or cancelled (cancelled ones go to the "Canceladas" tab), adding a task or a comment, or editing by double click (task text and priority, comment, due date; Enter or "Salvar" saves, Esc drops) writes to the note at once, in the brief's format. Changes made in the note (by hand or by `tasks-update`) show on the page within 5 seconds, or as soon as the tab comes back to the front.
 - It needs a Chromium browser (Chrome, Edge, Arc, Dia, Brave) or the host's preview pane. Safari and Firefox can't pick folders.
 - The address never changes, plugin updates included: the copy is updated in place.

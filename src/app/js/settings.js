@@ -14,9 +14,9 @@
   var el = function (id) { return document.getElementById(id); };
 
   var TEXT = {
-    none: "Nenhuma pasta escolhida",
-    unsupported: "Este navegador não deixa escolher pastas. Use Chrome, Edge ou Arc.",
-    failed: "Não foi possível abrir a pasta.",
+    none: "No folder chosen",
+    unsupported: "This browser can't open folders. Use Chrome, Edge or Arc.",
+    failed: "Couldn't open the folder.",
   };
 
   function render(name) {

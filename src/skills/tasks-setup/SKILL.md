@@ -59,5 +59,5 @@ Show the final values in a short readable summary and the diff when editing. Sav
 
 Finish with:
 - the path of `config.json` and a one-line reminder that it can be edited by hand;
-- the address of the page (`file:///…/eis-ops/task-manager/app/index.html`, as the user's computer sees it). On its first opening the user picks the notes folder (`output.folder`) in **Configurações → Escolher pasta**: browsers never let a page open a folder from a path;
+- the address of the page (`file:///…/eis-ops/task-manager/app/index.html`, as the user's computer sees it). On its first opening the user picks the notes folder (`output.folder`) in **Settings → Choose folder**: browsers never let a page open a folder from a path;
 - the next step: `/tasks-update`, or `/tasks-view` to generate (when needed) and open the page, or a schedule with the folder connected or with `--config {{path}}` in the scheduled prompt.

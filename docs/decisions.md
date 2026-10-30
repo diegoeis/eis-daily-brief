@@ -130,10 +130,13 @@
 - **Página**: a cópia muda de endereço (`eis-ops/task-manager/app/index.html`), então o navegador pede a pasta das notas uma vez de novo.
 - **Regras comuns do eis-ops**: `src/eis-ops/` (`rules.md` + `eis_ops.py`) é cópia de `eis-plugins/eis-ops/`, sincronizada por `eis-plugins/scripts/sync-eis-ops.sh`; o `pack.sh` recusa se a cópia divergir. O setup acha a `eis-ops` pelo pointer `~/.config/eis-ops/eis-ops-pointer.json` (fora de qualquer harness; sessões isoladas não o veem e perguntam) e se registra na tabela do `eis-ops/AGENTS.md`.
 
+## 2026-10-30 — v0.13.1, página em inglês
+
+- **Interface em inglês**: textos da página (HTML, `daily.js`, `settings.js`, `app.js`) e a nota de exemplo (mock) passam para inglês; datas em `en-GB` (dia antes do mês). O conteúdo da daily continua no `language` da config.
+
 ## Pendente
 
 
 - Testar `tasks-setup` no Cowork (seletor de pasta) e `tasks-update` agendado com `--config`.
 - Inferência de pessoas e canais pelo messenger no setup: está descrita, não testada.
 - `.gitkeep` em `src/skills/` pode ser removido.
-- Página: textos da interface em português; seguir o `language` da config.

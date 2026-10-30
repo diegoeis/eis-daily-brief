@@ -24,7 +24,7 @@ The plugin ships a local web page, `src/app/`, that shows the latest daily note 
 
 - No server and no install: plain HTML, CSS and JavaScript, opened straight from disk.
 - You open your copy, `eis-ops/task-manager/app/index.html` in your workspace, never the plugin's folder: the plugin folder moves on every update (in some hosts it lives in a temporary folder), and the browser keeps your choices per page address. `tasks-setup` and `tasks-view` keep the copy current, so its address never changes.
-- The first time, pick the folder of the daily notes in **Configurações** (the same folder as `output.folder`). Until then it shows sample data.
+- The first time, pick the folder of the daily notes in **Settings** (the same folder as `output.folder`). Until then it shows sample data.
 - It needs a Chromium browser (Chrome, Edge, Arc, Dia, Brave) or a host preview pane that opens local files (Hermes desktop does). Safari and Firefox can't pick folders. Chat artifacts and inline widgets run sandboxed and can't reach your files.
 - Filters, sorting and the chosen folder stay in the browser. The page never writes anything but the note.
 - The interface text is in Portuguese for now.

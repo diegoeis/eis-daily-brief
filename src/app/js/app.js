@@ -5,7 +5,7 @@
 (function () {
   "use strict";
 
-  var TITLES = { daily: "Daily", settings: "Configurações" };
+  var TITLES = { daily: "Daily", settings: "Settings" };
   var views = document.querySelectorAll("main[data-view]");
   var links = document.querySelectorAll("[data-view-link]");
 

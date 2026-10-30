@@ -5,7 +5,7 @@
 /* filters: above the tasks panel, outside it. Status on the left, fields on the right */
 .brief-toolbar{display:flex;align-items:flex-end;justify-content:space-between;flex-wrap:wrap;gap:var(--space-200)}
 .brief-toolbar__fields{display:flex;flex-wrap:wrap;gap:var(--space-200);margin-left:auto}
-/* "+ Tarefa" right after the status tabs */
+/* "+ Task" right after the status tabs */
 .brief-toolbar__add{align-self:flex-end}
 .brief-toolbar .brief-toolbar__search{inline-size:calc(var(--space-400) * 3.5)}
 .brief-toolbar .eis-field{inline-size:calc(var(--space-400) * 3)}
@@ -37,7 +37,7 @@
 .brief-note--action p{color:var(--ink)}
 .brief-cancelled{text-decoration:line-through;text-decoration-color:var(--ink-muted);color:var(--ink-muted)}
 .brief-cancelled .eis-chip{text-decoration:none}
-/* the "+ Tarefa" button or the form, above the groups */
+/* the "+ Task" button or the form, above the groups */
 .brief-add-bar{padding:var(--space-200);border-bottom:var(--border-width-100) solid var(--line)}
 .brief-col-act{width:44px}
 /* inline editors opened by a double click: the input takes the row, the button sits at its end */
