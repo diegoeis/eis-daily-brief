@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <!-- eis-ds favicon. Ink square (neutral-900, radius-100 scaled), a mono-weight "e" in neutral-0 and one accent dot (orange-500). -->
+  <rect width="32" height="32" rx="7" fill="#111111"/>
+  <path d="M8.5 17.5H21.5A6.5 6.5 0 1 0 19.6 22.1" fill="none" stroke="#f7f7f7" stroke-width="2.6" stroke-linecap="square"/>
+  <circle cx="25" cy="25" r="2.6" fill="#f35919"/>
+</svg>

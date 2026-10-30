@@ -1,6 +1,6 @@
 {
   "name": "eis-task-manager",
-  "version": "0.12.0",
+  "version": "0.12.1",
   "description": "Task manager built on a daily note from calendar, messenger, e-mail, meeting notes and reports: your tasks and obligations, pending issues by person and important topics, with tasks closed automatically when the source shows they were done.",
   "author": {
     "name": "Diego Eis"

@@ -4,11 +4,14 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Task manager</title>
+<link rel="icon" href="vendor/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="vendor/apple-touch-icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <!-- The whole app is this one page: on file:// browsers may keep storage (the chosen folder, view prefs)
      per page file, so separate pages would not share it. Views switch by #hash (js/app.js).
-     vendor/eis-ds.css is a trimmed copy of the eis-ds design system: built by scripts/vendor-eis-ds.py, never edited by hand. -->
+     vendor/eis-ds.css is a trimmed copy of the eis-ds design system and vendor/favicon.svg + apple-touch-icon.png its favicon:
+     built by scripts/vendor-eis-ds.py, never edited by hand. -->
 <link rel="stylesheet" href="vendor/eis-ds.css">
 <link rel="stylesheet" href="css/daily.css">
 <link rel="stylesheet" href="css/settings.css">
@@ -16,7 +19,7 @@
 <body class="eis-app-shell">
 
 <aside class="eis-app-sidebar" aria-label="Barra lateral">
-  <p class="eis-app-brand"><a href="#daily">TASK MANAGER</a> <span class="eis-mono">v0.12.0</span></p>
+  <p class="eis-app-brand"><a href="#daily">TASK MANAGER</a> <span class="eis-mono">v0.12.1</span></p>
   <nav class="eis-app-nav" aria-label="Principal">
     <section class="eis-app-nav__section" aria-labelledby="nav-tasks">
       <h2 class="eis-label" id="nav-tasks">Tarefas</h2>

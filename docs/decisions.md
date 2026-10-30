@@ -107,6 +107,10 @@
 - **Prioridade na edição** vira um seletor só com as marcas do formato (🔺 ⏫ 🔼 🔽 ⏬, do Obsidian Tasks), à esquerda do texto.
 - **Links para o Obsidian** no formato `obsidian://open?file=<nota>.md` (sem `vault`: abre no cofre aberto). Valem para `[[Nota]]` e para o caminho da daily no topo; esse caminho é montado com `folder` (`output.folder`), nova chave do `page-settings.js`.
 
+## 2026-10-30 — v0.12.1, favicon do eis-ds
+
+- **Favicon**: a página usa o favicon do eis-ds (`src/shared/brand/` no eis-ds, tag v0.5.0). `scripts/vendor-eis-ds.py` copia `favicon.svg` e `apple-touch-icon.png` para `src/app/vendor/` junto com o CSS; o `index.html` linka os dois.
+
 ## Pendente
 
 

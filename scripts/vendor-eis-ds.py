@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """vendor-eis-ds.py — builds src/app/vendor/eis-ds.css, the trimmed copy of the eis-ds design system
-that the plugin's page uses.
+that the plugin's page uses, and copies the eis-ds favicon (src/shared/brand/) into src/app/vendor/.
 
 The page must work wherever the plugin is installed, so it can't link eis-ds from a checkout.
 This script reads the shared and app scopes of an eis-ds checkout, keeps only the rules whose
@@ -14,6 +14,7 @@ Python 3 standard library only.
 """
 import pathlib
 import re
+import shutil
 import subprocess
 import sys
 
@@ -28,6 +29,8 @@ SOURCES = [
     "src/app/css/tokens.css",
     "src/app/css/components.css",
 ]
+# Copied as they are from src/shared/brand/ (the page links them from vendor/).
+BRAND = ["favicon.svg", "apple-touch-icon.png"]
 FONTS = re.compile(r'@import url\("https://fonts\.googleapis\.com[^"]*"\);')
 CLASS = re.compile(r"\.(eis-[a-z0-9_-]+)")
 
@@ -88,7 +91,7 @@ def main():
     if len(sys.argv) != 2:
         sys.exit("usage: python3 scripts/vendor-eis-ds.py /path/to/eis-ds")
     ds = pathlib.Path(sys.argv[1]).expanduser().resolve()
-    missing = [s for s in SOURCES + ["src/shared/shared.css"] if not (ds / s).is_file()]
+    missing = [s for s in SOURCES + ["src/shared/shared.css"] + ["src/shared/brand/" + b for b in BRAND] if not (ds / s).is_file()]
     if missing:
         sys.exit("not an eis-ds checkout, missing: " + ", ".join(missing))
     try:
@@ -113,6 +116,9 @@ def main():
     )
     OUT.parent.mkdir(parents=True, exist_ok=True)
     OUT.write_text(header + "\n".join(dict.fromkeys(fonts)) + "\n\n" + "\n".join(chunks), encoding="utf-8")
+    for name in BRAND:
+        shutil.copyfile(ds / "src/shared/brand" / name, OUT.parent / name)
+    print(f"copied {', '.join(BRAND)} to {OUT.parent.relative_to(ROOT)}")
     print(f"wrote {OUT.relative_to(ROOT)} ({OUT.stat().st_size // 1024} KB, eis-ds {commit}, {len(used)} classes used)")
 
 
