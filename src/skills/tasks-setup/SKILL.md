@@ -52,7 +52,7 @@ Show a short summary of the current config (counts and key values, not the raw J
 
 Show the final values in a short readable summary and the diff when editing. Save only after the user confirms:
 
-1. Run `init` and `register --plugin eis-task-manager --desc "Daily brief and task manager built on a daily note"`, as `../../eis-ops/rules.md` says. The folder `register` returns (`eis-ops/task-manager/`) is the workspace.
+1. Run `init` and `register --plugin eis-task-manager --desc "Daily brief and task manager built on a daily note" --label "Task Manager" --page app/index.html`, as `../../eis-ops/rules.md` says. The folder `register` returns (`eis-ops/task-manager/`) is the workspace.
 2. Write `config.json` there: valid JSON with `schemaVersion: 1`, two-space indentation.
 3. When the user confirmed a daily format, write it as `daily-format.json` there (two-space indentation, valid against `../../references/daily-format.schema.json`).
 4. Install or update the page copy in `eis-ops/task-manager/app/` and write `page-settings.js`, as "The page" in `references/config.md` says.

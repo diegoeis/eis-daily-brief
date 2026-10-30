@@ -134,6 +134,10 @@
 
 - **Interface em inglês**: textos da página (HTML, `daily.js`, `settings.js`, `app.js`) e a nota de exemplo (mock) passam para inglês; datas em `en-GB` (dia antes do mês). O conteúdo da daily continua no `language` da config.
 
+## 2026-10-30 — v0.14.0, menu entre as páginas do eis-ops
+
+- **Menu compartilhado**: a página carrega `../../nav.js` (gerado pelo `eis_ops.py register` na raiz da `eis-ops`) e ganha uma seção com links para as páginas dos outros plugins. Cada plugin com página tem `eis-ops-page.js` na própria pasta; se a pasta some, o link some. Com uma página só, a seção fica escondida.
+
 ## Pendente
 
 
