@@ -31,6 +31,8 @@ SOURCES = [
 ]
 # Copied as they are from src/shared/brand/ (the page links them from vendor/).
 BRAND = ["favicon.svg", "apple-touch-icon.png"]
+# Scripts copied as they are into src/app/vendor/ (the page loads them from vendor/).
+SCRIPTS = ["src/app/js/sidebar.js"]
 FONTS = re.compile(r'@import url\("https://fonts\.googleapis\.com[^"]*"\);')
 CLASS = re.compile(r"\.(eis-[a-z0-9_-]+)")
 
@@ -91,7 +93,7 @@ def main():
     if len(sys.argv) != 2:
         sys.exit("usage: python3 scripts/vendor-eis-ds.py /path/to/eis-ds")
     ds = pathlib.Path(sys.argv[1]).expanduser().resolve()
-    missing = [s for s in SOURCES + ["src/shared/shared.css"] + ["src/shared/brand/" + b for b in BRAND] if not (ds / s).is_file()]
+    missing = [s for s in SOURCES + ["src/shared/shared.css"] + ["src/shared/brand/" + b for b in BRAND] + SCRIPTS if not (ds / s).is_file()]
     if missing:
         sys.exit("not an eis-ds checkout, missing: " + ", ".join(missing))
     try:
@@ -118,7 +120,10 @@ def main():
     OUT.write_text(header + "\n".join(dict.fromkeys(fonts)) + "\n\n" + "\n".join(chunks), encoding="utf-8")
     for name in BRAND:
         shutil.copyfile(ds / "src/shared/brand" / name, OUT.parent / name)
-    print(f"copied {', '.join(BRAND)} to {OUT.parent.relative_to(ROOT)}")
+    for src in SCRIPTS:
+        shutil.copyfile(ds / src, OUT.parent / pathlib.Path(src).name)
+    copied = BRAND + [pathlib.Path(s).name for s in SCRIPTS]
+    print(f"copied {', '.join(copied)} to {OUT.parent.relative_to(ROOT)}")
     print(f"wrote {OUT.relative_to(ROOT)} ({OUT.stat().st_size // 1024} KB, eis-ds {commit}, {len(used)} classes used)")
 
 

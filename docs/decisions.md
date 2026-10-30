@@ -155,6 +155,11 @@
 - **Abas**: Open, Today, Done, All. Done junta feitas e canceladas (a aba Cancelled saiu; quem tinha ela salva volta para Open). "Due today" virou "Today".
 - **"+ Task"** sai da linha das abas e vai para o cabeçalho, à direita do título, abaixo do caminho da daily.
 
+## 2026-10-30 — v0.14.5, sidebar recolhível
+
+- **Sidebar** recolhe para uma faixa de 64px pelo botão com seta no canto de baixo, acima do rodapé (eis-ds `eis-app-sidebar__toggle` + `vendor/sidebar.js`, copiado pelo `scripts/vendor-eis-ds.py`). A escolha fica no `localStorage`. Abaixo de 1024px a sidebar é a barra do topo e o botão some.
+- **Conteúdo** ocupa o espaço livre até 1200px (`--app-size-main`), no centro. Sidebar branca.
+
 ## Pendente
 
 

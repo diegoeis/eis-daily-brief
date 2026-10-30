@@ -1,5 +1,5 @@
 /* eis-ds, trimmed for the eis-task-manager page. GENERATED: do not edit.
-   Source: https://github.com/diegoeis/eis-ds @ 50e05b0
+   Source: https://github.com/diegoeis/eis-ds @ 955e499
    Built by scripts/vendor-eis-ds.py with only the eis-* classes the page uses. */
 @import url("https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600&family=Geist+Mono:ital,wght@0,300;0,400;0,500;1,400&display=swap");
 
@@ -218,6 +218,8 @@ code{font-family:var(--font-family-mono);font-size:var(--font-size-200)}
 
 /* src/app/css/tokens.css */
 :root{--app-size-sidebar: 248px;
+  --app-size-sidebar-collapsed: 64px;
+  --app-size-main: 1200px;
   --app-size-aside: 360px;
   --app-size-nav-item: 32px;
   --app-size-row: 44px;
@@ -227,8 +229,8 @@ code{font-family:var(--font-family-mono);font-size:var(--font-size-200)}
 /* src/app/css/components.css */
 .eis-app-shell{display:grid;grid-template-columns:var(--app-size-sidebar) minmax(0,1fr);min-height:100vh}
 .eis-app-brand a,.eis-app-nav a{text-decoration:none}
-.eis-app-sidebar{background:var(--surface-panel);border-right:var(--border-width-100) solid var(--line);
-  display:flex;flex-direction:column;gap:var(--space-300);padding:var(--space-300) var(--space-200);
+.eis-app-sidebar{background:var(--surface-raised);border-right:var(--border-width-100) solid var(--line);
+  display:flex;flex-direction:column;gap:var(--space-300);padding:var(--space-300) var(--space-200) var(--space-200);
   position:sticky;top:0;height:100vh}
 .eis-app-brand{display:flex;align-items:baseline;justify-content:space-between;gap:var(--space-100);padding:0 var(--space-100)}
 .eis-app-brand a{font-family:var(--font-family-mono);font-size:var(--font-size-300);font-weight:var(--font-weight-semibold);letter-spacing:var(--font-letter-spacing-wide)}
@@ -242,10 +244,32 @@ code{font-family:var(--font-family-mono);font-size:var(--font-size-200)}
 .eis-app-nav a:hover{--bg:var(--surface-canvas)}
 .eis-app-nav a[aria-current="page"]{--bg:var(--surface-inverse);--fg:var(--ink-inverse)}
 .eis-app-nav__count{margin-left:auto;font-family:var(--font-family-mono);font-size:var(--font-size-200);opacity:.7}
-.eis-app-sidebar__foot{margin-top:auto;padding:var(--space-200) var(--space-100) 0;border-top:var(--border-width-100) solid var(--line)}
+.eis-app-sidebar__foot{margin-top:auto;padding:var(--space-200) 0 0;border-top:var(--border-width-100) solid var(--line)}
 .eis-app-sidebar__foot dl{display:grid;grid-template-columns:auto 1fr;gap:var(--space-100) var(--space-200)}
 .eis-app-sidebar__foot dd{text-align:right}
-.eis-app-main{padding:var(--space-300);display:flex;flex-direction:column;gap:var(--space-300);min-width:0}
+.eis-app-sidebar__toggle{display:none}
+@media (min-width:1025px){
+.eis-app-shell[data-eis-app-animate]{transition:grid-template-columns .2s ease}
+.eis-app-shell:has(.eis-app-sidebar__toggle[aria-expanded="false"]){grid-template-columns:var(--app-size-sidebar-collapsed) minmax(0,1fr)}
+.eis-app-sidebar{overflow-x:clip}
+.eis-app-sidebar > :not(.eis-app-sidebar__toggle){min-inline-size:calc(var(--app-size-sidebar) - var(--space-200) * 2);transition:opacity .2s ease}
+.eis-app-sidebar:has(.eis-app-sidebar__toggle[aria-expanded="false"]) > :not(.eis-app-sidebar__toggle){opacity:0;visibility:hidden;
+    transition:opacity .2s ease,visibility 0s linear .2s}
+.eis-app-sidebar__toggle{--bg:transparent;display:flex;align-items:center;justify-content:flex-start;flex:none;align-self:flex-start;
+    margin-top:auto;inline-size:var(--app-size-nav-item);block-size:var(--app-size-nav-item);padding:0 0 0 var(--space-100);
+    border:0;border-radius:var(--radius-100);background:var(--bg);color:var(--ink);cursor:pointer}
+.eis-app-sidebar__toggle ~ .eis-app-sidebar__foot{margin-top:0}
+.eis-app-sidebar__toggle:hover{--bg:var(--surface-canvas)}
+.eis-app-sidebar__toggle::before{content:"";inline-size:8px;block-size:8px;translate:2px 0;rotate:45deg;
+    border-left:1.5px solid currentColor;border-bottom:1.5px solid currentColor}
+.eis-app-shell[data-eis-app-animate] .eis-app-sidebar__toggle::before{transition:rotate .2s ease,translate .2s ease}
+.eis-app-sidebar__toggle[aria-expanded="false"]::before{rotate:225deg;translate:-2px 0}
+}
+@media (min-width:1025px) and (prefers-reduced-motion:reduce){
+.eis-app-shell[data-eis-app-animate],.eis-app-shell[data-eis-app-animate] .eis-app-sidebar__toggle::before,.eis-app-sidebar > :not(.eis-app-sidebar__toggle){transition:none}
+}
+.eis-app-main{padding:var(--space-300);display:flex;flex-direction:column;gap:var(--space-300);min-width:0;
+  inline-size:100%;max-inline-size:calc(var(--app-size-main) + var(--space-300) * 2);margin-inline:auto}
 .eis-app-page-head{display:flex;align-items:flex-end;justify-content:space-between;gap:var(--space-100) var(--space-300);flex-wrap:wrap}
 .eis-app-page-head__meta{flex:1 0 100%;display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:var(--space-100) var(--space-200)}
 .eis-app-page-head__meta > :last-child:not(:first-child){margin-left:auto;text-align:right;overflow-wrap:anywhere}
@@ -278,8 +302,6 @@ code{font-family:var(--font-family-mono);font-size:var(--font-size-200)}
 .eis-app-tasks .eis-table{table-layout:fixed}
 .eis-app-tasks .eis-table .eis-app-col-check{width:48px}
 .eis-app-tasks .eis-table .eis-app-col-idx{width:44px}
-.eis-app-tasks .eis-table .eis-app-col-src{width:184px}
-.eis-app-tasks .eis-table .eis-app-col-due,.eis-app-tasks .eis-table .eis-app-col-date{width:88px}
 .eis-app-tasks .eis-table th{text-align:left;padding-inline:0 var(--space-200);font-weight:inherit}
 .eis-app-tasks .eis-table th:first-child,.eis-app-tasks .eis-table td:first-child{padding-left:var(--space-200)}
 .eis-app-tasks .eis-table th:last-child,.eis-app-tasks .eis-table td:last-child{padding-right:var(--space-200);text-align:right}
@@ -290,9 +312,7 @@ code{font-family:var(--font-family-mono);font-size:var(--font-size-200)}
 .eis-app-tasks .eis-table label{cursor:pointer}
 .eis-app-task-title .eis-chip{vertical-align:text-bottom}
 .eis-app-tasks .eis-table tr:has(.eis-checkbox:checked) :is(label,.eis-app-task-title){color:var(--ink-muted);text-decoration:line-through}
-.eis-app-meta{display:flex;flex-wrap:wrap;align-items:center;gap:var(--space-100);margin-top:var(--space-100)}
-.eis-app-meta em{font-family:var(--font-family-mono);font-size:var(--font-size-200);color:var(--ink-muted)}
-.eis-app-due--over,.eis-app-meta .eis-app-over,.eis-app-over{color:var(--accent-ink);font-weight:var(--font-weight-medium)}
+.eis-app-due--over,.eis-app-over{color:var(--accent-ink);font-weight:var(--font-weight-medium)}
 .eis-app-due--today{color:var(--ink);font-weight:var(--font-weight-medium)}
 @media (max-width:1024px){
 .eis-app-shell{grid-template-columns:minmax(0,1fr);grid-template-rows:auto 1fr}
@@ -301,7 +321,7 @@ code{font-family:var(--font-family-mono);font-size:var(--font-size-200)}
 .eis-app-sidebar__foot,.eis-app-nav__section > .eis-label{display:none}
 .eis-app-nav,.eis-app-nav ul{flex-direction:row;gap:var(--space-100)}
 .eis-app-nav a{white-space:nowrap}
-.eis-app-main{padding:var(--space-200)}
+.eis-app-main{padding:var(--space-200);max-inline-size:calc(var(--app-size-main) + var(--space-200) * 2)}
 }
 @media (max-width:760px){
 .eis-app-metrics{grid-template-columns:repeat(2,1fr)}
