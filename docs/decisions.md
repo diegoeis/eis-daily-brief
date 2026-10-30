@@ -164,15 +164,15 @@
 
 - **Settings** sai do rodapé da sidebar e vai para o menu, abaixo de Daily. O rodapé guarda só o botão de recolher a sidebar.
 
+## 2026-10-30 — v0.14.7, eis-ds 58ae1e8
+
+- Ação principal com `eis-button--primary` (+ Tarefa, Salvar, botões do setup); `--black` no eis-ds virou só cor.
+- Painéis brancos pelo token (`surface.panel`), fundo da página `neutral.0`, cabeçalho de painel em `surface.head`, raio `--radius-100`, títulos de painel com `eis-panel__title`.
+- `src/app/vendor/eis-ds.css` regerado do eis-ds 58ae1e8.
+
 ## Pendente
 
 
 - Testar `tasks-setup` no Cowork (seletor de pasta) e `tasks-update` agendado com `--config`.
 - Inferência de pessoas e canais pelo messenger no setup: está descrita, não testada.
 - `.gitkeep` em `src/skills/` pode ser removido.
-
-## 2026-10-30 — v0.14.7, eis-ds 58ae1e8
-
-- Ação principal com `eis-button--primary` (+ Tarefa, Salvar, botões do setup); `--black` no eis-ds virou só cor.
-- Painéis brancos pelo token (`surface.panel`), fundo da página `neutral.0`, cabeçalho de painel em `surface.head`, raio `--radius-100`, títulos de painel com `eis-panel__title`.
-- `src/app/vendor/eis-ds.css` regerado do eis-ds 58ae1e8.
