@@ -1,5 +1,5 @@
 /* eis-ds, trimmed for the eis-task-manager page. GENERATED: do not edit.
-   Source: https://github.com/diegoeis/eis-ds @ e68675e
+   Source: https://github.com/diegoeis/eis-ds @ 50e05b0
    Built by scripts/vendor-eis-ds.py with only the eis-* classes the page uses. */
 @import url("https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600&family=Geist+Mono:ital,wght@0,300;0,400;0,500;1,400&display=swap");
 
@@ -194,10 +194,10 @@ code{font-family:var(--font-family-mono);font-size:var(--font-size-200)}
 .eis-checkbox:hover{border-color:var(--ink);background-color:var(--surface-canvas)}
 .eis-checkbox:checked:hover{background-color:color-mix(in srgb,var(--ink) 80%,var(--surface-panel));border-color:color-mix(in srgb,var(--ink) 80%,var(--surface-panel))}
 .eis-checkbox:disabled{opacity:.4;cursor:not-allowed;border-color:var(--ink-muted);background-color:var(--surface-panel)}
-.eis-tabs{display:inline-flex;border:var(--border-width-100) solid var(--line);border-radius:var(--radius-100);
+.eis-tabs{display:inline-flex;flex-wrap:wrap;max-width:100%;border:var(--border-width-100) solid var(--line);border-radius:var(--radius-100);
   background:var(--surface-panel);padding:calc(var(--space-100) / 2)}
 .eis-tabs legend{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%)}
-.eis-tabs label{position:relative;cursor:pointer}
+.eis-tabs label{position:relative;flex:1 1 auto;cursor:pointer}
 .eis-tabs input{position:absolute;opacity:0;inset:0;cursor:pointer}
 .eis-tabs span{display:flex;align-items:center;justify-content:center;padding:0 var(--space-200);
   min-height:calc(40px - 2 * var(--border-width-100) - var(--space-100));border-radius:calc(var(--radius-100) - var(--space-100) / 2);

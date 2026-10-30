@@ -115,6 +115,10 @@
 
 - **Toolbar**: "+ Tarefa" usa o botão de tamanho padrão (40px) e as abas de status ganharam a mesma altura no eis-ds (v0.5.1). Antes: abas 38px e botão `--sm` 32px, desalinhados.
 
+## 2026-10-30 — v0.12.3, abas de status no celular
+
+- **Sem rolagem horizontal**: em telas estreitas (360–390px) as cinco abas de status quebram em duas linhas (eis-ds v0.5.2), em vez de empurrar a página para os lados.
+
 ## Pendente
 
 
