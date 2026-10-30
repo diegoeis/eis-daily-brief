@@ -146,6 +146,10 @@
 
 - **Sidebar**: o link "Settings - Task Manager" sai da seção System e fica no rodapé, no lugar de "Data: mock" (que saiu). Na barra do topo (até 1024px), onde o eis-ds esconde o rodapé, ele aparece no fim da barra. Mesmo padrão no eis-answer-assistant.
 
+## 2026-10-30 — v0.14.3, fonte e datas abaixo do texto
+
+- **Tabela de tarefas**: as colunas Source, Created e Due saem; viram uma linha (`dl.brief-task-meta`) abaixo do texto da tarefa. Ficam só #, checkbox, tarefa e o botão de cancelar. Duplo clique no Due continua abrindo o campo de data, agora na própria linha.
+
 ## Pendente
 
 

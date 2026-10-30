@@ -355,10 +355,9 @@
       "<summary><h2>" + esc(group.name || TEXT.noGroup) + '</h2><span class="eis-mono">' +
       (overdue ? '<span class="eis-app-over">' + esc(TEXT.groupOverdue(overdue)) + "</span> · " : "") +
       tasks.length + "</span></summary>" +
-      '<table class="eis-table"><colgroup><col class="eis-app-col-idx"><col class="eis-app-col-check"><col><col class="eis-app-col-src"><col class="eis-app-col-date"><col class="eis-app-col-due"><col class="brief-col-act"></colgroup>' +
+      '<table class="eis-table"><colgroup><col class="eis-app-col-idx"><col class="eis-app-col-check"><col><col class="brief-col-act"></colgroup>' +
       '<thead class="eis-label"><tr>' +
       '<th scope="col">' + c.idx + '</th><th scope="col"><span class="eis-visually-hidden">' + c.done + '</span></th><th scope="col">' + c.task +
-      '</th><th scope="col">' + c.source + '</th><th scope="col">' + c.created + '</th><th scope="col">' + c.due +
       '</th><th scope="col"><span class="eis-visually-hidden">' + c.act + "</span></th></tr></thead>" +
       "<tbody>" + tasks.map(renderTask).join("") + "</tbody></table></details>";
   }
@@ -390,13 +389,15 @@
       '<td class="eis-mono">' + F.count(i + 1) + "</td>" +
       // Only the checkbox marks a task done: the title is not a <label>, it names the checkbox through aria-labelledby.
       '<td><input class="eis-checkbox" type="checkbox" aria-labelledby="' + id + '" data-line="' + t.line + '"' + (t.done && !t.cancelled ? " checked" : "") + (t.cancelled ? " disabled" : "") + "></td>" +
-      "<td>" + title + "</td>" +
-      '<td class="eis-mono" title="' + esc(t.source ? MD.toText(t.source) : "") + '">' + (t.source ? MD.toHtml(t.source, links()) : "—") + "</td>" +
-      '<td class="eis-mono">' + (t.created ? '<time datetime="' + t.created + '">' + F.shortDate(t.created) + "</time>" : "—") + "</td>" +
-      '<td class="eis-mono brief-due' + dueClass + '" data-edit-due="' + t.line + '" title="' + TEXT.dblclick + '">' + due + "</td>" +
+      // Under the text: source, created and due (double click on the due date edits it).
+      "<td>" + title + '<dl class="brief-task-meta eis-mono">' +
+      '<div><dt>' + TEXT.columns.source + '</dt><dd title="' + esc(t.source ? MD.toText(t.source) : "") + '">' + (t.source ? MD.toHtml(t.source, links()) : "—") + "</dd></div>" +
+      '<div><dt>' + TEXT.columns.created + "</dt><dd>" + (t.created ? '<time datetime="' + t.created + '">' + F.shortDate(t.created) + "</time>" : "—") + "</dd></div>" +
+      '<div><dt>' + TEXT.columns.due + '</dt><dd class="brief-due' + dueClass + '" data-edit-due="' + t.line + '" title="' + TEXT.dblclick + '">' + due + "</dd></div>" +
+      "</dl></td>" +
       "<td>" + (fmt().cancelled && (!t.done || t.cancelled) ? cancelButton(t) : "") + "</td></tr>" +
       // Second row, across the whole table: the comments, the new-comment form, then the task's actions.
-      '<tr class="brief-task-detail"><td colspan="7">' + renderNotes(t) +
+      '<tr class="brief-task-detail"><td colspan="4">' + renderNotes(t) +
       (t.done && t.completed ? '<p class="brief-task-done eis-mono">' + esc(TEXT.doneOn(F.shortDate(t.completed))) + "</p>" : "") +
       '<ul class="brief-task-actions" aria-label="' + esc(TEXT.taskActions) + '">' +
       actions.map(function (a) { return "<li>" + a + "</li>"; }).join("") + "</ul></td></tr>";

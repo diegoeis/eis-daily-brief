@@ -54,10 +54,14 @@
 .brief-inline-edit .eis-input{flex:1 1 0;min-inline-size:0}
 /* the priority, as its mark, left of the text */
 .brief-inline-edit__priority{flex:0 0 auto;inline-size:auto}
-/* the due date input sits over the cell's text, wider than the column so the whole date shows */
-.eis-app-tasks .eis-table td.brief-due{position:relative;overflow:visible}
-.brief-due-input{position:absolute;z-index:1;top:calc(var(--space-200) - 10px);right:var(--space-100);
-  inline-size:calc(var(--space-400) * 2.5);font-size:var(--font-size-200);background:var(--surface-raised)}
+/* source, created and due, in one line under the task text */
+.brief-task-meta{display:flex;flex-wrap:wrap;align-items:center;gap:var(--space-100) var(--space-300);margin:var(--space-100) 0 0;
+  font-size:var(--font-size-200);color:var(--ink-muted)}
+.brief-task-meta > div{display:flex;align-items:center;gap:var(--space-100);min-inline-size:0}
+.brief-task-meta dt{text-transform:uppercase;letter-spacing:.04em}
+.brief-task-meta dd{margin:0;color:var(--ink);min-inline-size:0;max-inline-size:calc(var(--space-400) * 5);overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+.brief-task-meta dd.brief-due{overflow:visible}
+.brief-due-input{inline-size:calc(var(--space-400) * 2.5);font-size:var(--font-size-200)}
 
 .brief-note-form{display:flex;flex-wrap:wrap;gap:var(--space-100);margin-top:var(--space-200)}
 .brief-note-form .eis-input{flex:1 1 calc(var(--space-400) * 6)}
@@ -81,6 +85,8 @@
 
 @media (max-width:760px){
   .brief-note{grid-template-columns:minmax(0,1fr);gap:0}
+  /* four cells now (number, checkbox, task, cancel): the cancel button goes to the right of the text */
+  .eis-app-tasks .eis-table tr.brief-task td:nth-child(4){grid-column:3;grid-row:1;margin-top:0}
   /* the eis-ds mobile grid puts every row in a card: the detail row joins the task's card */
   .eis-app-tasks .eis-table tr.brief-task-detail{display:block;border-top:0;padding:0 var(--space-200) var(--space-200) calc(32px + var(--space-300))}
   .eis-app-tasks .eis-table tr.brief-task-detail td{display:block;padding:0}
