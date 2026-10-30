@@ -289,7 +289,7 @@
   function renderAllDone() {
     var a = TEXT.allDone;
     var action = state.addingTask ? renderAddForm()
-      : '<button class="eis-button eis-button--black" type="button" data-action="task-open">' + a.add + "</button>";
+      : '<button class="eis-button eis-button--primary" type="button" data-action="task-open">' + a.add + "</button>";
     return '<div class="brief-all-done"><h2>' + a.title + "</h2><p>" + a.text + "</p>" + action + "</div>";
   }
 
@@ -324,7 +324,7 @@
     var sm = small ? " eis-button--sm" : "";
     return '<div class="brief-add-task__actions">' +
       '<button class="eis-button eis-button--ghost' + sm + '" type="button" data-action="' + cancelAction + '">' + TEXT.cancel + "</button>" +
-      '<button class="eis-button eis-button--black' + sm + '" type="submit">' + TEXT.save + "</button></div>";
+      '<button class="eis-button eis-button--primary' + sm + '" type="submit">' + TEXT.save + "</button></div>";
   }
 
   function renderAddForm() {
@@ -447,7 +447,7 @@
       '<label class="eis-visually-hidden" for="edit-task-' + t.line + '">' + TEXT.editTaskLabel + "</label>" +
       prioritySelect("edit-priority-" + t.line, t.priority, true) +
       '<input class="eis-input" id="edit-task-' + t.line + '" name="text" autocomplete="off" required value="' + esc(t.description) + '">' +
-      '<button class="eis-button eis-button--sm eis-button--black" type="submit">' + TEXT.save + "</button></form>";
+      '<button class="eis-button eis-button--sm eis-button--primary" type="submit">' + TEXT.save + "</button></form>";
   }
 
   function renderNotes(t) {
@@ -456,7 +456,7 @@
         ? '<form class="brief-inline-edit" data-form="note-edit" data-line="' + n.line + '">' +
           '<label class="eis-visually-hidden" for="edit-note-' + n.line + '">' + TEXT.editNoteLabel + "</label>" +
           '<input class="eis-input" id="edit-note-' + n.line + '" name="note" autocomplete="off" required value="' + esc(n.text) + '">' +
-          '<button class="eis-button eis-button--sm eis-button--black" type="submit">' + TEXT.save + "</button></form>"
+          '<button class="eis-button eis-button--sm eis-button--primary" type="submit">' + TEXT.save + "</button></form>"
         : '<p data-edit-note="' + n.line + '" title="' + TEXT.dblclick + '">' + MD.toHtml(n.text, links()) + "</p>";
       var chip = n.action ? '<span class="eis-chip eis-chip--sm ' + (n.action === "done" ? "eis-chip--success" : n.action === "failed" ? "brief-chip-failed" : "eis-chip--solid") +
         '">' + TEXT.action[n.action] + "</span> " : "";
@@ -473,7 +473,7 @@
         '<label class="eis-visually-hidden" for="note-' + t.line + '">' + TEXT.noteLabel + "</label>" +
         '<input class="eis-input" id="note-' + t.line + '" name="note" autocomplete="off" required placeholder="' + esc(TEXT.notePlaceholder) + '">' +
         '<button class="eis-button eis-button--sm eis-button--ghost" type="button" data-action="note-cancel">' + TEXT.cancel + "</button>" +
-        '<button class="eis-button eis-button--sm eis-button--black" type="submit">' + TEXT.save + "</button></form>"
+        '<button class="eis-button eis-button--sm eis-button--primary" type="submit">' + TEXT.save + "</button></form>"
       : "";
     return (items ? '<ul class="brief-notes">' + items + "</ul>" : "") + form;
   }

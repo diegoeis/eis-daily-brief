@@ -19,7 +19,7 @@
 <body class="eis-app-shell">
 
 <aside class="eis-app-sidebar" id="sidebar" aria-label="Sidebar">
-  <p class="eis-app-brand"><a href="#daily">TASK MANAGER</a> <span class="eis-mono">v0.14.6</span></p>
+  <p class="eis-app-brand"><a href="#daily">TASK MANAGER</a> <span class="eis-mono">v0.14.7</span></p>
   <nav class="eis-app-nav" aria-label="Main">
     <section class="eis-app-nav__section" aria-labelledby="nav-tasks">
       <h2 class="eis-label" id="nav-tasks">Tasks</h2>
@@ -40,7 +40,7 @@
   <header class="eis-app-page-head">
     <p class="eis-app-page-head__meta"><time class="eis-label" id="today"></time><span class="eis-mono" id="note-path"></span></p>
     <h1>Daily</h1>
-    <button class="eis-button eis-button--black" type="button" id="add-task-open">+ Task</button>
+    <button class="eis-button eis-button--primary" type="button" id="add-task-open">+ Task</button>
   </header>
 
   <p class="brief-notice eis-mono" id="notice" role="status" hidden></p>
@@ -91,8 +91,8 @@
   <section class="eis-panel brief-setup" id="setup-panel" aria-labelledby="setup-h" hidden>
     <h2 class="eis-label" id="setup-h"></h2>
     <p id="setup-text"></p>
-    <a class="eis-button eis-button--black" id="setup-link" href="#settings" hidden></a>
-    <button class="eis-button eis-button--black" type="button" id="setup-allow" hidden></button>
+    <a class="eis-button eis-button--primary" id="setup-link" href="#settings" hidden></a>
+    <button class="eis-button eis-button--primary" type="button" id="setup-allow" hidden></button>
   </section>
 </main>
 
@@ -103,7 +103,7 @@
   </header>
 
   <section class="eis-panel brief-settings" aria-labelledby="daily-h">
-    <header class="eis-panel__head"><h2 class="eis-label" id="daily-h">Daily</h2><span class="eis-mono">eis-task-manager</span></header>
+    <header class="eis-panel__head"><h2 class="eis-panel__title" id="daily-h">Daily</h2><span class="eis-mono">eis-task-manager</span></header>
     <div class="brief-settings__body">
       <div class="eis-field">
         <label for="daily-folder">Daily notes folder</label>
