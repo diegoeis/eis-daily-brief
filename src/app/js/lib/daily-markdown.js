@@ -10,6 +10,7 @@
    Done task:  - [x] {description} ... ✅ YYYY-MM-DD
    Cancelled:  - [-] {description} ...   (the line as it was, with another start)
    Comment:        - YYYY-MM-DD - {note}
+   Action:         - YYYY-MM-DD - 🤖 {instruction for tasks-act}   (🤖⏳ running, 🤖✅ done, 🤖⚠️ failed)
 
    compile(format) turns the JSON into what the functions use; every function takes that as its
    last argument and uses the default format without it. Dates in the model and in the arguments
@@ -48,6 +49,12 @@
     need(str(fl.created) && str(fl.due) && str(fl.completed), "tasks.fields needs created, due and completed");
     need(str(c.indent) && /^\s+$/.test(c.indent) && str(c.prefix) && str(c.line) && c.line.indexOf("{text}") !== -1,
       "tasks.comment needs a whitespace indent, a prefix and a line with {text}");
+    if (c.action !== undefined) {
+      var a = obj(c.action);
+      var marks4 = [a.pending, a.running, a.done, a.failed];
+      need(marks4.every(str) && marks4.every(function (m, i) { return marks4.indexOf(m) === i; }),
+        "tasks.comment.action needs pending, running, done and failed, all different");
+    }
     Object.keys(obj(t.priority)).forEach(function (k) {
       need(LEVELS.indexOf(t.priority[k]) !== -1, "tasks.priority." + k + " must be one of " + LEVELS.join(", "));
     });
@@ -123,7 +130,11 @@
       commentLine: function (key, text) {
         return t.comment.indent + t.comment.prefix + t.comment.line.replace("{date}", date.fromKey(key)).replace("{text}", text);
       },
-      closedPrefixes: (t.comment.closedPrefixes || []).map(function (p) { return p.toLowerCase(); })
+      closedPrefixes: (t.comment.closedPrefixes || []).map(function (p) { return p.toLowerCase(); }),
+      // Action marks, longest first: "🤖✅ " must win over "🤖 ".
+      actions: Object.keys(t.comment.action || {}).map(function (k) { return { state: k, mark: t.comment.action[k] }; })
+        .sort(function (a, b) { return b.mark.length - a.mark.length; }),
+      actionMark: t.comment.action || null
     };
   }
 
@@ -213,8 +224,20 @@
         else note.text = m[n + 1];
       });
     }
+    note.action = null;
+    note.marker = "";
+    for (var i = 0; i < F.actions.length; i++) {
+      // Also without the trailing space, for a mark typed at the very end of a line.
+      var mark = F.actions[i].mark;
+      if (note.text.indexOf(mark) === 0 || note.text === mark.trim()) {
+        note.action = F.actions[i].state;
+        note.marker = mark;
+        note.text = note.text.slice(mark.length).trim();
+        break;
+      }
+    }
     var lower = note.text.toLowerCase();
-    note.kind = F.closedPrefixes.some(function (p) { return lower.indexOf(p) === 0; }) ? "closed" : "note";
+    note.kind = note.action ? "action" : F.closedPrefixes.some(function (p) { return lower.indexOf(p) === 0; }) ? "closed" : "note";
     return note;
   }
 
@@ -282,11 +305,16 @@
     return joinLines(lines, markdown);
   }
 
-  /* Adds a comment after the task's last comment. */
-  function addTaskNote(markdown, lineIndex, key, text, F) {
+  /* Adds a comment after the task's last comment. With `action`, the comment is an instruction for
+     the tasks-act skill: it starts with the format's pending action mark. */
+  function addTaskNote(markdown, lineIndex, key, text, F, action) {
     F = F || DEFAULT;
     var clean = String(text).replace(/\s+/g, " ").trim();
     if (!clean) throw new Error("Empty note");
+    if (action) {
+      if (!F.actionMark) throw new Error("The format has no action marks");
+      clean = F.actionMark.pending + clean;
+    }
     var lines = splitLines(markdown);
     taskAt(lines, lineIndex, F);
     var at = lineIndex + 1;
@@ -444,6 +472,8 @@
     var s = noteAt(lines, lineIndex, F);
     var note = parseNote(s[1], lineIndex, F);
     var head = lines[lineIndex].slice(0, lines[lineIndex].length - s[1].length); // indent + prefix, as written
+    // An action keeps its mark and state; editing a failed one sends it back to tasks-act (pending).
+    clean = (note.action === "failed" ? F.actionMark.pending : note.marker) + clean;
     lines[lineIndex] = head + (note.date
       ? F.format.tasks.comment.line.replace("{date}", F.date.fromKey(note.date)).replace("{text}", clean)
       : clean);

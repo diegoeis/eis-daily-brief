@@ -40,7 +40,8 @@
       "indent": "    ",
       "prefix": "- ",
       "line": "{date} - {text}",
-      "closedPrefixes": ["Fechada:", "Fechado:", "Closed:"]
+      "closedPrefixes": ["Fechada:", "Fechado:", "Closed:"],
+      "action": {"pending": "🤖 ", "running": "🤖⏳ ", "done": "🤖✅ ", "failed": "🤖⚠️ "}
     }
   }
 }

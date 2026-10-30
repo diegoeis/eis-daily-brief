@@ -9,6 +9,7 @@ Everything the plugin keeps for a user lives in one folder, `.eis-task-manager/`
     ├── daily-format.json      optional: how the user writes tasks (see daily-format.md); absent = the default
     ├── page-settings.js       what the page needs from the two files above (see "The page"); written by the skills
     ├── state.json             written by tasks-update at the end of each run: {"lastCheck": ISO date-time}; start of the next run's search window
+    ├── act-state.json         written by tasks-act: the actions it is running now, with their start time
     └── app/                   the user's copy of the daily page (see "The page")
         ├── index.html
         └── VERSION            plugin version of this copy
@@ -46,12 +47,12 @@ The plugin ships a page, `app/` in the plugin's own folder, that shows the lates
 5. Write `.eis-task-manager/page-settings.js` (outside `app/`, so updates never replace it). A browser page can't read a `.json` from disk but can load a script, so this file carries what the page needs, as one line of JavaScript:
 
    ```js
-   window.EisTaskManagerSettings = {"pattern": "<output.pattern>", "format": <daily-format.json contents, or null>, "vault": "<vault.path, or null>"};
+   window.EisTaskManagerSettings = {"pattern": "<output.pattern>", "format": <daily-format.json contents, or null>, "vault": "<vault.path, or null>", "folder": "<output.folder>"};
    ```
 
-   With `vault`, the page turns each `[[Note]]` into a link that opens the note in Obsidian (`obsidian://open?vault=<folder name>&file=<Note>`), with the note's path as its tooltip.
+   With `vault`, the page turns each `[[Note]]` into a link that opens the note in Obsidian (`obsidian://open?file=<Note>.md`), with the note's path as its tooltip, and the path of the open daily note (its place in the vault, from `folder`) into the same kind of link.
 
-   Write it every time, even when the copy was current: the config or the format may have changed. Valid JSON after the `=`, nothing else in the file. It holds no personal data beyond the file pattern, the format and the vault path.
+   Write it every time, even when the copy was current: the config or the format may have changed. Valid JSON after the `=`, nothing else in the file. It holds no personal data beyond the file pattern, the format and the vault and notes folder paths.
 
 **The address to give the user** is the absolute path of `.eis-task-manager/app/index.html` **as the user's computer sees it** (`file:///…`). Hosts that run the session in an isolated environment mount the user's folders under another path: map it back to the user's path (the host shows both, or use the folder path the user gave in setup). If that is not possible, say it is `<folder you chose>/.eis-task-manager/app/index.html`.
 

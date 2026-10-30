@@ -16,7 +16,7 @@
 <body class="eis-app-shell">
 
 <aside class="eis-app-sidebar" aria-label="Barra lateral">
-  <p class="eis-app-brand"><a href="#daily">TASK MANAGER</a> <span class="eis-mono">v0.11.0</span></p>
+  <p class="eis-app-brand"><a href="#daily">TASK MANAGER</a> <span class="eis-mono">v0.12.0</span></p>
   <nav class="eis-app-nav" aria-label="Principal">
     <section class="eis-app-nav__section" aria-labelledby="nav-tasks">
       <h2 class="eis-label" id="nav-tasks">Tarefas</h2>
@@ -59,7 +59,12 @@
       <label><input type="radio" name="status" value="cancelled"><span>Canceladas</span></label>
       <label><input type="radio" name="status" value="all"><span>Todas</span></label>
     </fieldset>
+    <button class="eis-button eis-button--sm eis-button--black brief-toolbar__add" type="button" id="add-task-open">+ Tarefa</button>
     <div class="brief-toolbar__fields">
+      <div class="eis-field brief-toolbar__search">
+        <label for="search">Buscar</label>
+        <input class="eis-input" type="search" id="search" name="search" autocomplete="off" placeholder="Filtrar tarefas">
+      </div>
       <div class="eis-field">
         <label for="filter-group">Grupo</label>
         <select class="eis-select" id="filter-group" name="group"></select>

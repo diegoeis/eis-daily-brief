@@ -31,6 +31,7 @@
     closed: "Fechada",
     addNote: "+ Comentário",
     dblclick: "Clique duas vezes para editar",
+    openInObsidian: "Abrir no Obsidian",
     cancelTask: "Cancelar tarefa",
     reopenTask: "Reabrir tarefa",
     cancelled: "Cancelada",
@@ -41,6 +42,9 @@
     groupLabel: "Grupo",
     addTask: "+ Tarefa",
     notePlaceholder: "Atualização ou contexto desta tarefa",
+    actionPlaceholder: "O que a IA deve fazer (ex.: /skill e o pedido). Roda no próximo tasks-act",
+    actionToggle: "Ação para a IA: o tasks-act executa este comentário",
+    action: { pending: "🤖 A executar", running: "🤖 Executando", done: "🤖 Executada", failed: "🤖 Falhou" },
     noteLabel: "Novo comentário",
     save: "Salvar",
     cancel: "Cancelar",
@@ -77,7 +81,7 @@
      noteFormLine = new comment under that task; editTaskLine / editNoteLine / editDueLine = editing that
      task's text and priority, that comment, that task's due date (opened by a double click). */
   var state = { path: "", markdown: "", model: DM.parse(""), prefs: prefsStore.load(), noteFormLine: null, addingTask: false,
-    editTaskLine: null, editNoteLine: null, editDueLine: null, panel: null };
+    editTaskLine: null, editNoteLine: null, editDueLine: null, panel: null, search: "" };
   var CHECK_EVERY_MS = 5000;
   var today = DM.toDateKey(new Date());
   var el = function (id) { return document.getElementById(id); };
@@ -157,13 +161,21 @@
     render();
   }
 
+  function fold(text) { return String(text).toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, ""); }
+
   function rank(t) { var i = DM.LEVELS.indexOf(t.priority); return i === -1 ? 2.5 : i; }
 
   function isOverdue(t) { return !t.done && t.due && t.due < today; }
 
   function visibleTasks(tasks) {
     var p = state.prefs;
+    var words = fold(state.search).split(/\s+/).filter(Boolean);
     var list = tasks.filter(function (t) {
+      if (words.length) {
+        // Every word must be in the task: its text, source, group or comments; any case, any accent.
+        var hay = fold([t.description, t.source || "", t.group].concat(t.notes.map(function (n) { return n.text; })).map(MD.toText).join(" "));
+        if (!words.every(function (w) { return hay.indexOf(w) !== -1; })) return false;
+      }
       if (p.status === "open") return !t.done;
       if (p.status === "today") return !t.done && t.due === today;
       if (p.status === "done") return t.done && !t.cancelled;
@@ -197,7 +209,10 @@
 
     el("today").textContent = F.longDate(today);
     el("today").setAttribute("datetime", today);
-    el("note-path").textContent = state.path;
+    var inVault = notePathInVault(state.path);
+    el("note-path").innerHTML = inVault
+      ? '<a class="eis-link" href="' + esc(obsidianHref(inVault)) + '" title="' + esc(TEXT.openInObsidian) + '">' + esc(inVault) + "</a>"
+      : esc(state.path);
     el("nav-open-count").textContent = model.tasks.filter(function (t) { return !t.done; }).length;
 
     renderToolbar(groups);
@@ -280,21 +295,25 @@
     return '<div class="brief-all-done"><h2>' + a.title + "</h2><p>" + a.text + "</p>" + action + "</div>";
   }
 
-  // Above the groups when the note has open tasks: the button, or the form it opens.
+  // Above the groups while adding a task (the "+ Tarefa" button sits in the toolbar).
   function renderAddBar() {
-    return '<div class="brief-add-bar">' + (state.addingTask ? renderAddForm()
-      : '<button class="eis-button eis-button--sm" type="button" data-action="task-open">' + TEXT.addTask + "</button>") + "</div>";
+    return state.addingTask ? '<div class="brief-add-bar">' + renderAddForm() + "</div>" : "";
   }
 
   // Only the levels the format has a mark for; a format with no priority marks gets no field.
-  // compact: no visible label and no field wrapper, for the inline edit row.
+  // compact: no visible label and no field wrapper, for the inline edit row; the options are the
+  // format's own marks (the Obsidian Tasks emojis by default), named in their title.
   function prioritySelect(id, value, compact) {
     var levels = DM.LEVELS.filter(function (l) { return fmt().priorityMark[l]; });
     if (!levels.length) return "";
     if (compact) {
       return '<label class="eis-visually-hidden" for="' + id + '">' + TEXT.priorityLabel + "</label>" +
-        '<select class="eis-select brief-inline-edit__priority" id="' + id + '" name="priority"><option value="">' + TEXT.noPriority + "</option>" +
-        levels.map(function (l) { return '<option value="' + l + '"' + (l === value ? " selected" : "") + ">" + TEXT.priority[l] + "</option>"; }).join("") + "</select>";
+        '<select class="eis-select brief-inline-edit__priority" id="' + id + '" name="priority" title="' + TEXT.priorityLabel + '">' +
+        '<option value="" title="' + TEXT.noPriority + '">—</option>' +
+        levels.map(function (l) {
+          return '<option value="' + l + '" title="' + TEXT.priority[l] + '"' + (l === value ? " selected" : "") + ">" +
+            esc(fmt().priorityMark[l]) + "</option>";
+        }).join("") + "</select>";
     }
     return '<div class="eis-field"><label for="' + id + '">' + TEXT.priorityLabel + "</label>" +
       '<select class="eis-select" id="' + id + '" name="priority"><option value="">' + TEXT.noPriority + "</option>" +
@@ -382,15 +401,28 @@
       "<td>" + (fmt().cancelled && (!t.done || t.cancelled) ? cancelButton(t) : "") + "</td></tr>";
   }
 
-  /* [[Note]] links open the note in Obsidian when the page knows the vault (page-settings.js). */
+  /* Notes open in Obsidian when the page knows the vault (page-settings.js): obsidian://open?file=<name>.md. */
+  function obsidianHref(file) {
+    return "obsidian://open?file=" + encodeURIComponent(/\.md$/i.test(file) ? file : file + ".md");
+  }
+
   function links() {
     if (!WS.vault) return null;
     var root = WS.vault.replace(/[\\/]+$/, "");
-    var name = root.split(/[\\/]/).pop();
     return {
-      wikiHref: function (target) { return "obsidian://open?vault=" + encodeURIComponent(name) + "&file=" + encodeURIComponent(target); },
+      wikiHref: function (target) { return obsidianHref(target); },
       wikiTitle: function (target) { return root + "/" + target + ".md"; }
     };
+  }
+
+  /* The note's path inside the vault: the chosen folder's place in the vault (from page-settings.js)
+     plus the path the page found under it. Without the vault, the path as found. */
+  function notePathInVault(path) {
+    if (!WS.vault || !WS.folder || !path) return null;
+    var vault = WS.vault.replace(/[\\/]+$/, ""), folder = WS.folder.replace(/[\\/]+$/, "");
+    if (folder.indexOf(vault + "/") !== 0) return null;
+    var under = path.slice(path.indexOf("/") + 1); // the path starts with the chosen folder's name
+    return folder.slice(vault.length + 1) + "/" + under;
   }
 
   function textButton(action, line, label) {
@@ -412,9 +444,9 @@
   function renderTaskForm(t) {
     return '<form class="brief-inline-edit" data-form="task-edit" data-line="' + t.line + '">' +
       '<label class="eis-visually-hidden" for="edit-task-' + t.line + '">' + TEXT.editTaskLabel + "</label>" +
+      prioritySelect("edit-priority-" + t.line, t.priority, true) +
       '<input class="eis-input" id="edit-task-' + t.line + '" name="text" autocomplete="off" required value="' + esc(t.description) + '">' +
-      '<button class="eis-button eis-button--sm eis-button--black" type="submit">' + TEXT.save + "</button>" +
-      prioritySelect("edit-priority-" + t.line, t.priority, true) + "</form>";
+      '<button class="eis-button eis-button--sm eis-button--black" type="submit">' + TEXT.save + "</button></form>";
   }
 
   function renderNotes(t) {
@@ -425,12 +457,18 @@
           '<input class="eis-input" id="edit-note-' + n.line + '" name="note" autocomplete="off" required value="' + esc(n.text) + '">' +
           '<button class="eis-button eis-button--sm eis-button--black" type="submit">' + TEXT.save + "</button></form>"
         : '<p data-edit-note="' + n.line + '" title="' + TEXT.dblclick + '">' + MD.toHtml(n.text, links()) + "</p>";
-      return '<li class="brief-note">' +
+      var chip = n.action ? '<span class="eis-chip eis-chip--sm ' + (n.action === "done" ? "eis-chip--success" : n.action === "failed" ? "brief-chip-failed" : "eis-chip--solid") +
+        '">' + TEXT.action[n.action] + "</span> " : "";
+      if (chip && state.editNoteLine !== n.line) body = body.replace(/^(<p[^>]*>)/, "$1" + chip);
+      return '<li class="brief-note' + (n.action ? " brief-note--action" : "") + '">' +
         (n.date ? '<time class="eis-mono" datetime="' + n.date + '">' + F.shortDate(n.date) + "</time>" : "<span></span>") +
         "<div>" + body + "</div></li>";
     }).join("");
     var form = state.noteFormLine === t.line
       ? '<form class="brief-note-form" data-line="' + t.line + '">' +
+        // Turns the comment into an action for tasks-act (the 🤖 mark); flipped in place, so typed text stays.
+        (fmt().actionMark ? '<button class="brief-icon-button brief-action-toggle" type="button" data-action="note-ai" aria-pressed="false" title="' +
+          esc(TEXT.actionToggle) + '" aria-label="' + esc(TEXT.actionToggle) + '"><span aria-hidden="true">🤖</span></button>' : "") +
         '<label class="eis-visually-hidden" for="note-' + t.line + '">' + TEXT.noteLabel + "</label>" +
         '<input class="eis-input" id="note-' + t.line + '" name="note" autocomplete="off" required placeholder="' + esc(TEXT.notePlaceholder) + '">' +
         '<button class="eis-button eis-button--sm eis-button--ghost" type="button" data-action="note-cancel">' + TEXT.cancel + "</button>" +
@@ -451,6 +489,13 @@
       }
     });
     el("toolbar").addEventListener("submit", function (e) { e.preventDefault(); });
+    // Filters as the user types; only this page view, nothing is saved.
+    el("search").addEventListener("input", function (e) { state.search = e.target.value; render(); });
+    el("search").addEventListener("keydown", function (e) { if (e.key === "Escape") { e.target.value = ""; state.search = ""; render(); } });
+    el("add-task-open").addEventListener("click", function () {
+      closeForms(); state.addingTask = true; render();
+      var input = el("add-task-text"); if (input) input.focus();
+    });
 
     tasks.addEventListener("change", function (e) {
       if (!e.target.matches(".eis-checkbox")) return;
@@ -467,6 +512,14 @@
         case "task-open": closeForms(); state.addingTask = true; render(); focus("add-task-text"); break;
         case "task-cancel-it": edit(function () { return DM.setTaskCancelled(state.markdown, line, true, fmt()); }); break;
         case "task-reopen": edit(function () { return DM.setTaskCancelled(state.markdown, line, false, fmt()); }); break;
+        case "note-ai": {
+          var on = btn.getAttribute("aria-pressed") !== "true";
+          btn.setAttribute("aria-pressed", String(on));
+          var input = btn.form.elements.note;
+          input.placeholder = on ? TEXT.actionPlaceholder : TEXT.notePlaceholder;
+          input.focus();
+          break;
+        }
         case "note-cancel": case "task-cancel": closeForms(); render(); break;
       }
     });
@@ -515,7 +568,8 @@
       }
       if (!v("note").trim()) return;
       if (form.dataset.form === "note-edit") { edit(function () { return DM.editTaskNote(state.markdown, line, v("note"), fmt()); }); return; }
-      edit(function () { return DM.addTaskNote(state.markdown, line, today, v("note"), fmt()); });
+      var ai = form.querySelector('[data-action="note-ai"][aria-pressed="true"]') !== null;
+      edit(function () { return DM.addTaskNote(state.markdown, line, today, v("note"), fmt(), ai); });
     });
 
     el("setup-allow").addEventListener("click", function () {

@@ -257,3 +257,52 @@ test("inline: [[wikilinks]] become links only with a link builder", () => {
   assert.equal(MD.toHtml("[[A]]"), '<span class="brief-wikilink">A</span>');
   assert.equal(MD.toHtml("[[A]]", { wikiHref: () => "javascript:x", wikiTitle: () => "" }), '<span class="brief-wikilink">A</span>');
 });
+
+test("actions: 🤖 comments are instructions with a state; edits keep the mark", () => {
+  const note = [
+    "## Tasks",
+    "",
+    "**A**",
+    "- [ ] Specify the status button",
+    "    - 2026-10-29 - plain comment",
+    "    - 2026-10-29 - 🤖 /prod-specs-story Write the story",
+    "    - 2026-10-29 - 🤖✅ Make the mock",
+    "    - 2026-10-30 - Resultado: mock in Figma — [Figma](https://figma.com/x)",
+    "    - 2026-10-29 - 🤖⚠️ Watch the thread",
+    "    - 2026-10-29 - 🤖⏳ Being done",
+    ""
+  ].join("\n");
+  const [plain, pending, done, result, failed, running] = DM.parse(note).tasks[0].notes;
+  assert.equal(running.action, "running");
+  assert.equal(running.text, "Being done");
+  assert.equal(plain.kind, "note");
+  assert.equal(pending.kind, "action");
+  assert.equal(pending.action, "pending");
+  assert.equal(pending.text, "/prod-specs-story Write the story");
+  assert.equal(done.action, "done");
+  assert.equal(done.text, "Make the mock");
+  assert.equal(result.action, null);
+  assert.equal(failed.action, "failed");
+
+  const edited = DM.editTaskNote(note, pending.line, "/prod-specs-story Write the story and the mock");
+  assert.equal(edited.split("\n")[pending.line], "    - 2026-10-29 - 🤖 /prod-specs-story Write the story and the mock");
+  assert.equal(DM.editTaskNote(note, done.line, "Make the mock").split("\n")[done.line], "    - 2026-10-29 - 🤖✅ Make the mock");
+
+  assert.equal(DM.editTaskNote(note, failed.line, "Watch the thread daily").split("\n")[failed.line], "    - 2026-10-29 - 🤖 Watch the thread daily");
+
+  const added = DM.addTaskNote(note, 3, "2026-10-31", "Create a cron for the thread", undefined, true);
+  assert.equal(added.split("\n")[10], "    - 2026-10-31 - 🤖 Create a cron for the thread");
+  assert.equal(DM.addTaskNote(note, 3, "2026-10-31", "x").split("\n")[10], "    - 2026-10-31 - x");
+});
+
+test("actions: a format without action marks has none, and refuses to add one", () => {
+  const f = JSON.parse(JSON.stringify(require("../src/references/daily-format.json")));
+  delete f.tasks.comment.action;
+  const F = DM.compile(f);
+  const n = DM.parse("## Tasks\n\n- [ ] A\n    - 2026-10-29 - 🤖 do it\n", F).tasks[0].notes[0];
+  assert.equal(n.kind, "note");
+  assert.equal(n.text, "🤖 do it");
+  assert.throws(() => DM.addTaskNote("## Tasks\n\n- [ ] A\n", 2, "2026-10-29", "x", F, true));
+  f.tasks.comment.action = { pending: "🤖 ", running: "r", done: "🤖 ", failed: "x" };
+  assert.throws(() => DM.compile(f));
+});

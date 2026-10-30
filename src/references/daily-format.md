@@ -3,7 +3,8 @@
 How tasks are written in a daily note, as data: the section, the groups, the task lines, the date marks, the priority marks and the comments. One file is the contract between the two sides that touch the tasks:
 
 - `tasks-update` writes the tasks section by it;
-- the daily page reads, marks done or cancelled, adds and edits tasks, adds, edits and deletes comments, and sets priorities by it.
+- the daily page reads, marks done or cancelled, adds and edits tasks and comments (action comments for `tasks-act` included), and sets priorities by it;
+- `tasks-act` finds the action comments and records their results by it.
 
 The plugin's default is [`daily-format.json`](daily-format.json), next to this file: the format of `../skills/tasks-update/templates/daily.md`. A user with their own way of writing tasks keeps a `daily-format.json` in their workspace (`.eis-task-manager/daily-format.json`, see `config.md`); without one, the default applies. The schema is [`daily-format.schema.json`](daily-format.schema.json) (JSON Schema 2020-12). Same spirit as the W3C design tokens format: a small, versioned, declarative file that tools on both sides read.
 
@@ -30,6 +31,7 @@ Only the tasks section is described. The rest of the note (agenda, pending issue
 | `tasks.comment.indent` | Whitespace before a comment under a task. Any indent of 2+ spaces or a tab is read; this one is written. | 4 spaces |
 | `tasks.comment.prefix` | Start of a comment, after the indent. | `- ` |
 | `tasks.comment.line` | The rest of the comment, with `{text}` and optionally `{date}`. | `{date} - {text}` |
+| `tasks.comment.action` | Marks at the start of a comment that is an instruction for `tasks-act`: `pending` (to run), `running` (claimed by a run, so no other run takes it), `done` (run) and `failed`. Without it there are no action comments. | `🤖 `, `🤖⏳ `, `🤖✅ `, `🤖⚠️ ` |
 | `tasks.comment.closedPrefixes` | A comment starting with one of these (any case) is the evidence that closed the task. | `Fechada:`, `Fechado:`, `Closed:` |
 
 How a task line is read, in this order: the start (`open` or `done`), `newPrefix`, the date marks (each followed by a date in `dates.format`), the priority marks; what is left, split at the last source separator, is the description and the source.

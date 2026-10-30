@@ -94,6 +94,19 @@
 - **Colunas**: número antes do checkbox. Comentários e o campo de novo comentário ficam acima do "+ Comentário".
 - **Links das fontes**: `[[Nota]]` abre no Obsidian (`obsidian://open?vault=…&file=…`, caminho no tooltip) quando o `page-settings.js` traz `vault` (de `vault.path`). A página não lê o vault, então o link do Granola vem da nota: o `tasks-update` escreve `[[Nota]] · [Granola](url)` quando a nota de origem tem `granola_url` no frontmatter, e completa tarefas antigas que não têm.
 
+## 2026-10-29 — v0.12.0, ações para a IA nos comentários
+
+- **Comentário-ação**: um comentário que começa com 🤖 é uma instrução para a IA (`- 2026-10-29 - 🤖 /prod-specs-story Crie a história…`). A tarefa é o contexto. Vale qualquer coisa que a sessão saiba fazer: skill, plugin, connector, cron.
+- **Skill própria, `tasks-act`**: roda quando o usuário pede ou num agendamento. Fora do `tasks-update`, para o brief continuar só lendo e escrevendo a nota.
+- **Estado na própria nota**: 🤖 a executar, 🤖✅ executada, 🤖⚠️ falhou; abaixo, um comentário `Resultado: … — [links]` ou `Não executada: {motivo ou pergunta}`. Grava logo depois de cada ação, para uma execução interrompida não repetir o que já foi feito. Editar uma ação que falhou na página volta para 🤖 (nova tentativa).
+- **Segurança**: só o texto do comentário-ação é instrução; tarefa, fonte e tudo o que for lido ao agir são dados. O `tasks-update` nunca escreve um comentário começando com a marca, para que texto vindo de mensagens não vire ação. Ações sob tarefa feita ou cancelada não rodam. Sem pessoa na sessão (agendamento), dúvida vira falha com a pergunta, nunca palpite.
+- **Página**: botão 🤖 no campo de comentário liga "ação para a IA"; os comentários-ação aparecem com selo (A executar, Executada, Falhou). Formato ganhou a chave opcional `tasks.comment.action`.
+- **Trava contra execução dupla**: antes de executar, a ação vira 🤖⏳ e entra em `.eis-task-manager/act-state.json` com a hora de início; só depois roda. Outra sessão vê o ⏳ e pula. Um ⏳ com mais de 2 h (ou sem registro) é de uma execução que parou no meio: vira 🤖⚠️ para o usuário conferir, nunca roda de novo sozinho, porque pode ter feito metade.
+- **Pré-checagem sem LLM**: `skills/tasks-act/scripts/pending.py` lista as ações pendentes e as travadas; sem nada, imprime `{"wakeAgent": false}` e o agendador nem acorda o agente. Uso do autor: cron de hora em hora, 8h–22h, dias úteis.
+- **Página**: busca ao lado do Grupo filtra enquanto digita (texto, fonte, grupo e comentários; sem diferença de maiúsculas e acentos; Esc limpa). "+ Tarefa" saiu de cima das tabelas e foi para a linha das abas, à direita.
+- **Prioridade na edição** vira um seletor só com as marcas do formato (🔺 ⏫ 🔼 🔽 ⏬, do Obsidian Tasks), à esquerda do texto.
+- **Links para o Obsidian** no formato `obsidian://open?file=<nota>.md` (sem `vault`: abre no cofre aberto). Valem para `[[Nota]]` e para o caminho da daily no topo; esse caminho é montado com `folder` (`output.folder`), nova chave do `page-settings.js`.
+
 ## Pendente
 
 

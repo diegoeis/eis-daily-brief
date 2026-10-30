@@ -81,7 +81,19 @@
             "indent": { "description": "Indent written before a comment under a task.", "type": "string", "minLength": 1 },
             "prefix": { "description": "Start of a comment line, after the indent.", "type": "string", "minLength": 1 },
             "line": { "description": "The rest of the line. Must hold {text}; {date} is optional.", "type": "string", "pattern": "\\{text\\}" },
-            "closedPrefixes": { "description": "A comment that starts with one of these is the evidence that closed the task.", "type": "array", "items": { "type": "string", "minLength": 1 } }
+            "closedPrefixes": { "description": "A comment that starts with one of these is the evidence that closed the task.", "type": "array", "items": { "type": "string", "minLength": 1 } },
+            "action": {
+              "description": "Marks at the start of a comment that is an instruction for tasks-act: waiting, being run, run, failed. No action comments when missing.",
+              "type": "object",
+              "required": ["pending", "running", "done", "failed"],
+              "additionalProperties": false,
+              "properties": {
+                "pending": { "type": "string", "minLength": 1 },
+                "running": { "type": "string", "minLength": 1 },
+                "done": { "type": "string", "minLength": 1 },
+                "failed": { "type": "string", "minLength": 1 }
+              }
+            }
           }
         }
       }

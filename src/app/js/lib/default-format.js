@@ -61,7 +61,8 @@
           "Fechada:",
           "Fechado:",
           "Closed:"
-        ]
+        ],
+        "action": {"pending": "🤖 ", "running": "🤖⏳ ", "done": "🤖✅ ", "failed": "🤖⚠️ "}
       }
     }
   };
